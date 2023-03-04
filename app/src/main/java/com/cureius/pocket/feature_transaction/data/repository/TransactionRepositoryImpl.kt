@@ -1,0 +1,27 @@
+package com.cureius.pocket.feature_transaction.data.repository
+
+import com.cureius.pocket.feature_transaction.data.data_source.TransactionDao
+import com.cureius.pocket.feature_transaction.domain.model.Transaction
+import com.cureius.pocket.feature_transaction.domain.repository.TransactionRepository
+import kotlinx.coroutines.flow.Flow
+
+class TransactionRepositoryImpl(
+    private val dao: TransactionDao
+) : TransactionRepository {
+    override fun getTransactions(): Flow<List<Transaction>> {
+        return dao.getTransactions();
+    }
+
+    override suspend fun getTransactionById(id: Int): Transaction? {
+        return dao.getTransactionById(id)
+    }
+
+    override suspend fun insertTransaction(transaction: Transaction) {
+        return dao.insertTransaction(transaction)
+    }
+
+    override suspend fun deleteTransaction(transaction: Transaction) {
+        return dao.deleteTransaction(transaction)
+    }
+
+}

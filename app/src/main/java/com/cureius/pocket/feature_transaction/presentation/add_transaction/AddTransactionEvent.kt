@@ -1,0 +1,23 @@
+package com.cureius.pocket.feature_transaction.presentation.add_transaction
+
+import androidx.compose.ui.focus.FocusState
+
+sealed class AddTransactionEvent {
+    data class EnteredType(val value: String) : AddTransactionEvent()
+    data class ChangeTypeFocus(val focusState: FocusState) : AddTransactionEvent()
+
+    data class EnteredAccount(val value: String) : AddTransactionEvent()
+    data class ChangeAccountFocus(val focusState: FocusState) : AddTransactionEvent()
+
+    data class EnteredAmount(val value: Double) : AddTransactionEvent()
+    data class ChangeAmountFocus(val focusState: FocusState) : AddTransactionEvent()
+
+    data class EnteredDate(val value: Long) : AddTransactionEvent()
+    data class ChangeDateFocus(val focusState: FocusState) : AddTransactionEvent()
+
+    data class EnteredBalance(val value: Double) : AddTransactionEvent()
+    data class ChangeBalanceFocus(val focusState: FocusState) : AddTransactionEvent()
+
+    data class ChangeColor(val color: Int) : AddTransactionEvent()
+    object SaveTransaction : AddTransactionEvent()
+}
