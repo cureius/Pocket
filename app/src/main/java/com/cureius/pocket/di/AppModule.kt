@@ -40,6 +40,7 @@ object AppModule {
             getTransaction = GetTransaction(repository),
             deleteTransaction = DeleteTransaction(repository),
             addTransaction = AddTransaction(repository),
+            addTransactions = AddTransactions(repository),
             getTransactions = GetTransactions(repository)
         )
     }

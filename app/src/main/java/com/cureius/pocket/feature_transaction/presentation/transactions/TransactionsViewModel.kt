@@ -1,6 +1,7 @@
 package com.cureius.pocket.feature_transaction.presentation.transactions
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -24,6 +25,21 @@ class TransactionsViewModel @Inject constructor(
     val state: State<TransactionsState> = _state
     private var recentlyDeletedTransaction: Transaction? = null
     private var getTransactionsJob: Job? = null
+
+    val visiblePermissionDialogQueue = mutableStateListOf<String>()
+
+    fun dismissDialog() {
+        visiblePermissionDialogQueue.removeFirst()
+    }
+
+    fun onPermissionResult(
+        permission: String,
+        isGranted: Boolean
+    ) {
+        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
+            visiblePermissionDialogQueue.add(permission)
+        }
+    }
 
     init {
         getTransactions()

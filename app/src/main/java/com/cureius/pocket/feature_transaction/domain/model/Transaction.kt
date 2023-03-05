@@ -19,6 +19,8 @@ data class Transaction(
     val IMPS_ref: String? = null,
     val card_number: String? = null,
     val place: String? = null,
+    val bank: String? = null,
+    val body: String? = null,
     val latitude: Double? = null,
     val longitude: Double? = null,
     /*----------For-Flow-Tracking---------*/
@@ -28,7 +30,7 @@ data class Transaction(
     val expense_type: String? = null,
     /*--------------For-DB----------------*/
     val timestamp: Long,
-    @PrimaryKey val id: Int? = null
+    @PrimaryKey val id: Long? = null
 
 ) {
     companion object {

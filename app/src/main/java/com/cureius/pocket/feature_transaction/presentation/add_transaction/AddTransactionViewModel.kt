@@ -58,10 +58,13 @@ class AddTransactionViewModel @Inject constructor(
     private val _transactionColor = mutableStateOf(Transaction.transactionColors.random().toArgb())
     val transactionColor: State<Int> = _transactionColor
 
+    private val _transactionsList = mutableStateOf(listOf<Transaction>())
+    val transactionsList: State<List<Transaction>> = _transactionsList
+
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
-    private var currentTransactionId: Int? = null
+    private var currentTransactionId: Long? = null
 
     sealed class UiEvent {
         data class ShowSnackBar(val message: String) : UiEvent()
@@ -156,7 +159,25 @@ class AddTransactionViewModel @Inject constructor(
                 )
             }
 
-
+            is AddTransactionEvent.EnteredTransactionsList -> {
+                _transactionsList.value = transactionsList.value + event.value
+            }
+            is AddTransactionEvent.SaveAllTransactions -> {
+                viewModelScope.launch {
+                    try {
+                        transactionUseCases.addTransactions(
+                            transactionsList.value
+                        )
+                        _eventFlow.emit(UiEvent.SaveTransaction)
+                    } catch (e: InvalidTransactionException) {
+                        _eventFlow.emit(
+                            UiEvent.ShowSnackBar(
+                                message = e.message ?: "Cant Save Transaction"
+                            )
+                        )
+                    }
+                }
+            }
             is AddTransactionEvent.ChangeColor -> {
                 _transactionColor.value = event.color
             }
