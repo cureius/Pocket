@@ -2,9 +2,9 @@ package com.cureius.pocket.feature_transaction.presentation.transactions
 
 import android.Manifest
 import android.app.Activity
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -24,8 +24,8 @@ import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionEvent
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
+import com.cureius.pocket.feature_transaction.presentation.transactions.components.OrderSection
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.TransactionItem
 import com.cureius.pocket.feature_transaction.presentation.util.Screen
 import com.cureius.pocket.feature_transaction.presentation.util.components.CameraPermissionTextProvider
@@ -95,13 +95,24 @@ fun TransactionsScreen(
                     text = "Your Transactions", style = MaterialTheme.typography.h4
                 )
                 IconButton(onClick = {
-//                    cameraPermissionResultLauncher.launch(Manifest.permission.READ_SMS)
-//                    multiplePermissionResultLauncher.launch(permissionsToRequest)
-                    addViewModel.onEvent(AddTransactionEvent.SaveAllTransactions)
-                    Toast.makeText(navController?.context, "Starting sync", Toast.LENGTH_SHORT)
-                        .show()
+                    viewModel?.onEvent(TransactionsEvent.ToggleOrderSection)
                 }) {
-                    Icon(imageVector = Icons.Default.Download, contentDescription = "Sync")
+                    Icon(imageVector = Icons.Default.Sort, contentDescription = "Sort")
+                }
+            }
+            if (state != null) {
+                AnimatedVisibility(
+                    visible = state.isOrderSelectionVisible,
+                    enter = fadeIn() + slideInVertically(),
+                    exit = fadeOut() + slideOutVertically()
+                ) {
+                    OrderSection(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                        transactionOrder = state.transactionOrder,
+                        onOrderChange = {
+                            viewModel.onEvent(TransactionsEvent.Order(it))
+                        })
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))

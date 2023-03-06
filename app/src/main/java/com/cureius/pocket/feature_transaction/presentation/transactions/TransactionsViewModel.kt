@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
+import com.cureius.pocket.feature_transaction.domain.util.OrderType
+import com.cureius.pocket.feature_transaction.domain.util.TransactionOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -42,11 +44,19 @@ class TransactionsViewModel @Inject constructor(
     }
 
     init {
-        getTransactions()
+        getTransactions(TransactionOrder.Date(OrderType.Descending))
     }
 
     fun onEvent(event: TransactionsEvent) {
         when (event) {
+            is TransactionsEvent.Order -> {
+                if (state.value.transactionOrder::class == event.transactionOrder::class &&
+                    state.value.transactionOrder.orderType == event.transactionOrder.orderType
+                ) {
+                    return
+                }
+                getTransactions(event.transactionOrder)
+            }
             is TransactionsEvent.DeleteTransaction -> {
                 viewModelScope.launch {
                     transactionUseCases.deleteTransaction(event.transaction)
@@ -59,15 +69,21 @@ class TransactionsViewModel @Inject constructor(
                     recentlyDeletedTransaction = null
                 }
             }
+            is TransactionsEvent.ToggleOrderSection -> {
+                _state.value = state.value.copy(
+                    isOrderSelectionVisible = !state.value.isOrderSelectionVisible
+                )
+            }
 
         }
     }
 
-    private fun getTransactions() {
+    private fun getTransactions(transactionOrder: TransactionOrder) {
         getTransactionsJob?.cancel()
-        getTransactionsJob = transactionUseCases.getTransactions().onEach { transactions ->
+        getTransactionsJob = transactionUseCases.getTransactions(transactionOrder).onEach { transactions ->
             _state.value = state.value.copy(
                 transactions = transactions,
+                transactionOrder= transactionOrder
             )
         }.launchIn(viewModelScope)
     }
