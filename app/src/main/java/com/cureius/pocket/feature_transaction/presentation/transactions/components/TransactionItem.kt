@@ -67,7 +67,7 @@ fun TransactionItem(
             Text(
                 text = transaction.type,
                 style = MaterialTheme.typography.h6,
-                color = MaterialTheme.colors.onSurface,
+                color = Color.Black,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
@@ -75,7 +75,15 @@ fun TransactionItem(
             Text(
                 text = transaction.amount.toString(),
                 style = MaterialTheme.typography.body1,
-                color = MaterialTheme.colors.onSurface,
+                color = Color.Blue,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = transaction.body.toString(),
+                style = MaterialTheme.typography.body1,
+                color = Color.Gray,
                 maxLines = 10,
                 overflow = TextOverflow.Ellipsis
             )
