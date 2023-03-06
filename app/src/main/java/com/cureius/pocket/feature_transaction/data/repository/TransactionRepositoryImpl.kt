@@ -12,7 +12,7 @@ class TransactionRepositoryImpl(
         return dao.getTransactions();
     }
 
-    override suspend fun getTransactionById(id: Int): Transaction? {
+    override suspend fun getTransactionById(id: Long): Transaction? {
         return dao.getTransactionById(id)
     }
 

@@ -6,7 +6,7 @@ import com.cureius.pocket.feature_transaction.domain.repository.TransactionRepos
 class GetTransaction(
     private val repository: TransactionRepository
 ) {
-    suspend operator fun invoke(id: Int): Transaction? {
+    suspend operator fun invoke(id: Long): Transaction? {
         return repository.getTransactionById(id)
     }
 }

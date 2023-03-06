@@ -22,7 +22,7 @@
         android:theme="@style/Theme.Pocket"
         tools:targetApi="31">
         <activity
-            android:name="com.cureius.pocket.feature_transaction.presentation.MainActivity"
+            android:name="com.cureius.pocket.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Pocket">
