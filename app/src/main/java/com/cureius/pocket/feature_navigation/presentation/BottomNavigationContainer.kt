@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,9 +29,11 @@ import com.cureius.pocket.R
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun BottomNavigationContainer(){
+fun BottomNavigationContainer(
+    navController: NavHostController,
+) {
     // A surface container using the 'background' color from the theme
-    val navController = rememberNavController()
+    val bottomNavController = rememberNavController()
     val shape = RoundedCornerShape(
         topStart = 20.dp,
         topEnd = 20.dp,
@@ -66,9 +70,9 @@ fun BottomNavigationContainer(){
                         icon = account,
                     ),
                 ),
-                navController = navController,
+                navController = bottomNavController,
                 onItemClick = {
-                    navController.navigate(it.route)
+                    bottomNavController.navigate(it.route)
                 },
                 modifier = Modifier
                     .height(60.dp)
@@ -81,7 +85,7 @@ fun BottomNavigationContainer(){
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate(Screen.AddTransactionScreen.route)
+                    navController?.navigate("activity")
                 }, backgroundColor = MaterialTheme.colors.primary
             ) {
                 Icon(
@@ -92,7 +96,7 @@ fun BottomNavigationContainer(){
             }
         },
     ) {
-        BottomNavigationController(navController = navController)
+        BottomNavigationController(navController = navController, bottomNavHostController = bottomNavController)
     }
 }
 
@@ -129,7 +133,6 @@ fun HomeScreen() {
         }
     }
 }
-
 
 
 @Composable

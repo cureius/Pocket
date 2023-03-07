@@ -10,11 +10,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.DashBoardHeader
 
-@Preview
 @Composable
-fun DashboardScreen() {
+fun DashboardScreen(navHostController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -27,7 +27,7 @@ fun DashboardScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
-            DashBoardHeader()
+            DashBoardHeader(navHostController)
             val shape = RoundedCornerShape(
                 topStart = 24.dp,
                 topEnd = 24.dp,

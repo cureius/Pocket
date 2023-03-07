@@ -11,11 +11,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.cureius.pocket.R
 
-@Preview
 @Composable
-fun DashBoardHeader() {
+fun DashBoardHeader(navHostController: NavHostController) {
     Row(
         modifier = Modifier
             .height(112.dp)
@@ -28,14 +28,17 @@ fun DashBoardHeader() {
         val activity = ImageVector.vectorResource(id =R.drawable.notification)
 
         RoundIconButton(icon = profile, label = "Profile", onClick = {
+            navHostController.navigate("profile")
         })
 
         Row() {
 
             RoundIconButton(icon = wallet, label = "Wallet", onClick = {
+                navHostController.navigate("wallet")
             })
 
             RoundIconButton(icon = activity, label = "Activity", onClick = {
+                navHostController.navigate("activity")
             })
         }
 

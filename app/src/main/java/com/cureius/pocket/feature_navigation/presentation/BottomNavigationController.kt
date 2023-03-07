@@ -4,15 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.cureius.pocket.feature_account.presentation.account.AccountsScreen
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashboardScreen
 import com.cureius.pocket.feature_pot.presentation.pots.PotsScreen
 
 @Composable
-fun BottomNavigationController(navController: NavHostController) {
-        NavHost(navController = navController, startDestination = "home") {
+fun BottomNavigationController(navController: NavHostController, bottomNavHostController: NavHostController) {
+    NavHost(navController = bottomNavHostController, startDestination = "home") {
             composable("home") {
-                DashboardScreen()
+                DashboardScreen(navController)
             }
             composable("records") {
                 RecordsScreen()
