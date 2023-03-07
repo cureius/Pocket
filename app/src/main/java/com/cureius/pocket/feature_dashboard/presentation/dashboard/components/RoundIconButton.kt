@@ -23,13 +23,13 @@ fun RoundIconButton(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceEvenly,
-        modifier = Modifier.padding(8.dp, 4.dp, 8.dp, 4.dp)
+        modifier = Modifier.padding(8.dp, 4.dp, 8.dp, 0.dp)
     ) {
         Box(
             modifier = Modifier
                 .background(MaterialTheme.colors.primary.copy(alpha = 0.2F), CircleShape)
-                .height(52.dp)
-                .width(52.dp),
+                .height(40.dp)
+                .width(40.dp),
             contentAlignment = Alignment.Center
         ) {
             IconButton(onClick = onClick) {

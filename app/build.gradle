@@ -91,4 +91,8 @@ dependencies {
     // Material Icon Set
     implementation "androidx.compose.material:material-icons-extended:$compose_ui_version"
 
+    // GIF Composable
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.21'
+    implementation "com.airbnb.android:lottie-compose:4.1.0"
+
 }

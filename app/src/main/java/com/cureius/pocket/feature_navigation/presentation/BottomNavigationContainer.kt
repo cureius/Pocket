@@ -85,7 +85,7 @@ fun BottomNavigationContainer(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController?.navigate("activity")
+                    navController.navigate("activity")
                 }, backgroundColor = MaterialTheme.colors.primary
             ) {
                 Icon(
@@ -96,13 +96,15 @@ fun BottomNavigationContainer(
             }
         },
     ) {
-        BottomNavigationController(navController = navController, bottomNavHostController = bottomNavController)
+        BottomNavigationController(
+            navController = navController,
+            bottomNavHostController = bottomNavController
+        )
     }
 }
 
-
 @Composable
-fun HomeScreen() {
+fun RecordsScreen() {
     Surface(
         color = MaterialTheme.colors.background,
     ) {
@@ -131,16 +133,5 @@ fun HomeScreen() {
                 )
             }
         }
-    }
-}
-
-
-@Composable
-fun RecordsScreen() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "Records screen")
     }
 }

@@ -19,7 +19,7 @@ fun DashBoardHeader(navHostController: NavHostController) {
     Row(
         modifier = Modifier
             .height(112.dp)
-            .padding(36.dp, 16.dp, 36.dp, 16.dp)
+            .padding(28.dp, 16.dp, 28.dp, 0.dp)
             .fillMaxSize(),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
