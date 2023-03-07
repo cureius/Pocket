@@ -36,7 +36,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun TransactionsScreen(
-    navController: NavController?, viewModel: TransactionsViewModel? = hiltViewModel(), addViewModel: AddTransactionViewModel = hiltViewModel()
+    navController: NavController?,
+    viewModel: TransactionsViewModel? = hiltViewModel(),
+    addViewModel: AddTransactionViewModel = hiltViewModel()
 ) {
     val state = viewModel?.state?.value
     val scaffoldState = rememberScaffoldState()
@@ -75,11 +77,13 @@ fun TransactionsScreen(
             FloatingActionButton(
                 onClick = {
                     navController?.navigate(Screen.AddTransactionScreen.route)
-                }, backgroundColor = MaterialTheme.colors.primary
+                },
+                backgroundColor = MaterialTheme.colors.primary,
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Transaction")
             }
-        }, scaffoldState = scaffoldState
+        },
+        scaffoldState = scaffoldState,
     ) {
         Column(
             modifier = Modifier

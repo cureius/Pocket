@@ -13,3 +13,20 @@ val RedPink = Color(0xfff48fb1)
 val BabyBlue = Color(0xff81deea)
 val Violet = Color(0xffcf94da)
 val LightGreen = Color(0xffe7ed9b)
+
+/*-----------Common-Colors--------------*/
+val White = Color(0xffffffff)
+val Black = Color(0xff000000)
+
+/*-----------Light-Colors--------------*/
+val Gray200 = Color(0xffF1F1F1)
+val Indigo500 = Color(0xff5C5FC8)
+val Gray600 = Color(0xff6E6E6E)
+
+/*-----------Dark-Colors--------------*/
+val Gray900 = Color(0xff141414)
+val Gray800 = Color(0xff303030)
+val BlueA200 = Color(0xff7F85F5)
+val Gray500 = Color(0xff919191)
+val Gray300 = Color(0xffE1E1E1)
+val Lime100 = Color(0xffFDEFCA)

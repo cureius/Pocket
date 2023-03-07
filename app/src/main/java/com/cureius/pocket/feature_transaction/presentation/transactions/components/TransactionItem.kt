@@ -65,7 +65,7 @@ fun TransactionItem(
                 .padding(end = 32.dp)
         ) {
             Text(
-                text = transaction.type,
+                text = transaction.type.uppercase(),
                 style = MaterialTheme.typography.h6,
                 color = Color.Black,
                 maxLines = 1,

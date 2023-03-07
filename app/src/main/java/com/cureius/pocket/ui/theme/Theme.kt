@@ -5,32 +5,46 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 
-private val DarkColorPalette = darkColors(
-    primary = Purple200,
-    primaryVariant = Purple700,
-    secondary = Teal200
+private val LightColorPalette = darkColors(
+    primary = Indigo500,
+    primaryVariant = Indigo500,
+    secondary = Lime100,
+
+//     Other default colors to override
+    background = Gray200,
+    surface = Gray300,
+    onPrimary = White,
+    onSecondary = Gray800,
+    onBackground = Black,
+    onSurface = Gray900,
 )
 
-private val LightColorPalette = lightColors(
-    primary = Purple500,
-    primaryVariant = Purple700,
-    secondary = Teal200
+private val DarkColorPalette = lightColors(
+    primary = BlueA200,
+    primaryVariant = BlueA200,
+    secondary = Lime100,
 
-    /* Other default colors to override
-    background = Color.White,
-    surface = Color.White,
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black,
-    */
+//     Other default colors to override
+    background = Gray900,
+    surface = Gray800,
+    onPrimary = Gray900,
+    onSecondary = Gray900,
+    onBackground = Gray300,
+    onSurface = Gray500,
+
 )
 
 @Composable
 fun PocketTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+    val colors = if (darkTheme) {
+        DarkColorPalette
+    } else {
+        LightColorPalette
+    }
     MaterialTheme(
-        colors = DarkColorPalette,
+        colors = colors,
         typography = Typography,
         shapes = Shapes,
         content = content
