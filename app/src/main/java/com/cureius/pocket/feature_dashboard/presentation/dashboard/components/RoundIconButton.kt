@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.dp
 fun RoundIconButton(
     icon: ImageVector,
     label: String,
+    modifier: Modifier = Modifier,
+    iconColor: Color = MaterialTheme.colors.onBackground,
     onClick: () -> Unit
 ) {
     Column(
@@ -26,17 +28,14 @@ fun RoundIconButton(
         modifier = Modifier.padding(8.dp, 4.dp, 8.dp, 0.dp)
     ) {
         Box(
-            modifier = Modifier
-                .background(MaterialTheme.colors.primary.copy(alpha = 0.2F), CircleShape)
-                .height(40.dp)
-                .width(40.dp),
+            modifier = modifier,
             contentAlignment = Alignment.Center
         ) {
             IconButton(onClick = onClick) {
                 Icon(
                     imageVector = icon,
                     contentDescription = label,
-                    tint = MaterialTheme.colors.onBackground
+                    tint = iconColor
                 )
             }
         }

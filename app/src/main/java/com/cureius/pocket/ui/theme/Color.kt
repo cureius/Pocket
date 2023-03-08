@@ -17,6 +17,9 @@ val LightGreen = Color(0xffe7ed9b)
 /*-----------Common-Colors--------------*/
 val White = Color(0xffffffff)
 val Black = Color(0xff000000)
+val Green = Color(0xff7CFC00)
+val Orange = Color(0xffffbf57)
+val Purple = Color(0xff6831A6)
 
 /*-----------Light-Colors--------------*/
 val Gray200 = Color(0xffF1F1F1)
