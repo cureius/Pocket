@@ -13,9 +13,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@Preview
 @Composable
 fun IncomeCreditPrompt(){
     val buttonShape = RoundedCornerShape(
@@ -68,15 +70,15 @@ fun IncomeCreditPrompt(){
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.Yellow.copy(alpha = 0.9f), buttonShape),
+                    .background(MaterialTheme.colors.background.copy(alpha = 0.9f), buttonShape),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "$1,80,000.00",
-                    color = MaterialTheme.colors.error,
+                    text = "$1,80,000",
+                    color = MaterialTheme.colors.onBackground.copy(green = 0.8f, red = 0f, blue = 0f),
                     textAlign = TextAlign.Center,
                     style = TextStyle(fontWeight = FontWeight.Bold),
-                    fontSize = 18.sp
+                    fontSize = 20.sp
                 )
             }
         }

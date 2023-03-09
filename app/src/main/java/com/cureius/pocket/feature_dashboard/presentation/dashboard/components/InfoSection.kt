@@ -10,20 +10,35 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cureius.pocket.R
+
+
+fun Modifier.vertical() =
+    layout { measurable, constraints ->
+        val placeable = measurable.measure(constraints)
+        layout(placeable.height, placeable.width) {
+            placeable.place(
+                x = -(placeable.width / 2 - placeable.height / 2),
+                y = -(placeable.height / 2 - placeable.width / 2)
+            )
+        }
+    }
 
 @Preview
 @Composable
@@ -34,18 +49,24 @@ fun InfoSection() {
         bottomStart = 24.dp,
         bottomEnd = 24.dp
     )
+    val mtdShape = RoundedCornerShape(
+        topStart = 0.dp,
+        topEnd = 0.dp,
+        bottomStart = 24.dp,
+        bottomEnd = 0.dp
+    )
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(136.dp)
+            .height(140.dp)
             .padding(16.dp, 0.dp, 16.dp, 0.dp),
     ) {
         Box(
             modifier = Modifier
                 .background(MaterialTheme.colors.primary.copy(alpha = 0.2f), shape)
                 .fillMaxWidth()
-                .padding(8.dp)
-                .height(104.dp)
+                .padding(8.dp, 8.dp, 8.dp, 0.dp)
+                .height(108.dp)
         ) {
             Row(modifier = Modifier.fillMaxSize()) {
                 Column(modifier = Modifier.fillMaxWidth(0.7f)) {
@@ -55,8 +76,26 @@ fun InfoSection() {
                             .fillMaxWidth(0.9f),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(text = "Total Balance")
-                        Text(text = "$5,000.00", color = MaterialTheme.colors.primaryVariant)
+                        Text(
+                            text = "You Have",
+                            color = MaterialTheme.colors.onBackground,
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(fontWeight = FontWeight.Bold),
+                            fontSize = 16.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(0.dp, 0.dp)
+                        )
+                        Text(
+                            text = "$1,50,000",
+                            color = MaterialTheme.colors.secondary,
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(fontWeight = FontWeight.Bold),
+                            fontSize = 20.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(0.dp, 0.dp)
+                        )
                     }
                     Canvas(
                         modifier = Modifier
@@ -73,22 +112,88 @@ fun InfoSection() {
                             )
                         )
                     }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "$ 5,000.00", color = MaterialTheme.colors.primaryVariant)
-                            Text(text = "Income")
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box {
+                            Box(
+                                modifier = Modifier
+                                    .offset(x = (-8).dp, y = (0).dp)
+                                    .background(
+                                        MaterialTheme.colors.primary.copy(alpha = 0.1f),
+                                        mtdShape
+                                    )
+                                    .fillMaxHeight()
+                                    .width(24.dp),
+                            )
+                            Text(
+                                modifier = Modifier
+                                    .vertical()
+                                    .rotate(-90f)
+                                    .offset(y = (-8).dp)
+                                    .padding(2.dp, 0.dp, 8.dp, 2.dp),
+                                text = "MTD",
+                                style = TextStyle(fontWeight = FontWeight.Light),
+                                color = MaterialTheme.colors.background,
+                                textAlign = TextAlign.Center,
+                                fontSize = 13.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
                         }
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "$ 5,000.00", color = MaterialTheme.colors.primaryVariant)
-                            Text(text = "Spent")
-                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(vertical = 0.dp, horizontal = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "$ 20,000",
+                                    color = MaterialTheme.colors.primaryVariant,
+                                    textAlign = TextAlign.Center,
+                                    style = TextStyle(fontWeight = FontWeight.Bold),
+                                    fontSize = 14.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(0.dp, 0.dp)
+                                )
+                                Text(
+                                    text = "INCOME",
+                                    color = MaterialTheme.colors.onSurface,
+                                    textAlign = TextAlign.Center,
+                                    style = TextStyle(fontWeight = FontWeight.Bold),
+                                    fontSize = 14.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(0.dp, 0.dp)
+                                )
+                            }
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "$ 5,000",
+                                    color = MaterialTheme.colors.primaryVariant,
+                                    textAlign = TextAlign.Center,
+                                    style = TextStyle(fontWeight = FontWeight.Bold),
+                                    fontSize = 14.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(0.dp, 0.dp)
+                                )
+                                Text(
+                                    text = "SPENT",
+                                    color = MaterialTheme.colors.onSurface,
+                                    textAlign = TextAlign.Center,
+                                    style = TextStyle(fontWeight = FontWeight.Bold),
+                                    fontSize = 14.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(0.dp, 0.dp)
+                                )
+                            }
 
+                        }
                     }
+
                 }
                 Box(
                     modifier = Modifier
@@ -96,15 +201,15 @@ fun InfoSection() {
                         .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column (
+                    Column(
                         horizontalAlignment = Alignment.CenterHorizontally
-                            ){
+                    ) {
                         val pngImage: Painter = painterResource(id = R.drawable.sc2)
                         Image(
                             painter = pngImage,
-                            contentDescription = "Scan To Pay",
+                            contentDescription = "Scan & Pay",
                             modifier = Modifier
-                                .size(92.dp),
+                                .size(90.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
                         )
                         Text(

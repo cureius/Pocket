@@ -6,7 +6,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -22,36 +21,113 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_dashboard.domain.PotType
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.*
+import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
+import com.cureius.pocket.feature_pot.presentation.pots.components.PotItem
 import com.cureius.pocket.util.ScreenDimensions
 
 @Composable
 fun DashboardScreen(navHostController: NavHostController) {
-    val buttonShape = RoundedCornerShape(
-        topStart = 12.dp,
-        topEnd = 12.dp,
-        bottomStart = 12.dp,
-        bottomEnd = 12.dp
+    val save = ImageVector.vectorResource(id = R.drawable.save)
+    val wallet = ImageVector.vectorResource(id = R.drawable.wallet)
+    val emi = ImageVector.vectorResource(id = R.drawable.coins)
+    val invest = ImageVector.vectorResource(id = R.drawable.shop)
+    val add = ImageVector.vectorResource(id = R.drawable.add)
+
+    val food = ImageVector.vectorResource(id = R.drawable.food)
+    val entertainment = ImageVector.vectorResource(id = R.drawable.food)
+    val travel = ImageVector.vectorResource(id = R.drawable.travel)
+    val house = ImageVector.vectorResource(id = R.drawable.home)
+    val fuel = ImageVector.vectorResource(id = R.drawable.fuel)
+    val health = ImageVector.vectorResource(id = R.drawable.health)
+    val shopping = ImageVector.vectorResource(id = R.drawable.shopping)
+    val grocery = ImageVector.vectorResource(id = R.drawable.shop)
+
+    val gridItems = listOf(
+        CategoryItem(
+            icon = food,
+            name = "Food",
+            fill = 0.4,
+        ),
+        CategoryItem(
+            icon = entertainment,
+            name = "Fun",
+            fill = 0.7,
+        ),
+        CategoryItem(
+            icon = travel,
+            name = "Travel",
+            fill = 0.2,
+        ),
+        CategoryItem(
+            icon = house,
+            name = "House",
+            fill = 0.8,
+        ),
+        CategoryItem(
+            icon = fuel,
+            name = "Fuel",
+            fill = 0.3,
+        ),
+        CategoryItem(
+            icon = health,
+            name = "Health",
+            fill = 0.4,
+        ),
+        CategoryItem(
+            icon = shopping,
+            name = "Shopping",
+            fill = 1.0,
+        ),
+        CategoryItem(
+            icon = grocery,
+            name = "Grocery",
+            fill = 0.8,
+        ),
+        CategoryItem(
+            adder = true
+        ),
     )
-    val gridItems = listOf<String>(
-        "Food",
-        "Entertainment",
-        "Travel",
-        "Home",
-        "Subscription",
-        "Cash",
-        "Self Care",
-        "add"
-    )
-    val potItems = listOf<String>(
-        "Savings",
-        "Wallet",
-        "EMI",
-        "Investment",
+    val potItems = listOf(
+        PotItem(
+            icon = save,
+            name = "Savings",
+            capacity = 100.0,
+            fill = 0.8,
+            type = PotType.Asset
+        ),
+        PotItem(
+            icon = wallet,
+            name = "Wallet",
+            capacity = 100.0,
+            fill = 0.5,
+            type = PotType.Liability
+        ),
+        PotItem(
+            icon = emi,
+            name = "EMI",
+            capacity = 100.0,
+            fill = 0.6,
+            type = PotType.Liability
+        ),
+        PotItem(
+            icon = invest,
+            name = "Investment",
+            capacity = 100.0,
+            fill = 0.7,
+            type = PotType.Asset
+        )
     )
     val size = ScreenDimensions()
     val screenWeight = size.width()
-    val add = ImageVector.vectorResource(id = R.drawable.add)
+    val rowCap = (screenWeight / 76)
+    val rowNumber = if ((gridItems.size % rowCap) == 0) {
+        gridItems.size / rowCap
+    } else {
+        (gridItems.size / rowCap) + 1
+    }
+    val startPadding = ((screenWeight - (rowCap * 80)) / 2)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,7 +167,7 @@ fun DashboardScreen(navHostController: NavHostController) {
             item {
                 LazyRow(
                     modifier = Modifier
-                        .height(128.dp),
+                        .height(144.dp),
                     contentPadding = PaddingValues(
                         start = 0.dp,
                         top = 16.dp,
@@ -132,25 +208,8 @@ fun DashboardScreen(navHostController: NavHostController) {
 
                         Spacer(modifier = Modifier.width(16.dp))
                     }
-                    items(potItems){ item ->
-                        Box(
-                            modifier = Modifier
-                                .width(76.dp)
-                                .height(124.dp)
-                                .background(MaterialTheme.colors.surface, buttonShape)
-                                .padding(8.dp)
-                        ) {
-                            Text(
-                                text = item,
-                                color = MaterialTheme.colors.error,
-                                textAlign = TextAlign.Center,
-                                style = TextStyle(fontWeight = FontWeight.Bold),
-                                fontSize = 14.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
+                    items(potItems) { item ->
+                        PotItem(item.icon, item.fill, item.name, item.type)
                     }
                 }
             }
@@ -167,13 +226,7 @@ fun DashboardScreen(navHostController: NavHostController) {
                     modifier = Modifier.padding(4.dp, 0.dp)
                 )
             }
-
-            val rowCap = (screenWeight / 76)
-            val rowNumber = if ((gridItems.size % rowCap) == 0) {
-                gridItems.size / rowCap
-            } else {
-                (gridItems.size / rowCap) + 1
-            }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
             (1..rowNumber).forEach {
                 item {
                     ItemRow(
@@ -184,7 +237,8 @@ fun DashboardScreen(navHostController: NavHostController) {
                             } else {
                                 (rowCap * (it - 1)) + rowCap
                             }
-                        )
+                        ),
+                        modifier = Modifier.padding(startPadding.dp)
                     )
                 }
             }

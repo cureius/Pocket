@@ -28,7 +28,7 @@ private val DarkColorPalette = lightColors(
 
 //     Other default colors to override
     background = Black,
-    surface = Gray900,
+    surface = Gray800,
     onPrimary = Gray900,
     onSecondary = Gray900,
     onBackground = Gray300,

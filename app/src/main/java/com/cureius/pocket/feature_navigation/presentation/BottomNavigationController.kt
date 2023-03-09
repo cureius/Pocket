@@ -11,7 +11,7 @@ import com.cureius.pocket.feature_pot.presentation.pots.PotsScreen
 
 @Composable
 fun BottomNavigationController(navController: NavHostController, bottomNavHostController: NavHostController) {
-    NavHost(navController = bottomNavHostController, startDestination = "accounts") {
+    NavHost(navController = bottomNavHostController, startDestination = "home") {
             composable("home") {
                 DashboardScreen(navController)
             }
