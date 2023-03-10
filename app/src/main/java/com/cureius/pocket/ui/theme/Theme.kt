@@ -33,7 +33,6 @@ private val DarkColorPalette = lightColors(
     onSecondary = Gray900,
     onBackground = Gray300,
     onSurface = Gray500,
-
 )
 
 @Composable

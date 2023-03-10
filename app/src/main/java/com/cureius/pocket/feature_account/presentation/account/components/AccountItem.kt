@@ -29,7 +29,12 @@ import com.cureius.pocket.R
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 
 @Composable
-fun AccountItem (){
+fun AccountItem(
+    bankName: String,
+    cardNumber: String,
+    accountNumber: String,
+    holderName: String
+) {
     val paddingModifier = Modifier
         .padding(10.dp)
         .fillMaxWidth()
@@ -65,7 +70,7 @@ fun AccountItem (){
                     Spacer(modifier = Modifier.width(4.dp))
                     Column() {
                         Text(
-                            text = "United Bank Of India",
+                            text = bankName,
                             color = Color.Black,
                             textAlign = TextAlign.Center,
                             style = TextStyle(fontWeight = FontWeight.Bold),
@@ -100,7 +105,13 @@ fun AccountItem (){
                     )
                     Column {
                         Text(
-                            text = "XXXX XXXX XXXX 0286",
+                            text = "XXXX XXXX XXXX ${
+                                if (cardNumber != "") {
+                                    cardNumber
+                                } else {
+                                    "XXXX"
+                                }
+                            }",
                             color = Color.Black,
                             textAlign = TextAlign.Center,
                             style = TextStyle(fontWeight = FontWeight.Bold),
@@ -110,7 +121,7 @@ fun AccountItem (){
                             modifier = Modifier.padding(4.dp, 0.dp)
                         )
                         Text(
-                            text = "**********755",
+                            text = "**********$accountNumber",
                             color = Color.Black,
                             textAlign = TextAlign.Center,
                             style = TextStyle(fontWeight = FontWeight.Bold),
@@ -122,7 +133,7 @@ fun AccountItem (){
                     }
                 }
                 Text(
-                    text = "SOURAJ PAL",
+                    text = holderName.uppercase(),
                     color = Color.Black,
                     textAlign = TextAlign.Center,
                     style = TextStyle(fontWeight = FontWeight.Bold),

@@ -21,6 +21,10 @@ val Green = Color(0xff7CFC00)
 val Orange = Color(0xffffbf57)
 val Purple = Color(0xff6831A6)
 
+
+val GreyLight = Color(0xFFB5B6BA)
+val GreyDark = Color(0xFF60626C)
+
 /*-----------Light-Colors--------------*/
 val Gray200 = Color(0xffF1F1F1)
 val Indigo500 = Color(0xff5C5FC8)

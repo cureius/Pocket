@@ -12,11 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cureius.pocket.R
 
 @Composable
-fun AddAccountCard() {
+fun AddAccountCard(onClick: () -> Unit) {
     val add = ImageVector.vectorResource(id = R.drawable.add)
     val paddingModifier = Modifier
         .padding(10.dp)
@@ -34,7 +35,7 @@ fun AddAccountCard() {
                 .fillMaxSize()
         ) {
             IconButton(onClick = {
-
+                onClick()
             }, modifier = Modifier.fillMaxSize()) {
                 Icon(
                     imageVector = add,

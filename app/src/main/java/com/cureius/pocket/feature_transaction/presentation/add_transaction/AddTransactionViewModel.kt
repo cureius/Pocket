@@ -74,7 +74,7 @@ class AddTransactionViewModel @Inject constructor(
 
     init {
         savedStateHandle.get<Long>("transactionId")?.let { id ->
-            if (id.equals(-1)) {
+            if (id.toInt() != -1) {
                 viewModelScope.launch {
                     transactionUseCases.getTransaction(id)?.also { transaction ->
                         currentTransactionId = transaction.id
