@@ -9,50 +9,27 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.filled.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.cureius.pocket.feature_account.presentation.account.AccountsScreen
-import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashboardScreen
-import com.cureius.pocket.feature_navigation.presentation.BottomNavigationContainer
 import com.cureius.pocket.feature_navigation.presentation.NavigationController
-import com.cureius.pocket.feature_pot.presentation.pots.PotsScreen
 import com.cureius.pocket.feature_sms_sync.util.SyncUtils
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionEvent
-import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionScreen
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
-import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsScreen
-import com.cureius.pocket.feature_transaction.presentation.util.Screen
 import com.cureius.pocket.ui.theme.PocketTheme
 import com.cureius.pocket.util.SharedPreferencesUtil
-import com.cureius.pocket.util.components.BottomNavigationBar
-import com.cureius.pocket.util.model.BottomNavItem
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val TAG: String = "MainActivity"
+    private val tag: String = "MainActivity"
     private val PERMISSION_REQUEST_CODE = 1
 
-    @OptIn(ExperimentalMaterialApi::class)
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,18 +45,7 @@ class MainActivity : ComponentActivity() {
                 PERMISSION_REQUEST_CODE
             )
         } else {
-            val myViewModel = ViewModelProvider(this).get(AddTransactionViewModel::class.java)
-            val isFirstLoad: Boolean =
-                SharedPreferencesUtil.getBooleanValueToSharedPreferences(this, "initial_sync")
-            if (isFirstLoad) {
-                myViewModel.onEvent(AddTransactionEvent.EnteredTransactionsList(readSMS()))
-                myViewModel.onEvent(AddTransactionEvent.SaveAllTransactions)
-                SharedPreferencesUtil.setBooleanValueToSharedPreferences(
-                    this,
-                    "initial_sync",
-                    false
-                )
-            }
+            initialSmsSync(this)
         }
 
         setContent {
@@ -89,6 +55,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     @RequiresApi(Build.VERSION_CODES.M)
     override fun onRequestPermissionsResult(
         requestCode: Int,
@@ -98,18 +65,7 @@ class MainActivity : ComponentActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                val myViewModel = ViewModelProvider(this).get(AddTransactionViewModel::class.java)
-                val isFirstLoad: Boolean =
-                    SharedPreferencesUtil.getBooleanValueToSharedPreferences(this, "initial_sync")
-                if (isFirstLoad) {
-                    myViewModel.onEvent(AddTransactionEvent.EnteredTransactionsList(readSMS()))
-                    myViewModel.onEvent(AddTransactionEvent.SaveAllTransactions)
-                    SharedPreferencesUtil.setBooleanValueToSharedPreferences(
-                        this,
-                        "initial_sync",
-                        false
-                    )
-                }
+                initialSmsSync(this)
             } else {
                 Toast.makeText(
                     this,
@@ -122,7 +78,7 @@ class MainActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun readSMS(): List<Transaction> {
-        var transactionList = mutableListOf<Transaction>()
+        val transactionList = mutableListOf<Transaction>()
         val cursor = contentResolver.query(
             android.provider.Telephony.Sms.CONTENT_URI,
             null,
@@ -143,13 +99,13 @@ class MainActivity : ComponentActivity() {
                     (body.contains("credited") || body.contains("debited"))
                 ) {
                     Log.d(
-                        TAG,
+                        tag,
                         "format:  $address, ${
                             SyncUtils.extractTransactionalDetails(
                                 date,
                                 address,
                                 body
-                            ).toString()
+                            )
                         }"
                     )
                     SyncUtils.extractTransactionalDetails(
@@ -160,10 +116,24 @@ class MainActivity : ComponentActivity() {
                 }
             } while (cursor.moveToNext())
         }
-
         cursor?.close()
         return transactionList.reversed()
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun initialSmsSync(activity: ComponentActivity) {
+        val myViewModel = ViewModelProvider(activity).get(AddTransactionViewModel::class.java)
+        val isFirstLoad: Boolean =
+            SharedPreferencesUtil.getBooleanValueToSharedPreferences(activity, "initial_sync")
+        if (isFirstLoad) {
+            myViewModel.onEvent(AddTransactionEvent.EnteredTransactionsList(readSMS()))
+            myViewModel.onEvent(AddTransactionEvent.SaveAllTransactions)
+            SharedPreferencesUtil.setBooleanValueToSharedPreferences(
+                activity,
+                "initial_sync",
+                false
+            )
+        }
+    }
 }
 
