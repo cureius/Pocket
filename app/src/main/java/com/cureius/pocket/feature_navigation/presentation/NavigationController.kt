@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.cureius.pocket.feature_account.presentation.account.AccountsScreen
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashboardScreen
+import com.cureius.pocket.feature_pot.presentation.configure_pots.ConfigurePotsScreen
 import com.cureius.pocket.feature_pot.presentation.pots.PotsScreen
 
 @Composable
@@ -15,7 +16,7 @@ fun NavigationController(navController: NavHostController) {
     NavHost(
         navController = navController,
         route = "root",
-        startDestination = "bottom_navigation"
+        startDestination = "configure_pots"
     ) {
         bottomNavGraph(navController= navController)
         composable("bottom_nav") {
@@ -25,10 +26,13 @@ fun NavigationController(navController: NavHostController) {
             RecordsScreen()
         }
         composable("wallet") {
-            PotsScreen()
+            PotsScreen(navController)
         }
         composable("profile") {
             AccountsScreen()
+        }
+        composable("configure_pots") {
+            ConfigurePotsScreen()
         }
     }
 }
@@ -47,7 +51,7 @@ fun NavGraphBuilder.bottomNavGraph(navController: NavHostController) {
             RecordsScreen()
         }
         composable("pots") {
-            PotsScreen()
+            PotsScreen(navController)
         }
         composable("accounts") {
             AccountsScreen()

@@ -2,6 +2,7 @@ package com.cureius.pocket.feature_pot.presentation.pots
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
@@ -42,13 +44,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_pot.presentation.pots.components.Chart
 
-@Preview
 @Composable
-fun PotsScreen() {
-
+fun PotsScreen(navHostController: NavHostController, viewModel: PotsViewModel = hiltViewModel()) {
+    val state = viewModel.state.value
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -77,29 +82,45 @@ fun PotsScreen() {
                     modifier = Modifier
                         .background(color = MaterialTheme.colors.primary.copy(alpha = 0.4f))
                         .padding(8.dp)
-                        .height(32.dp)
-                        .width(60.dp),
+                        .clickable {
+                            navHostController.navigate("configure_pots")
+                        },
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "Edit")
+                    val config = ImageVector.vectorResource(id = R.drawable.sliders)
+                    Icon(
+                        imageVector = config,
+                        contentDescription = "config",
+                        tint = MaterialTheme.colors.background,
+                    )
                 }
             }
         }
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            item {
-                AddPotCard()
+            items(state) { pot ->
+                PotItem()
             }
-            item { PotItem() }
+            item {
+                AddPotCard(viewModel)
+            }
         }
     }
+    if (viewModel.isDialogShown) {
+        AddPotDialog(onDismiss = {
+            viewModel.onDismissDialog()
+        }, onSubmit = {
+
+        })
+    }
+
 }
 
 
 @Preview
 @Composable
-fun AddPotCard() {
+fun AddPotCard(viewModel: PotsViewModel = hiltViewModel()) {
     val add = ImageVector.vectorResource(id = R.drawable.add)
     val paddingModifier = Modifier
         .padding(10.dp)
@@ -117,7 +138,7 @@ fun AddPotCard() {
                 .fillMaxSize()
         ) {
             IconButton(onClick = {
-
+                viewModel.onAddClick()
             }, modifier = Modifier.fillMaxSize()) {
                 Icon(
                     imageVector = add,
@@ -138,7 +159,7 @@ fun PotItem() {
     val paddingModifier = Modifier
         .padding(8.dp)
         .fillMaxWidth()
-        .height(160.dp)
+        .height(168.dp)
     Card(
         shape = RoundedCornerShape(20.dp),
         elevation = 4.dp,
@@ -151,46 +172,132 @@ fun PotItem() {
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Box(
+            Column {
+                Row(
                     modifier = Modifier
-                        .fillMaxWidth(0.3f)
-                        .fillMaxHeight(),
-                    contentAlignment = Alignment.BottomCenter
+                        .padding(start = 8.dp, top = 8.dp, bottom = 4.dp)
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Box(
+                    Row(
                         modifier = Modifier
-                            .fillMaxHeight(0.4f)
-                            .fillMaxWidth(0.6f)
                             .background(
                                 MaterialTheme.colors.primary.copy(alpha = 0.4f),
                                 RoundedCornerShape(8.dp)
                             )
-                    )
-                    JarCanvas()
+                            .padding(2.dp),
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .background(
+                                    MaterialTheme.colors.secondary, RoundedCornerShape(12.dp)
+                                )
+                                .padding(4.dp)
+                        ) {
+                            val wallet = ImageVector.vectorResource(id = R.drawable.wallet)
+                            Icon(
+                                imageVector = wallet,
+                                contentDescription = "add account",
+                                tint = MaterialTheme.colors.surface,
+                            )
+                        }
+                        Text(
+                            text = "Monthly Wallet",
+                            color = MaterialTheme.colors.onBackground,
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(fontWeight = FontWeight.Bold),
+                            fontSize = 16.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(4.dp, 0.dp)
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                MaterialTheme.colors.primaryVariant,
+                                RoundedCornerShape(8.dp)
+                            )
+                    ) {
+                        Row() {
+                            Text(
+                                text = "2k/10k",
+                                color = MaterialTheme.colors.onPrimary,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(fontWeight = FontWeight.Normal),
+                                fontSize = 12.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(4.dp)
+                            )
+                            Text(
+                                text = " 20%",
+                                color = MaterialTheme.colors.onSecondary,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(fontWeight = FontWeight.Bold),
+                                fontSize = 12.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .background(
+                                        MaterialTheme.colors.secondary,
+                                        RoundedCornerShape(4.dp)
+                                    )
+                            )
+                        }
+
+                    }
                 }
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    Chart(
-                        data = mapOf(
-                            Pair("mo", 0.5f),
-                            Pair("tu", 0.1f),
-                            Pair("we", 0.6f),
-                            Pair("th", 0.2f),
-                            Pair("fr", 0.3f),
-                            Pair("sa", 0.7f),
-                            Pair("su", 0.8f),
-                        ), maxValue = 100, modifier = Modifier
-                            .fillMaxSize()
-                            .offset(y = (8).dp)
-                    )
+                Box {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.3f)
+                                .fillMaxHeight(),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxHeight(0.4f)
+                                    .fillMaxWidth(0.6f)
+                                    .background(
+                                        MaterialTheme.colors.primary.copy(alpha = 0.9f),
+                                        RoundedCornerShape(8.dp)
+                                    )
+                            )
+                            JarCanvas(MaterialTheme.colors.onSurface)
+                        }
+
+                        Box(
+                            modifier = Modifier.background(Color.Yellow.copy(alpha = 0.0f))
+                        ) {
+                            Chart(
+                                data = mapOf(
+                                    Pair("mo", 0.5f),
+                                    Pair("tu", 1f),
+                                    Pair("we", 0.6f),
+                                    Pair("th", 0.2f),
+                                    Pair("fr", 0.3f),
+                                    Pair("sa", 0.7f),
+                                    Pair("su", 0.8f),
+                                ),
+                                maxValue = 100,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .offset(y = (8).dp)
+                            )
+                        }
+                    }
                 }
             }
+
 
         }
 
@@ -249,13 +356,12 @@ fun waterJar() {
 
 @Preview
 @Composable
-fun JarCanvas() {
+fun JarCanvas(color: Color = Color.Black) {
     Canvas(
-        modifier = Modifier.size(300.dp)
+        modifier = Modifier.size(300.dp),
     ) {
         val width = size.width
         val height = size.height
-        val color = Color.Black
 
         // draw jar body
         drawPath(

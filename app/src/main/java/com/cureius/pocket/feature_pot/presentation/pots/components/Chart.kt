@@ -31,14 +31,15 @@ fun Chart(
     data: Map<String, Float>, maxValue: Int, modifier: Modifier = Modifier
 ) {
 
-    Column(
-        modifier = modifier
-            .padding(0.dp)
-            .fillMaxSize()
-            .background(MaterialTheme.colors.surface, RoundedCornerShape(CornerSize(12.dp))),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.End
-    ) {
+//    Column(
+//        modifier = modifier
+//            .background(
+//                MaterialTheme.colors.surface,
+//                RoundedCornerShape(CornerSize(12.dp))
+//            ),
+//        verticalArrangement = Arrangement.Top,
+//        horizontalAlignment = Alignment.End
+//    ) {
         val context = LocalContext.current
         // BarGraph Dimensions
         val barGraphHeight by remember { mutableStateOf(80.dp) }
@@ -50,16 +51,16 @@ fun Chart(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.9f),
+                .fillMaxHeight(1.0f),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
 
             // graph
             data.forEach {
                 Column(
                     modifier = Modifier
-                        .padding(start = barGraphWidth * 1.9f)
+                        .padding(start = barGraphWidth /2 , end = barGraphWidth/2 )
                         .fillMaxHeight()
                         .background(
                             MaterialTheme.colors.surface, RoundedCornerShape(CornerSize(12.dp))
@@ -70,15 +71,15 @@ fun Chart(
                     Box(modifier = Modifier
                         .clip(RoundedCornerShape(CornerSize(4.dp)))
                         .width(barGraphWidth)
-                        .fillMaxHeight(it.value)
-                        .background(MaterialTheme.colors.primary.copy(alpha = 0.6f))
+                        .fillMaxHeight(it.value * 0.9f)
+                        .background(MaterialTheme.colors.primary.copy(alpha = 1.0f))
                         .clickable {
                             Toast
                                 .makeText(context, it.value.toString(), Toast.LENGTH_SHORT)
                                 .show()
                         })
                     Text(
-                        color = MaterialTheme.colors.onSecondary,
+                        color = MaterialTheme.colors.onSurface,
                         text = it.key.uppercase(),
                         textAlign = TextAlign.Center,
                         style = TextStyle(fontWeight = FontWeight.Bold),
@@ -108,7 +109,7 @@ fun Chart(
                 Spacer(modifier = Modifier.fillMaxHeight(0.8f))
             }
         }
-    }
+//    }
 
 }
 

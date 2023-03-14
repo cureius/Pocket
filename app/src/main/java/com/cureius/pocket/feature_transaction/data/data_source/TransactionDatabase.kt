@@ -6,7 +6,7 @@ import com.cureius.pocket.feature_transaction.domain.model.Transaction
 
 
 @Database(
-    entities = [Transaction::class], version = 1
+    entities = [Transaction::class], version = 1, exportSchema = true
 )
 abstract class TransactionDatabase : RoomDatabase() {
     abstract val transactionDao: TransactionDao

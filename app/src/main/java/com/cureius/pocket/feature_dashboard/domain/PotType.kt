@@ -1,6 +1,6 @@
 package com.cureius.pocket.feature_dashboard.domain
 
-sealed class PotType{
-    object Asset: PotType()
-    object Liability: PotType()
+sealed class PotType(val type: String){
+    object Asset: PotType(type = "asset")
+    object Liability: PotType(type = "liability")
 }

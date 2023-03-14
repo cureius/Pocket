@@ -6,6 +6,14 @@ import com.cureius.pocket.feature_account.data.data_source.AccountDatabase
 import com.cureius.pocket.feature_account.data.reposetory.AccountRepositoryImpl
 import com.cureius.pocket.feature_account.domain.repository.AccountRepository
 import com.cureius.pocket.feature_account.domain.use_case.*
+import com.cureius.pocket.feature_pot.data.data_source.PotDatabase
+import com.cureius.pocket.feature_pot.data.repository.PotRepositoryImpl
+import com.cureius.pocket.feature_pot.domain.repository.PotRepository
+import com.cureius.pocket.feature_pot.domain.use_case.AddPot
+import com.cureius.pocket.feature_pot.domain.use_case.DeletePot
+import com.cureius.pocket.feature_pot.domain.use_case.GetPot
+import com.cureius.pocket.feature_pot.domain.use_case.GetPots
+import com.cureius.pocket.feature_pot.domain.use_case.PotUseCases
 import com.cureius.pocket.feature_transaction.data.data_source.TransactionDatabase
 import com.cureius.pocket.feature_transaction.data.repository.TransactionRepositoryImpl
 import com.cureius.pocket.feature_transaction.domain.repository.TransactionRepository
@@ -73,6 +81,34 @@ object AppModule {
             deleteAccount = DeleteAccount(repository),
             addAccount = AddAccount(repository),
             getAccounts = GetAccounts(repository)
+        )
+    }
+
+
+    @Provides
+    @Singleton
+    fun providePotDatabase(app: Application): PotDatabase{
+        return Room.databaseBuilder(
+            app,
+            PotDatabase::class.java,
+            PotDatabase.DATABASE_NAME
+        ).build()
+    }
+
+    @Provides
+    @Singleton
+    fun providePotRepository(db: PotDatabase): PotRepository {
+        return PotRepositoryImpl(db.potDao)
+    }
+
+    @Provides
+    @Singleton
+    fun providePotUseCases(repository: PotRepository): PotUseCases {
+        return PotUseCases(
+            getPot = GetPot(repository),
+            deletePot = DeletePot(repository),
+            addPot = AddPot(repository),
+            getPots = GetPots(repository)
         )
     }
 }

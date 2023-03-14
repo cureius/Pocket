@@ -6,7 +6,7 @@ import com.cureius.pocket.feature_account.domain.model.Account
 
 
 @Database(
-    entities = [Account::class], version = 1
+    entities = [Account::class], version = 1, exportSchema = true
 )
 abstract class AccountDatabase : RoomDatabase() {
     abstract val accountDao: AccountDao

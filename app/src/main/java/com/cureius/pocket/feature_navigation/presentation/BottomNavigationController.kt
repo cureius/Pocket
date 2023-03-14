@@ -19,7 +19,7 @@ fun BottomNavigationController(navController: NavHostController, bottomNavHostCo
                 RecordsScreen()
             }
             composable("pots") {
-                PotsScreen()
+                PotsScreen(navController)
             }
             composable("accounts") {
                 AccountsScreen()

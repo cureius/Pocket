@@ -24,7 +24,7 @@ import com.cureius.pocket.R
 import com.cureius.pocket.feature_dashboard.domain.PotType
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.*
 import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
-import com.cureius.pocket.feature_pot.presentation.pots.components.PotItem
+import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.util.ScreenDimensions
 
 @Composable
@@ -90,33 +90,33 @@ fun DashboardScreen(navHostController: NavHostController) {
         ),
     )
     val potItems = listOf(
-        PotItem(
-            icon = save,
-            name = "Savings",
+        Pot(
+            icon = save.toString(),
+            title = "Savings",
             capacity = 100.0,
-            fill = 0.8,
-            type = PotType.Asset
+            filled = 0.8f,
+            type = PotType.Asset.type
         ),
-        PotItem(
-            icon = wallet,
-            name = "Wallet",
+        Pot(
+            icon = wallet.toString(),
+            title = "Wallet",
             capacity = 100.0,
-            fill = 0.5,
-            type = PotType.Liability
+            filled = 0.5f,
+            type = PotType.Liability.type
         ),
-        PotItem(
-            icon = emi,
-            name = "EMI",
+        Pot(
+            icon = emi.toString(),
+            title = "EMI",
             capacity = 100.0,
-            fill = 0.6,
-            type = PotType.Liability
+            filled = 0.6f,
+            type = PotType.Liability.type
         ),
-        PotItem(
-            icon = invest,
-            name = "Investment",
+        Pot(
+            icon = invest.toString(),
+            title = "Investment",
             capacity = 100.0,
-            fill = 0.7,
-            type = PotType.Asset
+            filled = 0.7f,
+            type = PotType.Asset.type
         )
     )
     val size = ScreenDimensions()
@@ -209,7 +209,11 @@ fun DashboardScreen(navHostController: NavHostController) {
                         Spacer(modifier = Modifier.width(16.dp))
                     }
                     items(potItems) { item ->
-                        PotItem(item.icon, item.fill, item.name, item.type)
+                        item.filled?.let { item.type?.let { it1 ->
+                            PotItem(item.icon, it, item.title,
+                                it1
+                            )
+                        } }
                     }
                 }
             }
