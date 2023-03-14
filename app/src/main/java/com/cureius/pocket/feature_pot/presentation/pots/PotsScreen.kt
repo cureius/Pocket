@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -42,6 +43,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_pot.presentation.pots.components.Chart
 
 @Preview
 @Composable
@@ -134,7 +136,7 @@ fun AddPotCard() {
 fun PotItem() {
     val pot = ImageVector.vectorResource(id = R.drawable.pot)
     val paddingModifier = Modifier
-        .padding(10.dp)
+        .padding(8.dp)
         .fillMaxWidth()
         .height(160.dp)
     Card(
@@ -147,13 +149,12 @@ fun PotItem() {
             modifier = Modifier
                 .background(MaterialTheme.colors.surface)
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(8.dp)
         ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth()
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Box(
                     modifier = Modifier
@@ -169,33 +170,31 @@ fun PotItem() {
                                 MaterialTheme.colors.primary.copy(alpha = 0.4f),
                                 RoundedCornerShape(8.dp)
                             )
-                    ) {
-
-                    }
+                    )
                     JarCanvas()
-
                 }
-                /*IconButton(onClick = {
-                    }) {
-                        Icon(
-                            imageVector = pot,
-                            contentDescription = "add account",
-                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.9f),
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth(0.3f)
-                        )
-                    }*/
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    Text(text = "Content")
+                    Chart(
+                        data = mapOf(
+                            Pair("mo", 0.5f),
+                            Pair("tu", 0.1f),
+                            Pair("we", 0.6f),
+                            Pair("th", 0.2f),
+                            Pair("fr", 0.3f),
+                            Pair("sa", 0.7f),
+                            Pair("su", 0.8f),
+                        ), maxValue = 100, modifier = Modifier
+                            .fillMaxSize()
+                            .offset(y = (8).dp)
+                    )
                 }
             }
 
-
         }
+
+
     }
 }
 
@@ -252,8 +251,7 @@ fun waterJar() {
 @Composable
 fun JarCanvas() {
     Canvas(
-        modifier = Modifier
-            .size(300.dp)
+        modifier = Modifier.size(300.dp)
     ) {
         val width = size.width
         val height = size.height
@@ -300,8 +298,7 @@ fun JarCanvas() {
                     ), -90f, 90f, false
                 )
 
-                lineTo(width * 0.80f, height * 0.92f)
-                /*arcTo(
+                lineTo(width * 0.80f, height * 0.92f)/*arcTo(
                     Rect(
                         left = width * 0.785f,
                         top = height * 0.28f,
@@ -345,9 +342,7 @@ fun JarCanvas() {
                 )
                 lineTo(width * 0.33f, height * 0.1f)
                 close()
-            },
-            color = color,
-            style = Stroke(width = 2.dp.toPx())
+            }, color = color, style = Stroke(width = 2.dp.toPx())
         )
         // draw jar lid
         drawPath(
@@ -370,9 +365,7 @@ fun JarCanvas() {
                         bottom = height * 0.1f
                     ), -90f, 180f, false
                 )
-            },
-            color = color,
-            style = Fill
+            }, color = color, style = Fill
         )
         // draw jar top
         drawPath(
@@ -388,9 +381,7 @@ fun JarCanvas() {
                     ), 90f, 90f, false
                 )
 
-            },
-            color = color,
-            style = Stroke(width = 2.dp.toPx())
+            }, color = color, style = Stroke(width = 2.dp.toPx())
         )
     }
 }
