@@ -16,7 +16,7 @@ fun NavigationController(navController: NavHostController) {
     NavHost(
         navController = navController,
         route = "root",
-        startDestination = "configure_pots"
+        startDestination = "bottom_nav"
     ) {
         bottomNavGraph(navController= navController)
         composable("bottom_nav") {
