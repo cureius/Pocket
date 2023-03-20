@@ -1,10 +1,9 @@
-package com.cureius.pocket.feature_pot.presentation.configure_pots
+package com.cureius.pocket.feature_pot.presentation.configure_pots.components
 
 import android.view.MotionEvent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi

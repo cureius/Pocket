@@ -8,15 +8,18 @@ object SyncUtils {
 
     private fun dateToTimeStamp(date: String?, time: String?): Long? {
 
+        if (date == null) {
+            return null
+        }
         val dateTimeString: String = if (time == null) {
-            if (date?.contains("/") == true) {
+            if (date.contains("/")) {
                 val newDate = date.replace('/', '-')
                 "$newDate 00:00"
             } else {
                 "$date 00:00"
             }
         } else {
-            if (date?.contains("/") == true) {
+            if (date.contains("/")) {
                 val newDate = date.replace('/', '-')
                 "$newDate $time"
             } else {

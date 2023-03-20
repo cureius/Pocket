@@ -1,5 +1,6 @@
 package com.cureius.pocket.feature_pot.presentation.configure_pots
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,19 +15,19 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
-import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,8 +38,6 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -48,17 +47,37 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_pot.domain.util.IconDictionary
+import com.cureius.pocket.feature_pot.presentation.configure_pots.components.RangeSlider
+import kotlin.math.roundToInt
 
 @Preview
 @Composable
-fun ConfigurePotsScreen() {
-    var p1 by remember { mutableStateOf(0.0f) }
-    var p2 by remember { mutableStateOf(0.2f) }
-    var p3 by remember { mutableStateOf(0.5f) }
-    var p4 by remember { mutableStateOf(1.0f) }
+fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
     var text by remember { mutableStateOf(TextFieldValue("")) }
-
+    var weightList = viewModel.nodes.value
+    var nodeList = mutableListOf<MutableState<Float>>()
+    var potTemplateList = viewModel.state.value
+    weightList.add(0, remember {
+        mutableStateOf(0.0f)
+    })
+    weightList.forEachIndexed { index, mutableState ->
+        if (mutableState != null) {
+            nodeList.add(index, remember {
+                mutableStateOf(
+                    mutableState.value + if (index > 0) {
+                        nodeList[index - 1].value
+                    } else {
+                        0.0f
+                    }
+                )
+            })
+        }
+    }
+    println(nodeList)
+    Log.d("nodes", "ConfigurePotsScreen: $nodeList")
     Scaffold {
         Column {
             Column(
@@ -122,33 +141,26 @@ fun ConfigurePotsScreen() {
                     .fillMaxWidth()
                     .fillMaxHeight()
             ) {
-                item {
-                    ConfigurablePotItem(initialStart = p1, initialEnd = p2, onStartChange = {
-                        p1 = it
-                    }, onEndChange = {
-                        p2 = it
-                    })
-                }
-                item {
-                    ConfigurablePotItem(initialStart = p2, initialEnd = p3, onStartChange = {
-                        p2 = it
-                    }, onEndChange = {
-                        p3 = it
-                        text = TextFieldValue(it.toString())
-                    })
-                }
-                item {
-                    ConfigurablePotItem(initialStart = p3, initialEnd = p4, onStartChange = {
-                        p3 = it
-                    }, onEndChange = {
-                        p4 = it
-                    })
+                itemsIndexed(potTemplateList) { ix, pot ->
+                    ConfigurablePotItem(
+                        initialStart = nodeList[ix].value,
+                        initialEnd = nodeList[ix + 1].value,
+                        onStartChange = {
+                            nodeList[ix].value = it
+                        },
+                        onEndChange = {
+                            nodeList[ix + 1].value = it
+                        },
+                        capacity = pot.capacity ?: 0.0,
+                        label = pot.title,
+                        icon = pot.icon,
+                        filled = pot.filled ?: 0.0f,
+                        weight = pot.weight ?: 0.3f
+                    )
                 }
             }
         }
-
     }
-
 }
 
 @Composable
@@ -157,8 +169,12 @@ fun ConfigurablePotItem(
     initialEnd: Float = 0.0f,
     onStartChange: (Float) -> Unit,
     onEndChange: (Float) -> Unit,
+    label: String,
+    icon: String?,
+    filled: Float,
+    capacity: Double,
+    weight: Float
 ) {
-    val pot = ImageVector.vectorResource(id = R.drawable.pot)
     val paddingModifier = Modifier
         .padding(8.dp)
         .fillMaxWidth()
@@ -197,15 +213,18 @@ fun ConfigurablePotItem(
                                 )
                                 .padding(4.dp)
                         ) {
-                            val wallet = ImageVector.vectorResource(id = R.drawable.wallet)
-                            Icon(
-                                imageVector = wallet,
-                                contentDescription = "add account",
-                                tint = MaterialTheme.colors.surface,
-                            )
+                            val icon =
+                                IconDictionary.allIcons[icon]?.let { ImageVector.vectorResource(id = it) }
+                            if (icon != null) {
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = "add account",
+                                    tint = MaterialTheme.colors.surface,
+                                )
+                            }
                         }
                         Text(
-                            text = "Monthly Wallet",
+                            text = label,
                             color = MaterialTheme.colors.onBackground,
                             textAlign = TextAlign.Center,
                             style = TextStyle(fontWeight = FontWeight.Bold),
@@ -223,7 +242,7 @@ fun ConfigurablePotItem(
                     ) {
                         Row() {
                             Text(
-                                text = "2k/10k",
+                                text = "${(capacity * filled).roundToInt()}/${capacity.roundToInt()}",
                                 color = MaterialTheme.colors.onPrimary,
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(fontWeight = FontWeight.Normal),
@@ -233,7 +252,7 @@ fun ConfigurablePotItem(
                                 modifier = Modifier.padding(4.dp)
                             )
                             Text(
-                                text = " 20%",
+                                text = " ${(filled * 100).roundToInt()}%",
                                 color = MaterialTheme.colors.onSecondary,
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(fontWeight = FontWeight.Bold),
