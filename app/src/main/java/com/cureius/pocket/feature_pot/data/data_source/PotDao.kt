@@ -19,6 +19,9 @@ interface PotDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertPot(pot: Pot)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertPots(pots: List<Pot>)
+
     @Delete
     suspend fun deletePot(pot: Pot)
 

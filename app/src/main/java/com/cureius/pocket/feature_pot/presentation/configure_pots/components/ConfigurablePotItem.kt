@@ -117,7 +117,6 @@ fun ConfigurablePotItem(
                                 Color.Transparent
                             )
                         ) {
-                            Log.d("Recompose", "ConfigurablePotItem: $weight")
                             Box(
                                 modifier = Modifier.padding(8.dp, 4.dp, 0.dp, 4.dp),
                                 contentAlignment = Alignment.Center

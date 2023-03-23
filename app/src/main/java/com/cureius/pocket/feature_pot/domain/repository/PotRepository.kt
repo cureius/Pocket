@@ -10,5 +10,7 @@ interface PotRepository {
 
     suspend fun insertPot(pot: Pot)
 
+    suspend fun insertPots(pots: List<Pot>)
+
     suspend fun deletePot(pot: Pot)
 }

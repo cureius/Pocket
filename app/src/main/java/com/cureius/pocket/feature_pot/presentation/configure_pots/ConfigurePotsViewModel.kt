@@ -1,18 +1,22 @@
 package com.cureius.pocket.feature_pot.presentation.configure_pots
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.domain.use_case.PotUseCases
+import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
+import com.cureius.pocket.feature_transaction.domain.model.InvalidTransactionException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,6 +31,7 @@ class ConfigurePotsViewModel @Inject constructor(
     private val _state = mutableStateOf(listOf<Pot>())
     val state: State<List<Pot>> = _state
     private var _updatedPots = mutableListOf<Pot>()
+    val updatedPots: MutableList<Pot> = _updatedPots
 
     private var getPotsJob: Job? = null
 
@@ -39,11 +44,9 @@ class ConfigurePotsViewModel @Inject constructor(
 
     init {
         getTemplatePots()
-        _updatedPots = state.value.toMutableList()
-        Log.d("updating list", "onEvent: ${_updatedPots.size}")
-
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     fun onEvent(event: ConfigurePotsEvent) {
         when (event) {
             is ConfigurePotsEvent.EnteredIncome -> {
@@ -54,27 +57,22 @@ class ConfigurePotsViewModel @Inject constructor(
                 _nodes.value[event.nodeIndex]?.value = event.value
             }
 
-            is ConfigurePotsEvent.UpdatePot -> {
-                Log.d("updating list", "onEvent: ${event.toString()}")
-                var index: Int
-                if (_updatedPots.any {
-                        it.id == _state.value[event.potIndex].id
-                    }) {
+            is ConfigurePotsEvent.SaveConfiguration -> {
+                viewModelScope.launch {
+                    try {
+                        potUseCases.addPots(updatedPots)
+                    } catch (e: InvalidTransactionException) {
 
-                    index = _updatedPots.indexOf(_state.value[event.potIndex])
-                    if (index > 0) {
-                        _updatedPots.add(
-                            index, _state.value[event.potIndex].copy(weight = event.value)
-                        )
                     }
-
-                } else {
-                    _updatedPots.add(
-                        _state.value[event.potIndex].copy(weight = event.value)
-                    )
                 }
+            }
 
-                Log.d("updated list", "onEvent: $_updatedPots")
+            is ConfigurePotsEvent.UpdatePot -> {
+                val firstElement =
+                    state.value.first { it.id == event.id }.copy(weight = event.value)
+                _updatedPots.removeIf { it.id == event.id }
+                _updatedPots.add(firstElement)
+                Log.d("Changing List", "onEvent: ${updatedPots}")
             }
         }
     }
@@ -86,7 +84,6 @@ class ConfigurePotsViewModel @Inject constructor(
             _weights.value =
                 _state.value.map { it.weight?.let { weight -> mutableStateOf(weight) } }
                     .toMutableList()
-            Log.d("Weight", "getTemplatePots: ${_weights.value.toString()}")
             _nodes.value.add(
                 mutableStateOf(
                     0.0f
@@ -107,6 +104,4 @@ class ConfigurePotsViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
-
-
 }

@@ -45,7 +45,7 @@ fun PotsScreen(
     viewModel: PotsViewModel = hiltViewModel(),
     addPotViewModel: AddPotViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state.value
+    val state = viewModel.pots.value
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -92,19 +92,16 @@ fun PotsScreen(
             modifier = Modifier.fillMaxWidth(),
         ) {
             items(state) { pot ->
-                pot.icon?.let {
-                    PotItem(
-                        pot.title,
-                        it,
-                        pot.capacity,
-                        pot.filled
-                    )
-                }
+
+                PotItem(
+                    pot
+                )
+
             }
             item {
                 AddPotCard(addPotViewModel)
             }
-            item { 
+            item {
                 Spacer(modifier = Modifier.height(140.dp))
             }
         }

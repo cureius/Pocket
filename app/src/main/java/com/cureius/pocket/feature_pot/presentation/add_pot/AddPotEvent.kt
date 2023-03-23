@@ -13,6 +13,7 @@ sealed class AddPotEvent {
     data class SelectedType(val value: String) : AddPotEvent()
     object ToggleAddAccountDialog : AddPotEvent()
 
+    object SavePots : AddPotEvent()
     object SavePot : AddPotEvent()
 
 }

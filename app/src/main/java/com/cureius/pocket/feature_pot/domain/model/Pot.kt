@@ -20,6 +20,7 @@ data class Pot(
     @ColumnInfo(name = "validity") val validity: Long? = null,
     @ColumnInfo(name = "associated_account") val associated_account: Int? = null,
     @ColumnInfo(name = "icon") val icon: String? = null,
+    @ColumnInfo(name = "parent") val parent: Int? = null,
     /*--------------For-DB----------------*/
     @ColumnInfo(name = "timestamp") val timestamp: Long? = null,
     @PrimaryKey val id: Int? = null,

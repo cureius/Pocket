@@ -10,6 +10,7 @@ import com.cureius.pocket.feature_pot.data.data_source.PotDatabase
 import com.cureius.pocket.feature_pot.data.repository.PotRepositoryImpl
 import com.cureius.pocket.feature_pot.domain.repository.PotRepository
 import com.cureius.pocket.feature_pot.domain.use_case.AddPot
+import com.cureius.pocket.feature_pot.domain.use_case.AddPots
 import com.cureius.pocket.feature_pot.domain.use_case.DeletePot
 import com.cureius.pocket.feature_pot.domain.use_case.GetPot
 import com.cureius.pocket.feature_pot.domain.use_case.GetPots
@@ -108,6 +109,7 @@ object AppModule {
             getPot = GetPot(repository),
             deletePot = DeletePot(repository),
             addPot = AddPot(repository),
+            addPots = AddPots(repository),
             getPots = GetPots(repository)
         )
     }

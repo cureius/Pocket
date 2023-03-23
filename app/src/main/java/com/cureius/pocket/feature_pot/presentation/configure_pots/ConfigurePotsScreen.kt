@@ -1,5 +1,7 @@
 package com.cureius.pocket.feature_pot.presentation.configure_pots
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,14 +32,19 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.feature_pot.presentation.configure_pots.components.ConfigurablePotItem
 import com.cureius.pocket.feature_pot.presentation.configure_pots.components.CutCornerButton
+import kotlin.math.roundToInt
 
+@RequiresApi(Build.VERSION_CODES.N)
 @Preview
 @Composable
 fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
     val income = viewModel.income.value
     val nodeList = viewModel.nodes.value
     val potTemplateList = viewModel.state.value
-
+    val nonMutableNodeList = nodeList.toList()
+    if (nonMutableNodeList.isNotEmpty() && nonMutableNodeList[nodeList.size - 1]?.value != 1.0f) {
+        nodeList[nodeList.size - 1]?.value = 1.0f
+    }
     Scaffold {
         Column {
             Column(
@@ -84,33 +91,34 @@ fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
                 itemsIndexed(potTemplateList) { ix, pot ->
                     nodeList[ix]?.let { it1 ->
                         nodeList[ix + 1]?.let { it2 ->
+                            viewModel.onEvent(
+                                ConfigurePotsEvent.UpdatePot(
+                                    pot.id, it2.value.minus(it1.value)
+                                )
+                            )
                             ConfigurablePotItem(
                                 initialStart = it1.value,
                                 initialEnd = it2.value,
                                 onStartChange = {
-                                    viewModel.onEvent(
-                                        ConfigurePotsEvent.RangeChange(
-                                            ix, it
+                                    if (potTemplateList.indexOf(pot) != 0) {
+                                        val startNode =
+                                            ((it * 100.0).roundToInt() / 100.0).toFloat()
+                                        viewModel.onEvent(
+                                            ConfigurePotsEvent.RangeChange(
+                                                ix, startNode
+                                            )
                                         )
-                                    )
-                                    viewModel.onEvent(
-                                        ConfigurePotsEvent.UpdatePot(
-                                            ix, it2.value.minus(it1.value)
-                                        )
-                                    )
+                                    }
                                 },
                                 onEndChange = {
-                                    viewModel.onEvent(
-                                        ConfigurePotsEvent.RangeChange(
-                                            ix + 1, it
+                                    if (potTemplateList.indexOf(pot) != (potTemplateList.size - 1)) {
+                                        val endNode = ((it * 100.0).roundToInt() / 100.0).toFloat()
+                                        viewModel.onEvent(
+                                            ConfigurePotsEvent.RangeChange(
+                                                ix + 1, endNode
+                                            )
                                         )
-                                    )
-                                    viewModel.onEvent(
-                                        ConfigurePotsEvent.UpdatePot(
-                                            ix, it2.value.minus(it1.value)
-                                        )
-                                    )
-
+                                    }
                                 },
                                 totalCapacity = (income),
                                 label = pot.title,
@@ -122,7 +130,9 @@ fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
                 item {
                     CutCornerButton(
                         onClick = {
-
+                            viewModel.onEvent(
+                                ConfigurePotsEvent.SaveConfiguration
+                            )
                         },
                         label = "Set Configuration",
                         modifier = Modifier

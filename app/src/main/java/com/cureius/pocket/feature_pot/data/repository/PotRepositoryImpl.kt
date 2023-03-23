@@ -20,6 +20,10 @@ class PotRepositoryImpl(
         return dao.insertPot(pot)
     }
 
+    override suspend fun insertPots(pots: List<Pot>) {
+        return dao.insertPots(pots)
+    }
+
     override suspend fun deletePot(pot: Pot) {
         return dao.deletePot(pot)
     }

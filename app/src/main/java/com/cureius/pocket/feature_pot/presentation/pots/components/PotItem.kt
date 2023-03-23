@@ -20,6 +20,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -30,14 +31,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
+import com.cureius.pocket.feature_pot.domain.model.Pot
 import kotlin.math.roundToInt
 
 @Composable
 fun PotItem(
-    title: String,
-    icon: String,
-    capacity: Double?,
-    filled: Float?,
+    pot: Pot,
     data: Map<String, Float>? = mapOf(
         Pair("mo", 0.0f),
         Pair("tu", 0.0f),
@@ -48,8 +47,8 @@ fun PotItem(
         Pair("su", 0.0f),
     )
 ) {
-    val icon = IconDictionary.allIcons[icon]
-    val maxValue = (capacity?.let { data?.values?.maxOrNull()?.times(it) })?.roundToInt()
+    val icon = IconDictionary.allIcons[pot.icon]
+    val maxValue = (pot.capacity?.let { data?.values?.maxOrNull()?.times(it) })?.roundToInt()
     val paddingModifier = Modifier
         .padding(8.dp)
         .fillMaxWidth()
@@ -99,7 +98,7 @@ fun PotItem(
                             }
                         }
                         Text(
-                            text = title,
+                            text = pot.title,
                             color = MaterialTheme.colors.onBackground,
                             textAlign = TextAlign.Center,
                             style = TextStyle(fontWeight = FontWeight.Bold),
@@ -117,10 +116,10 @@ fun PotItem(
                                 RoundedCornerShape(8.dp)
                             )
                     ) {
-                        Row() {
-                            if (capacity != null) {
+                        Row {
+                            if (pot.capacity != null) {
                                 Text(
-                                    text = "${(capacity * filled!!).roundToInt()}/${capacity.roundToInt()}",
+                                    text = "${(pot.capacity * pot.filled!!).roundToInt()}/${pot.capacity.roundToInt()}",
                                     color = MaterialTheme.colors.onPrimary,
                                     textAlign = TextAlign.Center,
                                     style = TextStyle(fontWeight = FontWeight.Normal),
@@ -130,9 +129,9 @@ fun PotItem(
                                     modifier = Modifier.padding(4.dp)
                                 )
                             }
-                            if (filled != null) {
+                            if (pot.filled != null) {
                                 Text(
-                                    text = " ${(filled * 100).roundToInt()}%",
+                                    text = " ${(pot.filled * 100).roundToInt()}%",
                                     color = MaterialTheme.colors.onSecondary,
                                     textAlign = TextAlign.Center,
                                     style = TextStyle(fontWeight = FontWeight.Bold),
@@ -151,48 +150,89 @@ fun PotItem(
 
                     }
                 }
-                Box {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+
+
+                Box(contentAlignment = Alignment.Center) {
+                    if (pot.is_template == true && pot.weight == null) {
+                        Text(
+                            text = "Set Pot ",
+                            color = MaterialTheme.colors.onBackground,
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(fontWeight = FontWeight.Bold),
+                            fontSize = 24.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(4.dp, 0.dp)
+                        )
+                    } else if (pot.is_template == true && pot.weight != null) {
+                        Text(
+                            text = "Set Up Pots:",
+                            color = MaterialTheme.colors.onBackground,
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(fontWeight = FontWeight.Bold),
+                            fontSize = 20.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(4.dp, 0.dp)
+                        )
+                    } else {
+
+                    }
+                    Box(
+                        modifier = Modifier.blur(
+                            if (pot.is_template == true && pot.weight == null) {
+                                16.dp
+                            } else if (pot.is_template == true && pot.weight != null) {
+                                18.dp
+                            } else {
+                                0.dp
+                            }
+                        )
                     ) {
-                        Box(
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .fillMaxWidth(0.3f)
-                                .fillMaxHeight(),
-                            contentAlignment = Alignment.BottomCenter
+                                .fillMaxWidth()
                         ) {
-                            if (filled != null) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxHeight(filled)
-                                        .fillMaxWidth(0.6f)
-                                        .background(
-                                            MaterialTheme.colors.primary.copy(alpha = 0.9f),
-                                            RoundedCornerShape(8.dp)
-                                        )
-                                )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth(0.3f)
+                                    .fillMaxHeight(),
+                                contentAlignment = Alignment.BottomCenter
+                            ) {
+                                if (pot.filled != null) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxHeight(pot.filled)
+                                            .fillMaxWidth(0.6f)
+                                            .background(
+                                                MaterialTheme.colors.primary.copy(alpha = 0.9f),
+                                                RoundedCornerShape(8.dp)
+                                            )
+                                    )
+                                }
+
+                                Jar(MaterialTheme.colors.onSurface)
                             }
 
-                            Jar(MaterialTheme.colors.onSurface)
-                        }
-
-                        Box(
-                            modifier = Modifier.background(Color.Yellow.copy(alpha = 0.0f))
-                        ) {
-                            if (data != null) {
-                                Chart(
-                                    data = data,
-                                    maxValue = maxValue?.toDouble(),
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .offset(y = (8).dp)
-                                )
+                            Box(
+                                modifier = Modifier.background(Color.Yellow.copy(alpha = 0.0f))
+                            ) {
+                                if (data != null) {
+                                    Chart(
+                                        data = data,
+                                        maxValue = maxValue?.toDouble(),
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .offset(y = (8).dp)
+                                    )
+                                }
                             }
                         }
                     }
                 }
+
             }
         }
     }
