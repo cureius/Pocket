@@ -1,5 +1,6 @@
 package com.cureius.pocket.feature_navigation.presentation
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,8 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -26,33 +29,38 @@ import com.cureius.pocket.feature_transaction.presentation.util.Screen
 import com.cureius.pocket.util.components.BottomNavigationBar
 import com.cureius.pocket.util.model.BottomNavItem
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_account.presentation.add_account.AddAccountFormDialog
+import com.cureius.pocket.feature_account.presentation.add_account.AddAccountViewModel
+import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
+import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
+import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomNavigationContainer(
     navController: NavHostController,
+    addPotViewModel: AddPotViewModel = hiltViewModel(),
+    addAccountViewModel: AddAccountViewModel = hiltViewModel(),
+    addTransactionViewModel: AddTransactionViewModel = hiltViewModel()
 ) {
     // A surface container using the 'background' color from the theme
     val bottomNavController = rememberNavController()
     val shape = RoundedCornerShape(
-        topStart = 20.dp,
-        topEnd = 20.dp,
-        bottomStart = 0.dp,
-        bottomEnd = 0.dp
+        topStart = 20.dp, topEnd = 20.dp, bottomStart = 0.dp, bottomEnd = 0.dp
     )
     val home = ImageVector.vectorResource(id = R.drawable.home)
     val record = ImageVector.vectorResource(id = R.drawable.bill)
     val pot = ImageVector.vectorResource(id = R.drawable.pot)
     val account = ImageVector.vectorResource(id = R.drawable.accounts)
     val add = ImageVector.vectorResource(id = R.drawable.add)
+
+    val context = LocalContext.current
     Scaffold(
         bottomBar = {
             BottomNavigationBar(
                 items = listOf(
                     BottomNavItem(
-                        name = "Home",
-                        route = "home",
-                        icon = home
+                        name = "Home", route = "home", icon = home
                     ),
                     BottomNavItem(
                         name = "Records",
@@ -77,29 +85,65 @@ fun BottomNavigationContainer(
                 modifier = Modifier
                     .height(60.dp)
                     .background(
-                        color = MaterialTheme.colors.surface,
-                        shape = shape
+                        color = MaterialTheme.colors.surface, shape = shape
                     ),
             )
         },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate("activity")
+                    when (bottomNavController.currentDestination?.route) {
+                        "home" -> {
+                            Toast.makeText(
+                                context, "Dash Board Screen !", Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        "records" -> {
+                            Toast.makeText(
+                                context, "Records Screen !", Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                        "pots" -> {
+                            addPotViewModel.onAddClick()
+                        }
+
+                        "accounts" -> {
+                            addAccountViewModel.onAddClick()
+                        }
+
+                        else -> {
+                            Toast.makeText(
+                                context, "Unknown Screen !", Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
                 }, backgroundColor = MaterialTheme.colors.primary
             ) {
                 Icon(
-                    imageVector = add,
-                    contentDescription = "Add Transaction",
-                    Modifier.size(56.dp)
+                    imageVector = add, contentDescription = "Add Transaction", Modifier.size(56.dp)
                 )
             }
         },
     ) {
         BottomNavigationController(
-            navController = navController,
-            bottomNavHostController = bottomNavController
+            navController = navController, bottomNavHostController = bottomNavController
         )
+    }
+    if (addAccountViewModel.isDialogShown) {
+        AddAccountFormDialog(onDismiss = {
+            addAccountViewModel.onDismissDialog()
+        }, onSubmit = {
+
+        })
+    }
+    if (addPotViewModel.isDialogShown) {
+        AddPotDialog(onDismiss = {
+            addPotViewModel.onDismissDialog()
+        }, onSubmit = {
+
+        })
     }
 }
 
@@ -110,22 +154,20 @@ fun RecordsScreen() {
     ) {
         val navController = rememberNavController()
         NavHost(
-            navController = navController,
-            startDestination = Screen.TransactionsScreen.route
+            navController = navController, startDestination = Screen.TransactionsScreen.route
         ) {
             composable(route = Screen.TransactionsScreen.route) {
                 TransactionsScreen(navController = navController)
             }
             composable(
                 route = Screen.AddTransactionScreen.route + "?transactionId={transactionId}&transactionColor={transactionColor}",
-                arguments = listOf(
-                    navArgument(name = "transactionId") {
-                        type = NavType.LongType
-                        defaultValue = -1
-                    }, navArgument(name = "transactionColor") {
-                        type = NavType.IntType
-                        defaultValue = -1
-                    })
+                arguments = listOf(navArgument(name = "transactionId") {
+                    type = NavType.LongType
+                    defaultValue = -1
+                }, navArgument(name = "transactionColor") {
+                    type = NavType.IntType
+                    defaultValue = -1
+                })
             ) {
                 val color = it.arguments?.getInt("transactionColor") ?: -1
                 AddTransactionScreen(

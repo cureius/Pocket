@@ -23,17 +23,6 @@ class PotsViewModel @Inject constructor(
     private val potUseCases: PotUseCases
 ) : ViewModel() {
 
-    var isDialogShown by mutableStateOf(false)
-        private set
-
-    fun onAddClick() {
-        isDialogShown = true
-    }
-
-    fun onDismissDialog() {
-        isDialogShown = false
-    }
-
     private val _state = mutableStateOf(listOf<Pot>())
     val state: State<List<Pot>> = _state
     private var getPotsJob: Job? = null

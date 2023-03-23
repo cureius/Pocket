@@ -1,4 +1,4 @@
-package com.cureius.pocket.feature_account.presentation.account.components
+package com.cureius.pocket.feature_account.presentation.add_account.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

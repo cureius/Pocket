@@ -1,4 +1,4 @@
-package com.cureius.pocket.feature_account.presentation.account.components
+package com.cureius.pocket.feature_account.presentation.add_account.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.cureius.pocket.feature_account.presentation.add_account.components.CharBoxView
 
 @Composable
 fun SeparatedNumberField(

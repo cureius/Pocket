@@ -40,7 +40,7 @@ fun AddAccountCard(onClick: () -> Unit) {
                 Icon(
                     imageVector = add,
                     contentDescription = "add account",
-                    tint = MaterialTheme.colors.onSurface,
+                    tint = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
                     modifier = Modifier.fillMaxSize(0.7f)
                 )
             }

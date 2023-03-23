@@ -1,13 +1,16 @@
 package com.cureius.pocket.feature_pot.presentation.pots
 
+import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -30,12 +33,17 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_pot.presentation.pots.components.AddPotCard
 import com.cureius.pocket.feature_pot.presentation.pots.components.PotItem
 
 @Composable
-fun PotsScreen(navHostController: NavHostController, viewModel: PotsViewModel = hiltViewModel()) {
+fun PotsScreen(
+    navHostController: NavHostController,
+    viewModel: PotsViewModel = hiltViewModel(),
+    addPotViewModel: AddPotViewModel = hiltViewModel()
+) {
     val state = viewModel.state.value
     Column(
         modifier = Modifier
@@ -93,13 +101,16 @@ fun PotsScreen(navHostController: NavHostController, viewModel: PotsViewModel = 
                 }
             }
             item {
-                AddPotCard(viewModel)
+                AddPotCard(addPotViewModel)
+            }
+            item { 
+                Spacer(modifier = Modifier.height(140.dp))
             }
         }
     }
-    if (viewModel.isDialogShown) {
+    if (addPotViewModel.isDialogShown) {
         AddPotDialog(onDismiss = {
-            viewModel.onDismissDialog()
+            addPotViewModel.onDismissDialog()
         }, onSubmit = {
 
         })

@@ -1,4 +1,4 @@
-package com.cureius.pocket.feature_account.presentation.account
+package com.cureius.pocket.feature_account.presentation.add_account
 
 import com.cureius.pocket.feature_account.domain.model.Bank
 

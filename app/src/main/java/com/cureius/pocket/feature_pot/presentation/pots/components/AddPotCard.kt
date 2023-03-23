@@ -20,11 +20,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.R
-import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
+import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 
 @Preview
 @Composable
-fun AddPotCard(viewModel: PotsViewModel = hiltViewModel()) {
+fun AddPotCard(viewModel: AddPotViewModel = hiltViewModel()) {
     val add = ImageVector.vectorResource(id = R.drawable.add)
     val paddingModifier = Modifier
         .padding(10.dp)
