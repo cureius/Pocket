@@ -260,7 +260,6 @@ fun ConfigurablePotItem(
                                         fontSize = 12.sp
                                     ),
                                     modifier = Modifier
-//                                        .background(Color.Blue)
                                         .padding(2.dp)
                                         .align(Alignment.CenterEnd),
                                     maxLines = 1
