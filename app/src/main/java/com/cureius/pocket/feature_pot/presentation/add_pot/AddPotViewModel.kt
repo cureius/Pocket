@@ -1,9 +1,7 @@
 package com.cureius.pocket.feature_pot.presentation.add_pot
 
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cureius.pocket.feature_pot.domain.model.Pot
@@ -21,16 +19,9 @@ class AddPotViewModel @Inject constructor(
     private val potUseCases: PotUseCases
 ) : ViewModel() {
 
-    var isDialogShown by mutableStateOf(false)
-        private set
+    private val _dialogVisibility = mutableStateOf(false)
+    val dialogVisibility: State<Boolean> = _dialogVisibility
 
-    fun onAddClick() {
-        isDialogShown = true
-    }
-
-    fun onDismissDialog() {
-        isDialogShown = false
-    }
     private val _potTitle = mutableStateOf("")
     val potTitle: State<String> = _potTitle
 
@@ -62,6 +53,10 @@ class AddPotViewModel @Inject constructor(
 
     fun onEvent(event: AddPotEvent) {
         when (event) {
+            is AddPotEvent.ToggleAddAccountDialog -> {
+                _dialogVisibility.value = !_dialogVisibility.value
+            }
+
             is AddPotEvent.EnteredTitle -> {
                 _potTitle.value = event.value
             }

@@ -1,6 +1,7 @@
 package com.cureius.pocket.feature_pot.presentation.add_pot
 
 import androidx.compose.ui.focus.FocusState
+import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionEvent
 
 sealed class AddPotEvent {
@@ -10,6 +11,8 @@ sealed class AddPotEvent {
     data class EnteredValidity(val value: Long) : AddPotEvent()
     data class SelectedIcon(val value: String) : AddPotEvent()
     data class SelectedType(val value: String) : AddPotEvent()
+    object ToggleAddAccountDialog : AddPotEvent()
+
     object SavePot : AddPotEvent()
 
 }

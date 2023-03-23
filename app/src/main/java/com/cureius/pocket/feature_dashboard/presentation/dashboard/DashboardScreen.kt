@@ -1,5 +1,6 @@
 package com.cureius.pocket.feature_dashboard.presentation.dashboard
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +26,7 @@ import com.cureius.pocket.feature_dashboard.domain.PotType
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.*
 import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
 import com.cureius.pocket.feature_pot.domain.model.Pot
+import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.util.ScreenDimensions
 
 @Composable
@@ -91,28 +93,28 @@ fun DashboardScreen(navHostController: NavHostController) {
     )
     val potItems = listOf(
         Pot(
-            icon = save.toString(),
+            icon = "save",
             title = "Savings",
             capacity = 100.0,
             filled = 0.8f,
             type = PotType.Asset.type
         ),
         Pot(
-            icon = wallet.toString(),
+            icon = "wallet",
             title = "Wallet",
             capacity = 100.0,
             filled = 0.5f,
             type = PotType.Liability.type
         ),
         Pot(
-            icon = emi.toString(),
+            icon = "emi",
             title = "EMI",
             capacity = 100.0,
             filled = 0.6f,
             type = PotType.Liability.type
         ),
         Pot(
-            icon = invest.toString(),
+            icon = "invest",
             title = "Investment",
             capacity = 100.0,
             filled = 0.7f,
@@ -167,7 +169,7 @@ fun DashboardScreen(navHostController: NavHostController) {
             item {
                 LazyRow(
                     modifier = Modifier
-                        .height(144.dp),
+                        .height(152.dp),
                     contentPadding = PaddingValues(
                         start = 0.dp,
                         top = 16.dp,
@@ -208,6 +210,7 @@ fun DashboardScreen(navHostController: NavHostController) {
 
                         Spacer(modifier = Modifier.width(16.dp))
                     }
+                    Log.d("Pots", "DashboardScreen: $potItems")
                     items(potItems) { item ->
                         item.filled?.let { item.type?.let { it1 ->
                             PotItem(item.icon, it, item.title,

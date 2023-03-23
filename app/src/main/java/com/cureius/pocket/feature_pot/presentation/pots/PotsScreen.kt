@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotEvent
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_pot.presentation.pots.components.AddPotCard
@@ -108,9 +109,9 @@ fun PotsScreen(
             }
         }
     }
-    if (addPotViewModel.isDialogShown) {
+    if (addPotViewModel.dialogVisibility.value) {
         AddPotDialog(onDismiss = {
-            addPotViewModel.onDismissDialog()
+            addPotViewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
         }, onSubmit = {
 
         })

@@ -26,11 +26,14 @@ import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -56,7 +59,9 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AddAccountFormDialog(
-    onDismiss: () -> Unit, onSubmit: () -> Unit, viewModel: AddAccountViewModel = hiltViewModel()
+    onDismiss: () -> Unit,
+    onSubmit: () -> Unit,
+    viewModel: AddAccountViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val holderName = viewModel.accountHolderName.value
@@ -127,22 +132,44 @@ fun AddAccountFormDialog(
                 ) {
 
                     item {
-                        Text(
-                            text = "Add Account",
-                            color = MaterialTheme.colors.onBackground,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 20.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(4.dp, 0.dp)
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            val checkedState = remember { mutableStateOf(false) }
+                            Text(
+                                text = "Add Account",
+                                color = MaterialTheme.colors.onBackground,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(fontWeight = FontWeight.Bold),
+                                fontSize = 20.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(4.dp, 0.dp)
+                            )
+                            Box() {
+                                Column(
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = "Primary",
+                                        color = MaterialTheme.colors.onBackground,
+                                        textAlign = TextAlign.Center,
+                                        style = TextStyle(fontWeight = FontWeight.Bold),
+                                        fontSize = 12.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(0.dp, 0.dp)
+                                    )
+                                    Switch(checked = checkedState.value,
+                                        onCheckedChange = { checkedState.value = it })
+                                }
+                            }
+                        }
                     }
                     item {
-                        Spacer(modifier = Modifier.height(14.dp))
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(20.dp))
                     }
                     item {
                         Box(

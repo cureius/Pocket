@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.feature_account.presentation.account.components.AccountItem
 import com.cureius.pocket.feature_account.presentation.account.components.AddAccountCard
+import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountFormDialog
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountViewModel
 
@@ -67,16 +68,16 @@ fun AccountsScreen(
             }
             item {
                 AddAccountCard(onClick = {
-                    addAccountViewModel.onAddClick()
+                    addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
                 })
             }
             item {
                 Spacer(modifier = Modifier.height(140.dp))
             }
         }
-        if (addAccountViewModel.isDialogShown) {
+        if (addAccountViewModel.dialogVisibility.value) {
             AddAccountFormDialog(onDismiss = {
-                addAccountViewModel.onDismissDialog()
+                addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
             }, onSubmit = {
 
             })

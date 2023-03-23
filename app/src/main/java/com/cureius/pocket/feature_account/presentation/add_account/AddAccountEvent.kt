@@ -7,6 +7,6 @@ sealed class AddAccountEvent {
     data class SelectedBank(val value: Bank) : AddAccountEvent()
     data class EnteredAccountNumber(val value: String) : AddAccountEvent()
     data class EnteredCardNumber(val value: String) : AddAccountEvent()
-
+    object ToggleAddAccountDialog : AddAccountEvent()
     object SaveAccount : AddAccountEvent()
 }

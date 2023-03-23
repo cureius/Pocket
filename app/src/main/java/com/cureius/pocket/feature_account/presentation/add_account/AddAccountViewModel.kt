@@ -1,9 +1,7 @@
 package com.cureius.pocket.feature_account.presentation.add_account
 
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cureius.pocket.feature_account.domain.model.Account
@@ -21,16 +19,8 @@ class AddAccountViewModel @Inject constructor(
     private val accountUseCases: AccountUseCases,
 ) : ViewModel() {
 
-    var isDialogShown by mutableStateOf(false)
-        private set
-
-    fun onAddClick() {
-        isDialogShown = true
-    }
-
-    fun onDismissDialog() {
-        isDialogShown = false
-    }
+    private val _dialogVisibility = mutableStateOf(false)
+    val dialogVisibility: State<Boolean> = _dialogVisibility
 
     private val _accountHolderName = mutableStateOf("")
     val accountHolderName: State<String> = _accountHolderName
@@ -61,6 +51,9 @@ class AddAccountViewModel @Inject constructor(
 
     fun onEvent(event: AddAccountEvent) {
         when (event) {
+            is AddAccountEvent.ToggleAddAccountDialog -> {
+                _dialogVisibility.value = !_dialogVisibility.value
+            }
             is AddAccountEvent.EnteredHolderName -> {
                 _accountHolderName.value = event.value
             }

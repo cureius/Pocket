@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
                 PERMISSION_REQUEST_CODE
             )
         } else {
-            initialSmsSync(this)
+//            initialSmsSync(this)
         }
 
         setContent {
@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initialSmsSync(this)
+//                initialSmsSync(this)
             } else {
                 Toast.makeText(
                     this,

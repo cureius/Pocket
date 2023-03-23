@@ -29,8 +29,10 @@ import com.cureius.pocket.feature_transaction.presentation.util.Screen
 import com.cureius.pocket.util.components.BottomNavigationBar
 import com.cureius.pocket.util.model.BottomNavItem
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountFormDialog
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountViewModel
+import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotEvent
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
@@ -106,11 +108,11 @@ fun BottomNavigationContainer(
                         }
 
                         "pots" -> {
-                            addPotViewModel.onAddClick()
+                            addPotViewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
                         }
 
                         "accounts" -> {
-                            addAccountViewModel.onAddClick()
+                            addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
                         }
 
                         else -> {
@@ -131,16 +133,16 @@ fun BottomNavigationContainer(
             navController = navController, bottomNavHostController = bottomNavController
         )
     }
-    if (addAccountViewModel.isDialogShown) {
+    if (addAccountViewModel.dialogVisibility.value) {
         AddAccountFormDialog(onDismiss = {
-            addAccountViewModel.onDismissDialog()
+            addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
         }, onSubmit = {
 
         })
     }
-    if (addPotViewModel.isDialogShown) {
+    if (addPotViewModel.dialogVisibility.value) {
         AddPotDialog(onDismiss = {
-            addPotViewModel.onDismissDialog()
+            addPotViewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
         }, onSubmit = {
 
         })

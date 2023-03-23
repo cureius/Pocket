@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotEvent
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 
 @Preview
@@ -42,7 +43,7 @@ fun AddPotCard(viewModel: AddPotViewModel = hiltViewModel()) {
                 .fillMaxSize()
         ) {
             IconButton(onClick = {
-                viewModel.onAddClick()
+                viewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
             }, modifier = Modifier.fillMaxSize()) {
                 Icon(
                     imageVector = add,

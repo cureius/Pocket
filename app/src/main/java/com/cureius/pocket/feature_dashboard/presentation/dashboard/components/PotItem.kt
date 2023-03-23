@@ -35,7 +35,7 @@ fun PotItem(
     val fillShape = RoundedCornerShape(
         topStart = 8.dp, topEnd = 8.dp, bottomStart = 12.dp, bottomEnd = 12.dp
     )
-    Column {
+    Column() {
         Box(contentAlignment = Alignment.Center) {
             Box(
                 modifier = Modifier
@@ -44,7 +44,6 @@ fun PotItem(
                     .background(MaterialTheme.colors.surface, potShape),
                 contentAlignment = Alignment.BottomCenter
             ) {
-
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -76,7 +75,7 @@ fun PotItem(
 
             }
             if (icon != null) {
-                IconDictionary.allIcons.get(icon)
+                IconDictionary.allIcons[icon]
                     ?.let { ImageVector.vectorResource(id = it) }?.let {
                         Icon(
                             imageVector = it,
