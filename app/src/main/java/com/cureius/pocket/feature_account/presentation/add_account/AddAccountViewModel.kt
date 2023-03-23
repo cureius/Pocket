@@ -31,6 +31,9 @@ class AddAccountViewModel @Inject constructor(
     private val _cardNumber = mutableStateOf("")
     val cardNumber: State<String> = _cardNumber
 
+    private val _isPrimaryAccount = mutableStateOf(false)
+    val isPrimaryAccount: State<Boolean> = _isPrimaryAccount
+
     private val _bank = mutableStateOf(
         Bank(
             null, null
@@ -49,20 +52,35 @@ class AddAccountViewModel @Inject constructor(
         object SaveAccount : UiEvent()
     }
 
+    init {
+        _accountHolderName.value = ""
+        _accountNumber.value = ""
+        _cardNumber.value = ""
+        _isPrimaryAccount.value = false
+    }
+
     fun onEvent(event: AddAccountEvent) {
         when (event) {
             is AddAccountEvent.ToggleAddAccountDialog -> {
                 _dialogVisibility.value = !_dialogVisibility.value
             }
+
+            is AddAccountEvent.ToggleIsPrimaryAccount -> {
+                _isPrimaryAccount.value = !_isPrimaryAccount.value
+            }
+
             is AddAccountEvent.EnteredHolderName -> {
                 _accountHolderName.value = event.value
             }
+
             is AddAccountEvent.SelectedBank -> {
                 _bank.value = event.value
             }
+
             is AddAccountEvent.EnteredAccountNumber -> {
                 _accountNumber.value = event.value
             }
+
             is AddAccountEvent.EnteredCardNumber -> {
                 _cardNumber.value = event.value
             }
@@ -76,7 +94,7 @@ class AddAccountViewModel @Inject constructor(
                                 bank.value.name.toString(),
                                 accountHolderName.value,
                                 cardNumber.value,
-                                is_primary = true,
+                                is_primary = isPrimaryAccount.value,
                                 timestamp = System.currentTimeMillis(),
                                 id = currentAccountId
                             )

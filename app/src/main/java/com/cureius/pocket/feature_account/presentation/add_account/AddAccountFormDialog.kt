@@ -59,9 +59,7 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AddAccountFormDialog(
-    onDismiss: () -> Unit,
-    onSubmit: () -> Unit,
-    viewModel: AddAccountViewModel = hiltViewModel()
+    onDismiss: () -> Unit, onSubmit: () -> Unit, viewModel: AddAccountViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val holderName = viewModel.accountHolderName.value
@@ -162,8 +160,11 @@ fun AddAccountFormDialog(
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.padding(0.dp, 0.dp)
                                     )
-                                    Switch(checked = checkedState.value,
-                                        onCheckedChange = { checkedState.value = it })
+                                    Switch(checked = viewModel.isPrimaryAccount.value,
+                                        onCheckedChange = {
+                                            viewModel.onEvent(AddAccountEvent.ToggleIsPrimaryAccount)
+                                        }
+                                    )
                                 }
                             }
                         }
