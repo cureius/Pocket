@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 
 @Preview
 @Composable
-fun IncomeCreditPrompt(){
+fun IncomeCreditPrompt(position: Int = 0){
     val buttonShape = RoundedCornerShape(
         topStart = 12.dp,
         topEnd = 12.dp,

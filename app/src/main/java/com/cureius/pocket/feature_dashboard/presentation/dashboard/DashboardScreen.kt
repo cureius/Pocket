@@ -148,11 +148,20 @@ fun DashboardScreen(navHostController: NavHostController) {
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .offset(y = (-30).dp),
+                .offset(y = (-26).dp),
             contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp)
         ) {
             item {
-                IncomeCreditPrompt()
+                AddAccountRequest(position = -1)
+            }
+            item {
+                AddPotRequest(position = 0)
+            }
+            item {
+                SyncSMS(position = 0)
+            }
+            item {
+                IncomeCreditPrompt(position = 1)
             }
             item {
                 Text(
