@@ -28,25 +28,10 @@ class PotsViewModel @Inject constructor(
     init {
         getPots()
     }
-
     private fun getPots() {
         getPotsJob?.cancel()
         getPotsJob = potUseCases.getPots().onEach { pots ->
             _state.value = pots
-            filterPots()
         }.launchIn(viewModelScope)
-    }
-
-    private fun filterPots() {
-        _pots.value.clear()
-        state.value.forEach { template ->
-            if (template.is_template == true) {
-                if (_state.value.any { it.parent == template.id }) {
-                    _pots.value.add(_state.value.last { it.parent == template.id })
-                } else {
-                    _pots.value.add(template)
-                }
-            }
-        }
     }
 }

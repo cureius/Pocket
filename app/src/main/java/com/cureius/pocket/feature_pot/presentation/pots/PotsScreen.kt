@@ -20,6 +20,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -33,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotEvent
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
@@ -45,7 +48,17 @@ fun PotsScreen(
     viewModel: PotsViewModel = hiltViewModel(),
     addPotViewModel: AddPotViewModel = hiltViewModel()
 ) {
-    val state = viewModel.pots.value
+    val state = viewModel.state.value
+    val pots = mutableListOf<Pot>()
+    pots.clear()
+    state.filter { it.is_template == true }.forEach { template ->
+        if (state.any { it.parent == template.id }) {
+            pots.add(state.last { it.parent == template.id })
+        } else {
+            pots.add(template)
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,12 +104,10 @@ fun PotsScreen(
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
         ) {
-            items(state) { pot ->
-
+            items(pots) { pot ->
                 PotItem(
                     pot
                 )
-
             }
             item {
                 AddPotCard(addPotViewModel)

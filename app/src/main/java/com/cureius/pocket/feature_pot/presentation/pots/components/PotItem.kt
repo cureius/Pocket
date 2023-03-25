@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.feature_pot.domain.model.Pot
+import java.util.Random
 import kotlin.math.roundToInt
 
 @Composable
@@ -47,6 +48,8 @@ fun PotItem(
         Pair("su", 0.0f),
     )
 ) {
+    var filled = pot.filled;
+    var mData: Map<String, Float>? = data
     val icon = IconDictionary.allIcons[pot.icon]
     val maxValue = (pot.capacity?.let { data?.values?.maxOrNull()?.times(it) })?.roundToInt()
     val paddingModifier = Modifier
@@ -119,7 +122,7 @@ fun PotItem(
                         Row {
                             if (pot.capacity != null) {
                                 Text(
-                                    text = "${(pot.capacity * pot.filled!!).roundToInt()}/${pot.capacity.roundToInt()}",
+                                    text = "${(pot.capacity * filled!!).roundToInt()}/${pot.capacity.roundToInt()}",
                                     color = MaterialTheme.colors.onPrimary,
                                     textAlign = TextAlign.Center,
                                     style = TextStyle(fontWeight = FontWeight.Normal),
@@ -129,9 +132,9 @@ fun PotItem(
                                     modifier = Modifier.padding(4.dp)
                                 )
                             }
-                            if (pot.filled != null) {
+                            if (filled != null) {
                                 Text(
-                                    text = " ${(pot.filled * 100).roundToInt()}%",
+                                    text = " ${(filled!! * 100).roundToInt()}%",
                                     color = MaterialTheme.colors.onSecondary,
                                     textAlign = TextAlign.Center,
                                     style = TextStyle(fontWeight = FontWeight.Bold),
@@ -154,19 +157,39 @@ fun PotItem(
 
                 Box(contentAlignment = Alignment.Center) {
                     if (pot.is_template == true && pot.weight == null) {
+                        filled = kotlin.random.Random.nextFloat()
+                        mData = mapOf(
+                            Pair("mo", kotlin.random.Random.nextFloat()),
+                            Pair("tu", kotlin.random.Random.nextFloat()),
+                            Pair("we", kotlin.random.Random.nextFloat()),
+                            Pair("th", kotlin.random.Random.nextFloat()),
+                            Pair("fr", kotlin.random.Random.nextFloat()),
+                            Pair("sa", kotlin.random.Random.nextFloat()),
+                            Pair("su", kotlin.random.Random.nextFloat()),
+                        )
                         Text(
-                            text = "Set Pot ",
+                            text = "Set Weightage",
                             color = MaterialTheme.colors.onBackground,
                             textAlign = TextAlign.Center,
                             style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 24.sp,
+                            fontSize = 20.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(4.dp, 0.dp)
                         )
                     } else if (pot.is_template == true && pot.weight != null) {
+                        filled = kotlin.random.Random.nextFloat()
+                        mData = mapOf(
+                            Pair("mo", kotlin.random.Random.nextFloat()),
+                            Pair("tu", kotlin.random.Random.nextFloat()),
+                            Pair("we", kotlin.random.Random.nextFloat()),
+                            Pair("th", kotlin.random.Random.nextFloat()),
+                            Pair("fr", kotlin.random.Random.nextFloat()),
+                            Pair("sa", kotlin.random.Random.nextFloat()),
+                            Pair("su", kotlin.random.Random.nextFloat()),
+                        )
                         Text(
-                            text = "Set Up Pots:",
+                            text = "Not Initialized",
                             color = MaterialTheme.colors.onBackground,
                             textAlign = TextAlign.Center,
                             style = TextStyle(fontWeight = FontWeight.Bold),
@@ -181,9 +204,9 @@ fun PotItem(
                     Box(
                         modifier = Modifier.blur(
                             if (pot.is_template == true && pot.weight == null) {
-                                16.dp
+                                20.dp
                             } else if (pot.is_template == true && pot.weight != null) {
-                                18.dp
+                                12.dp
                             } else {
                                 0.dp
                             }
@@ -201,10 +224,10 @@ fun PotItem(
                                     .fillMaxHeight(),
                                 contentAlignment = Alignment.BottomCenter
                             ) {
-                                if (pot.filled != null) {
+                                if (filled != null) {
                                     Box(
                                         modifier = Modifier
-                                            .fillMaxHeight(pot.filled)
+                                            .fillMaxHeight(filled!!)
                                             .fillMaxWidth(0.6f)
                                             .background(
                                                 MaterialTheme.colors.primary.copy(alpha = 0.9f),
@@ -219,9 +242,9 @@ fun PotItem(
                             Box(
                                 modifier = Modifier.background(Color.Yellow.copy(alpha = 0.0f))
                             ) {
-                                if (data != null) {
+                                if (mData != null) {
                                     Chart(
-                                        data = data,
+                                        data = mData!!,
                                         maxValue = maxValue?.toDouble(),
                                         modifier = Modifier
                                             .fillMaxSize()
@@ -232,7 +255,6 @@ fun PotItem(
                         }
                     }
                 }
-
             }
         }
     }

@@ -115,6 +115,31 @@ class ConfigurePotsViewModel @Inject constructor(
                             )
                         }
                     )
+                }else{
+                    _nodes.value.add(
+                        index + 1, if (index == _weights.value.size - 1) {
+                            if (0.0f + nodes.value[index]?.value!! != 1.0f) {
+                                mutableStateOf(
+                                    1.0f
+                                )
+                            } else {
+                                Log.d("previous node", "getTemplatePots: ${nodes.value[index - 1]?.value}")
+                                mutableStateOf(
+                                    0.0f +
+                                            _nodes.value[index]?.value!!
+                                )
+                            }
+                        } else {
+                            mutableStateOf(
+                                0.0f + (if (index > 0) {
+                                    Log.d("previous node", "getTemplatePots: ${nodes.value[index - 1]?.value}")
+                                    _nodes.value[index]?.value
+                                } else {
+                                    0.0f
+                                })!!
+                            )
+                        }
+                    )
                 }
             }
         }.launchIn(viewModelScope)

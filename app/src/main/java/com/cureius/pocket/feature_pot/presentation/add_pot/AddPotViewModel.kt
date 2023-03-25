@@ -96,7 +96,7 @@ class AddPotViewModel @Inject constructor(
                                 is_default = isDefault.value,
                                 timestamp = System.currentTimeMillis(),
                                 id = currentPotId,
-                                weight = 0.0f
+                                weight = null
                             )
                         )
                         _eventFlow.emit(UiEvent.SavePot)
