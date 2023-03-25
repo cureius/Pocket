@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -58,56 +60,57 @@ fun PotsScreen(
             pots.add(template)
         }
     }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background)
-            .padding(16.dp),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "Your Pots",
-                color = MaterialTheme.colors.onBackground,
-                textAlign = TextAlign.Center,
-                style = TextStyle(fontWeight = FontWeight.Bold),
-                fontSize = 24.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(4.dp, 0.dp)
-            )
-            Card(
-                elevation = 4.dp, shape = RoundedCornerShape(12.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .background(color = MaterialTheme.colors.primary.copy(alpha = 0.4f))
-                        .padding(8.dp)
-                        .clickable {
-                            navHostController.navigate("configure_pots")
-                        },
-                    contentAlignment = Alignment.Center
-                ) {
-                    val config = ImageVector.vectorResource(id = R.drawable.sliders)
-                    Icon(
-                        imageVector = config,
-                        contentDescription = "config",
-                        tint = MaterialTheme.colors.background,
-                    )
-                }
-            }
-        }
+    Scaffold {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
         ) {
+            item {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(0.dp, 0.dp)
+                ) {
+                    Text(
+                        text = "Your Pots",
+                        color = MaterialTheme.colors.onBackground,
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(fontWeight = FontWeight.Bold),
+                        fontSize = 24.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(4.dp, 0.dp)
+                    )
+                    Card(
+                        elevation = 4.dp, shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colors.primary.copy(
+                                        alpha = 0.4f
+                                    )
+                                )
+                                .padding(8.dp)
+                                .clickable {
+                                    navHostController.navigate("configure_pots")
+                                }, contentAlignment = Alignment.Center
+                        ) {
+                            val config = ImageVector.vectorResource(id = R.drawable.sliders)
+                            Icon(
+                                imageVector = config,
+                                contentDescription = "config",
+                                tint = MaterialTheme.colors.background,
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+            }
             items(pots) { pot ->
-                PotItem(
-                    pot
-                )
+                PotItem(pot)
             }
             item {
                 AddPotCard(addPotViewModel)
@@ -116,12 +119,12 @@ fun PotsScreen(
                 Spacer(modifier = Modifier.height(140.dp))
             }
         }
-    }
-    if (addPotViewModel.dialogVisibility.value) {
-        AddPotDialog(onDismiss = {
-            addPotViewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
-        }, onSubmit = {
+        if (addPotViewModel.dialogVisibility.value) {
+            AddPotDialog(onDismiss = {
+                addPotViewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
+            }, onSubmit = {
 
-        })
+            })
+        }
     }
 }

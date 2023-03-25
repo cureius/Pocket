@@ -56,8 +56,6 @@ fun AccountsScreen(
                 )
                 Spacer(modifier = Modifier.height(20.dp))
             }
-
-
             items(state) { account ->
                 AccountItem(
                     bankName = account.bank,
