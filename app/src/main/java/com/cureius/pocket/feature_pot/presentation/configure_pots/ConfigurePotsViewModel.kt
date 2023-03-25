@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.domain.use_case.PotUseCases
-import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_transaction.domain.model.InvalidTransactionException
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -89,16 +88,32 @@ class ConfigurePotsViewModel @Inject constructor(
                     0.0f
                 )
             )
-            _weights.value.forEachIndexed { index, mutableState ->
+            weights.value.forEachIndexed { index, mutableState ->
+                Log.d("weight", "getTemplatePots: $index-->$mutableState")
                 if (mutableState != null) {
                     _nodes.value.add(
-                        index + 1, mutableStateOf(
-                            mutableState.value + (if (index > 0) {
-                                _nodes.value[index - 1]?.value
+                        index + 1, if (index == _weights.value.size - 1) {
+                            if (mutableState.value + nodes.value[index]?.value!! != 1.0f) {
+                                mutableStateOf(
+                                    1.0f
+                                )
                             } else {
-                                0.0f
-                            })!!
-                        )
+                                Log.d("previous node", "getTemplatePots: ${nodes.value[index - 1]?.value}")
+                                mutableStateOf(
+                                    mutableState.value +
+                                        _nodes.value[index]?.value!!
+                                )
+                            }
+                        } else {
+                            mutableStateOf(
+                                mutableState.value + (if (index > 0) {
+                                    Log.d("previous node", "getTemplatePots: ${nodes.value[index - 1]?.value}")
+                                    _nodes.value[index]?.value
+                                } else {
+                                    0.0f
+                                })!!
+                            )
+                        }
                     )
                 }
             }

@@ -1,6 +1,7 @@
 package com.cureius.pocket.feature_pot.presentation.configure_pots
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -42,9 +43,7 @@ fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
     val nodeList = viewModel.nodes.value
     val potTemplateList = viewModel.state.value
     val nonMutableNodeList = nodeList.toList()
-    if (nonMutableNodeList.isNotEmpty() && nonMutableNodeList[nodeList.size - 1]?.value != 1.0f) {
-        nodeList[nodeList.size - 1]?.value = 1.0f
-    }
+    Log.d("Nodes", "ConfigurePotsScreen: $nonMutableNodeList")
     Scaffold {
         Column {
             Column(
