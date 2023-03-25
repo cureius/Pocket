@@ -31,6 +31,8 @@ fun RangeSlider(
     modifier: Modifier,
     rangeColor: Color,
     backColor: Color,
+    startKnob: Color,
+    endKnob: Color,
     barHeight: Dp,
     circleRadius: Dp,
     cornerRadius: CornerRadius,
@@ -102,7 +104,6 @@ fun RangeSlider(
             .height(barHeight)
             .pointerInteropFilter(
                 onTouchEvent = { motionEvent ->
-
                     when (motionEvent.action) {
                         MotionEvent.ACTION_DOWN -> {
                             val x = motionEvent.x
@@ -114,10 +115,10 @@ fun RangeSlider(
                                 (x - rightCircleOffset.x).pow(2) + (y - rightCircleOffset.y).pow(2)
                             )
 
-                            if (dis1 < circleRadiusInPx) { // left circle clicked
-                                leftCircleDragging = true
-                            } else if (dis2 < circleRadiusInPx) { // right circle clicked
+                            if (dis2 < circleRadiusInPx) { // left circle clicked
                                 rightCircleDragging = true
+                            } else if (dis1 < circleRadiusInPx) { // right circle clicked
+                                leftCircleDragging = true
                             }
                         }
 
@@ -150,6 +151,7 @@ fun RangeSlider(
                             rightCircleDragging = false
                             onProgressChanged(progress1, progress2)
                         }
+
                     }
                     true
                 }
@@ -179,13 +181,13 @@ fun RangeSlider(
         //draw left circle
         scale(scaleAnim1, pivot = leftCircleOffset) {
             drawCircle(
-                color = rangeColor.copy(alpha = 0.2f),
+                color = startKnob.copy(alpha = 0.2f),
                 radius = circleRadius.toPx(),
                 center = leftCircleOffset
             )
         }
         drawCircle(
-            color = rangeColor,
+            color = startKnob,
             radius = circleRadius.toPx(),
             center = leftCircleOffset
         )
@@ -193,13 +195,13 @@ fun RangeSlider(
         //draw right circle
         scale(scaleAnim2, pivot = rightCircleOffset) {
             drawCircle(
-                color = rangeColor.copy(alpha = 0.2f),
+                color = endKnob.copy(alpha = 0.2f),
                 radius = circleRadius.toPx(),
                 center = rightCircleOffset
             )
         }
         drawCircle(
-            color = rangeColor,
+            color = endKnob,
             radius = circleRadius.toPx(),
             center = rightCircleOffset,
         )

@@ -178,6 +178,8 @@ fun ConfigurablePotItem(
                         .fillMaxWidth(),
                         rangeColor = MaterialTheme.colors.primary,
                         backColor = MaterialTheme.colors.primary.copy(alpha = 0.1f),
+                        startKnob = MaterialTheme.colors.secondary,
+                        endKnob = MaterialTheme.colors.primary,
                         barHeight = 8.dp,
                         circleRadius = 10.dp,
                         progress1InitialValue = initialStart,

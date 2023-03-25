@@ -99,6 +99,9 @@ class AddPotViewModel @Inject constructor(
                                 weight = null
                             )
                         )
+                        _potTitle.value = ""
+                        _potType.value = ""
+                        _potIcon.value = ""
                         _eventFlow.emit(UiEvent.SavePot)
                     } catch (e: InvalidTransactionException) {
                         _eventFlow.emit(
