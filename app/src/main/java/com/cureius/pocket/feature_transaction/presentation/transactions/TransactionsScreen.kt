@@ -74,14 +74,14 @@ fun TransactionsScreen(
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navController?.navigate(Screen.AddTransactionScreen.route)
-                },
-                backgroundColor = MaterialTheme.colors.primary,
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Transaction")
-            }
+//            FloatingActionButton(
+//                onClick = {
+//                    navController?.navigate(Screen.AddTransactionScreen.route)
+//                },
+//                backgroundColor = MaterialTheme.colors.primary,
+//            ) {
+//                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Transaction")
+//            }
         },
         scaffoldState = scaffoldState,
     ) {

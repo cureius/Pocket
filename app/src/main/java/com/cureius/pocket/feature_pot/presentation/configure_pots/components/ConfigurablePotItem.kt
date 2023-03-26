@@ -49,7 +49,7 @@ fun ConfigurablePotItem(
     val paddingModifier = Modifier
         .padding(8.dp)
         .fillMaxWidth()
-        .height(140.dp)
+        .height(144.dp)
     Card(
         shape = RoundedCornerShape(20.dp),
         elevation = 4.dp,
@@ -66,7 +66,7 @@ fun ConfigurablePotItem(
                 var weight = (initialEnd.minus(initialStart).toString())
                 Row(
                     modifier = Modifier
-                        .padding(start = 8.dp, top = 8.dp, bottom = 4.dp)
+                        .padding(start = 8.dp, top = 8.dp, bottom = 8.dp, end = 8.dp)
                         .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(
