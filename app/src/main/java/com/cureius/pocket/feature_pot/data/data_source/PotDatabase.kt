@@ -7,7 +7,7 @@ import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.domain.util.ImageTypeConverter
 
 @Database(
-    entities = [Pot::class], version = 1, exportSchema = true
+    entities = [Pot::class], version = 2, exportSchema = true
 )
 @TypeConverters(ImageTypeConverter::class)
 abstract class PotDatabase : RoomDatabase() {

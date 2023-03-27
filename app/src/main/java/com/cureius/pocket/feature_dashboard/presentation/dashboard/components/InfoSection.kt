@@ -68,8 +68,7 @@ fun InfoSection() {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(140.dp)
-            .padding(16.dp, 0.dp, 16.dp, 0.dp),
+            .padding(16.dp, 0.dp, 16.dp, 12.dp),
     ) {
         Box(
             modifier = Modifier

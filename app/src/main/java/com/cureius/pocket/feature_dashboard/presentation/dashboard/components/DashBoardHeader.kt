@@ -40,7 +40,6 @@ fun DashBoardHeader(navHostController: NavHostController) {
         })
 
         Row() {
-
             RoundIconButton(icon = wallet, label = "Wallet", modifier = Modifier
                 .background(
                     MaterialTheme.colors.primary.copy(alpha = 0.2F), CircleShape

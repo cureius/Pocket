@@ -98,22 +98,19 @@ fun DashboardScreen(navHostController: NavHostController) {
             capacity = 100.0,
             filled = 0.8f,
             type = PotType.Asset.type
-        ),
-        Pot(
+        ), Pot(
             icon = "wallet",
             title = "Wallet",
             capacity = 100.0,
             filled = 0.5f,
             type = PotType.Liability.type
-        ),
-        Pot(
+        ), Pot(
             icon = "emi",
             title = "EMI",
             capacity = 100.0,
             filled = 0.6f,
             type = PotType.Liability.type
-        ),
-        Pot(
+        ), Pot(
             icon = "invest",
             title = "Investment",
             capacity = 100.0,
@@ -123,7 +120,7 @@ fun DashboardScreen(navHostController: NavHostController) {
     )
     val size = ScreenDimensions()
     val screenWeight = size.width()
-    val rowCap = (screenWeight / 76)
+    val rowCap = (screenWeight / 80)
     val rowNumber = if ((gridItems.size % rowCap) == 0) {
         gridItems.size / rowCap
     } else {
@@ -133,132 +130,128 @@ fun DashboardScreen(navHostController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colors.background)
+            .background(MaterialTheme.colors.background),
     ) {
         Column(
-            modifier = Modifier
-                .background(MaterialTheme.colors.surface)
-                .height(280.dp),
+            modifier = Modifier.background(MaterialTheme.colors.surface),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             DashBoardHeader(navHostController)
             InfoSection()
-            CurveBottomMask()
         }
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .offset(y = (-26).dp),
-            contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp)
-        ) {
-            item {
-                AddAccountRequest(position = -1)
-            }
-            item {
-                AddPotRequest(position = 0)
-            }
-            item {
-                SyncSMS(position = 0)
-            }
-            item {
-                IncomeCreditPrompt(position = 1)
-            }
-            item {
-                Text(
-                    text = "Your Pots",
-                    color = MaterialTheme.colors.onBackground,
-                    textAlign = TextAlign.Center,
-                    style = TextStyle(fontWeight = FontWeight.Bold),
-                    fontSize = 20.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(4.dp, 0.dp)
-                )
-            }
-            item {
-                LazyRow(
-                    modifier = Modifier
-                        .height(152.dp),
-                    contentPadding = PaddingValues(
-                        start = 0.dp,
-                        top = 16.dp,
-                        end = 16.dp,
-                        bottom = 16.dp
-                    )
-                ) {
-                    item {
-                        Column(
-                            verticalArrangement = Arrangement.SpaceEvenly,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-
-                            Spacer(modifier = Modifier.height(8.dp))
-                            RoundIconButton(icon = add,
-                                label = "",
-                                modifier = Modifier
-                                    .background(
-                                        MaterialTheme.colors.onBackground, CircleShape
-                                    )
-                                    .height(44.dp)
-                                    .width(44.dp),
-                                iconColor = MaterialTheme.colors.background,
-                                onClick = {
-
-                                })
-                            Text(
-                                text = "Create new",
-                                color = MaterialTheme.colors.onBackground,
-                                textAlign = TextAlign.Center,
-                                style = TextStyle(fontWeight = FontWeight.Bold),
-                                fontSize = 14.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
-                        }
-
-                        Spacer(modifier = Modifier.width(16.dp))
-                    }
-                    Log.d("Pots", "DashboardScreen: $potItems")
-                    items(potItems) { item ->
-                        item.filled?.let { item.type?.let { it1 ->
-                            PotItem(item.icon, it, item.title,
-                                it1
-                            )
-                        } }
-                    }
-                }
-            }
-            item { Spacer(modifier = Modifier.height(16.dp)) }
-            item {
-                Text(
-                    text = "Expense Categories",
-                    color = MaterialTheme.colors.onBackground,
-                    textAlign = TextAlign.Center,
-                    style = TextStyle(fontWeight = FontWeight.Bold),
-                    fontSize = 20.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(4.dp, 0.dp)
-                )
-            }
-            item { Spacer(modifier = Modifier.height(16.dp)) }
-            (1..rowNumber).forEach {
+        Box(contentAlignment = Alignment.TopCenter) {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .offset(y = (0).dp),
+                contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp)
+            ) {
                 item {
-                    ItemRow(
-                        gridItems.subList(
-                            (rowCap * (it - 1)),
-                            if ((rowCap * (it - 1)) + rowCap > gridItems.size) {
-                                gridItems.size
-                            } else {
-                                (rowCap * (it - 1)) + rowCap
-                            }
-                        ),
-                        modifier = Modifier.padding(startPadding.dp)
+                    AddAccountRequest(position = -1)
+                }
+                item {
+                    AddPotRequest(position = 0)
+                }
+                item {
+                    SyncSMS(position = 0)
+                }
+                item {
+                    IncomeCreditPrompt(position = 1)
+                }
+                item {
+                    Text(
+                        text = "Your Pots",
+                        color = MaterialTheme.colors.onBackground,
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(fontWeight = FontWeight.Bold),
+                        fontSize = 20.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(4.dp, 0.dp)
                     )
                 }
+                item {
+                    LazyRow(
+                        modifier = Modifier.height(152.dp), contentPadding = PaddingValues(
+                            start = 0.dp, top = 16.dp, end = 16.dp, bottom = 16.dp
+                        )
+                    ) {
+                        item {
+                            Column(
+                                verticalArrangement = Arrangement.SpaceEvenly,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+
+                                Spacer(modifier = Modifier.height(8.dp))
+                                RoundIconButton(icon = add,
+                                    label = "",
+                                    modifier = Modifier
+                                        .background(
+                                            MaterialTheme.colors.onBackground, CircleShape
+                                        )
+                                        .height(44.dp)
+                                        .width(44.dp),
+                                    iconColor = MaterialTheme.colors.background,
+                                    onClick = {
+
+                                    })
+                                Text(
+                                    text = "Create new",
+                                    color = MaterialTheme.colors.onBackground,
+                                    textAlign = TextAlign.Center,
+                                    style = TextStyle(fontWeight = FontWeight.Bold),
+                                    fontSize = 14.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+
+                            Spacer(modifier = Modifier.width(16.dp))
+                        }
+                        Log.d("Pots", "DashboardScreen: $potItems")
+                        items(potItems) { item ->
+                            item.filled?.let {
+                                item.type?.let { it1 ->
+                                    PotItem(
+                                        item.icon, it, item.title, it1
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+                item {
+                    Text(
+                        text = "Expense Categories",
+                        color = MaterialTheme.colors.onBackground,
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(fontWeight = FontWeight.Bold),
+                        fontSize = 20.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(4.dp, 0.dp)
+                    )
+                }
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+                (1..rowNumber).forEach {
+                    item {
+                        ItemRow(
+                            gridItems.subList(
+                                (rowCap * (it - 1)),
+                                if ((rowCap * (it - 1)) + rowCap > gridItems.size) {
+                                    gridItems.size
+                                } else {
+                                    (rowCap * (it - 1)) + rowCap
+                                }
+                            ), modifier = Modifier.padding(startPadding.dp)
+                        )
+                    }
+                }
+                item { Spacer(modifier = Modifier.height(88.dp)) }
             }
-            item { Spacer(modifier = Modifier.height(88.dp)) }
+            CurveBottomMask(cornerColor = MaterialTheme.colors.surface)
         }
     }
 }

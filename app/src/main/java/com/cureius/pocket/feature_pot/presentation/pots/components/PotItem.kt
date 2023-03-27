@@ -37,8 +37,7 @@ import kotlin.math.roundToInt
 
 @Composable
 fun PotItem(
-    pot: Pot,
-    data: Map<String, Float>? = mapOf(
+    pot: Pot, data: Map<String, Float>? = mapOf(
         Pair("mo", 0.0f),
         Pair("tu", 0.0f),
         Pair("we", 0.0f),
@@ -72,8 +71,7 @@ fun PotItem(
                 Row(
                     modifier = Modifier
                         .padding(start = 8.dp, top = 8.dp, bottom = 4.dp)
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row(
                         modifier = Modifier
@@ -113,11 +111,9 @@ fun PotItem(
                     }
 
                     Box(
-                        modifier = Modifier
-                            .background(
-                                MaterialTheme.colors.primaryVariant,
-                                RoundedCornerShape(8.dp)
-                            )
+                        modifier = Modifier.background(
+                            MaterialTheme.colors.primaryVariant, RoundedCornerShape(8.dp)
+                        )
                     ) {
                         Row {
                             if (pot.capacity != null) {
@@ -144,8 +140,7 @@ fun PotItem(
                                     modifier = Modifier
                                         .padding(4.dp)
                                         .background(
-                                            MaterialTheme.colors.secondary,
-                                            RoundedCornerShape(4.dp)
+                                            MaterialTheme.colors.secondary, RoundedCornerShape(4.dp)
                                         )
                                 )
                             }
@@ -156,7 +151,7 @@ fun PotItem(
 
 
                 Box(contentAlignment = Alignment.Center) {
-                    if (pot.is_template == true && pot.weight == null) {
+                    if (pot.is_template == true) {
                         filled = kotlin.random.Random.nextFloat()
                         mData = mapOf(
                             Pair("mo", kotlin.random.Random.nextFloat()),
@@ -167,6 +162,62 @@ fun PotItem(
                             Pair("sa", kotlin.random.Random.nextFloat()),
                             Pair("su", kotlin.random.Random.nextFloat()),
                         )
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.3f)
+                                .fillMaxHeight(),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            if (filled != null) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxHeight(filled!!)
+                                        .fillMaxWidth(0.6f)
+                                        .background(
+                                            MaterialTheme.colors.primary.copy(alpha = 0.9f),
+                                            RoundedCornerShape(8.dp)
+                                        )
+                                )
+                            }
+
+                            Jar(MaterialTheme.colors.onSurface)
+                        }
+
+                        Box(
+                            modifier = Modifier.background(Color.Yellow.copy(alpha = 0.0f))
+                        ) {
+                            if (mData != null) {
+                                Chart(
+                                    data = mData!!,
+                                    maxValue = maxValue?.toDouble(),
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .offset(y = (8).dp)
+                                )
+                            }
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = if (pot.is_template == true && pot.weight == null) {
+                                    MaterialTheme.colors.surface.copy(alpha = 0.95f)
+                                } else if (pot.is_template == true && pot.weight != null) {
+                                    MaterialTheme.colors.surface.copy(alpha = 0.90f)
+                                } else {
+                                    MaterialTheme.colors.surface.copy(alpha = 0.0f)
+                                }, shape = RoundedCornerShape(24.dp)
+                            )
+                            .fillMaxSize(),
+                    )
+                    if (pot.is_template == true && pot.weight == null) {
                         Text(
                             text = "Set Weightage",
                             color = MaterialTheme.colors.onBackground,
@@ -178,16 +229,6 @@ fun PotItem(
                             modifier = Modifier.padding(4.dp, 0.dp)
                         )
                     } else if (pot.is_template == true && pot.weight != null) {
-                        filled = kotlin.random.Random.nextFloat()
-                        mData = mapOf(
-                            Pair("mo", kotlin.random.Random.nextFloat()),
-                            Pair("tu", kotlin.random.Random.nextFloat()),
-                            Pair("we", kotlin.random.Random.nextFloat()),
-                            Pair("th", kotlin.random.Random.nextFloat()),
-                            Pair("fr", kotlin.random.Random.nextFloat()),
-                            Pair("sa", kotlin.random.Random.nextFloat()),
-                            Pair("su", kotlin.random.Random.nextFloat()),
-                        )
                         Text(
                             text = "Not Initialized",
                             color = MaterialTheme.colors.onBackground,
@@ -196,63 +237,12 @@ fun PotItem(
                             fontSize = 20.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(4.dp, 0.dp)
+                            modifier = Modifier
+                                .padding(4.dp, 0.dp)
+                                .fillMaxSize()
                         )
                     } else {
 
-                    }
-                    Box(
-                        modifier = Modifier.blur(
-                            if (pot.is_template == true && pot.weight == null) {
-                                20.dp
-                            } else if (pot.is_template == true && pot.weight != null) {
-                                12.dp
-                            } else {
-                                0.dp
-                            }
-                        )
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth(0.3f)
-                                    .fillMaxHeight(),
-                                contentAlignment = Alignment.BottomCenter
-                            ) {
-                                if (filled != null) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxHeight(filled!!)
-                                            .fillMaxWidth(0.6f)
-                                            .background(
-                                                MaterialTheme.colors.primary.copy(alpha = 0.9f),
-                                                RoundedCornerShape(8.dp)
-                                            )
-                                    )
-                                }
-
-                                Jar(MaterialTheme.colors.onSurface)
-                            }
-
-                            Box(
-                                modifier = Modifier.background(Color.Yellow.copy(alpha = 0.0f))
-                            ) {
-                                if (mData != null) {
-                                    Chart(
-                                        data = mData!!,
-                                        maxValue = maxValue?.toDouble(),
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .offset(y = (8).dp)
-                                    )
-                                }
-                            }
-                        }
                     }
                 }
             }
