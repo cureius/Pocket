@@ -39,8 +39,7 @@ fun ItemRow(items: List<CategoryItem>, modifier: Modifier = Modifier) {
         bottomEnd = 12.dp
     )
     LazyRow(
-        modifier = modifier
-            .height(80.dp),
+        modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

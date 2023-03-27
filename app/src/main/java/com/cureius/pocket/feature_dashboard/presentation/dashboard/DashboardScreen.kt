@@ -244,7 +244,7 @@ fun DashboardScreen(navHostController: NavHostController) {
                                 } else {
                                     (rowCap * (it - 1)) + rowCap
                                 }
-                            ), modifier = Modifier.padding(startPadding.dp)
+                            ), modifier = Modifier.padding( start = startPadding.dp)
                         )
                     }
                 }

@@ -42,32 +42,25 @@ import androidx.compose.ui.unit.sp
 import com.cureius.pocket.R
 
 
-fun Modifier.vertical() =
-    layout { measurable, constraints ->
-        val placeable = measurable.measure(constraints)
-        layout(placeable.height, placeable.width) {
-            placeable.place(
-                x = -(placeable.width / 2 - placeable.height / 2),
-                y = -(placeable.height / 2 - placeable.width / 2)
-            )
-        }
+fun Modifier.vertical() = layout { measurable, constraints ->
+    val placeable = measurable.measure(constraints)
+    layout(placeable.height, placeable.width) {
+        placeable.place(
+            x = -(placeable.width / 2 - placeable.height / 2),
+            y = -(placeable.height / 2 - placeable.width / 2)
+        )
     }
+}
 
 @Preview
 @Composable
 fun InfoSection() {
     val rupee = painterResource(id = R.drawable.rupee)
     val shape = RoundedCornerShape(
-        topStart = 24.dp,
-        topEnd = 24.dp,
-        bottomStart = 24.dp,
-        bottomEnd = 24.dp
+        topStart = 24.dp, topEnd = 24.dp, bottomStart = 24.dp, bottomEnd = 24.dp
     )
     val mtdShape = RoundedCornerShape(
-        topStart = 0.dp,
-        topEnd = 0.dp,
-        bottomStart = 24.dp,
-        bottomEnd = 0.dp
+        topStart = 0.dp, topEnd = 0.dp, bottomStart = 24.dp, bottomEnd = 0.dp
     )
     Box(
         modifier = Modifier
@@ -99,8 +92,10 @@ fun InfoSection() {
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(0.dp, 0.dp)
                         )
-                        Row(horizontalArrangement = Arrangement.SpaceAround,
-                            verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Image(
                                 painter = rupee,
                                 contentDescription = "rupee",
@@ -109,7 +104,7 @@ fun InfoSection() {
                                 alignment = Alignment.Center
                             )
                             Text(
-                                text = "1,50,000",
+                                text = " 1,50,000",
                                 color = MaterialTheme.colors.secondary,
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(fontWeight = FontWeight.Bold),
@@ -119,11 +114,9 @@ fun InfoSection() {
                                 modifier = Modifier.padding(0.dp, 0.dp)
                             )
                         }
-
                     }
                     Canvas(
-                        modifier = Modifier
-                            .fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         drawLine(
                             color = Color.DarkGray.copy(alpha = 0.5f),
@@ -131,8 +124,7 @@ fun InfoSection() {
                             end = Offset(x = size.width * 0.95f, y = size.height / 2),
                             strokeWidth = 8f,
                             pathEffect = PathEffect.dashPathEffect(
-                                intervals = floatArrayOf(20f, 10f),
-                                phase = 0f
+                                intervals = floatArrayOf(20f, 10f), phase = 0f
                             )
                         )
                     }
@@ -142,8 +134,7 @@ fun InfoSection() {
                                 modifier = Modifier
                                     .offset(x = (-8).dp, y = (0).dp)
                                     .background(
-                                        MaterialTheme.colors.primary.copy(alpha = 0.1f),
-                                        mtdShape
+                                        MaterialTheme.colors.primary.copy(alpha = 0.1f), mtdShape
                                     )
                                     .fillMaxHeight()
                                     .width(24.dp),
@@ -171,16 +162,29 @@ fun InfoSection() {
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = "$ 20,000",
-                                    color = MaterialTheme.colors.primaryVariant,
-                                    textAlign = TextAlign.Center,
-                                    style = TextStyle(fontWeight = FontWeight.Bold),
-                                    fontSize = 14.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.padding(0.dp, 0.dp)
-                                )
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceAround,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = rupee,
+                                        contentDescription = "rupee",
+                                        modifier = Modifier.size(12.dp),
+                                        colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
+                                        alignment = Alignment.Center
+                                    )
+                                    Text(
+                                        text = " 20,000",
+                                        color = MaterialTheme.colors.primaryVariant,
+                                        textAlign = TextAlign.Center,
+                                        style = TextStyle(fontWeight = FontWeight.Bold),
+                                        fontSize = 14.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(0.dp, 0.dp)
+                                    )
+                                }
+
                                 Text(
                                     text = "INCOME",
                                     color = MaterialTheme.colors.onSurface,
@@ -193,16 +197,29 @@ fun InfoSection() {
                                 )
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(
-                                    text = "$ 5,000",
-                                    color = MaterialTheme.colors.primaryVariant,
-                                    textAlign = TextAlign.Center,
-                                    style = TextStyle(fontWeight = FontWeight.Bold),
-                                    fontSize = 14.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.padding(0.dp, 0.dp)
-                                )
+                                Row(
+                                    horizontalArrangement = Arrangement.SpaceAround,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Image(
+                                        painter = rupee,
+                                        contentDescription = "rupee",
+                                        modifier = Modifier.size(12.dp),
+                                        colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
+                                        alignment = Alignment.Center
+                                    )
+                                    Text(
+                                        text = " 5,000",
+                                        color = MaterialTheme.colors.primaryVariant,
+                                        textAlign = TextAlign.Center,
+                                        style = TextStyle(fontWeight = FontWeight.Bold),
+                                        fontSize = 14.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.padding(0.dp, 0.dp)
+                                    )
+                                }
+
                                 Text(
                                     text = "SPENT",
                                     color = MaterialTheme.colors.onSurface,
@@ -232,8 +249,7 @@ fun InfoSection() {
                         Image(
                             painter = pngImage,
                             contentDescription = "Scan & Pay",
-                            modifier = Modifier
-                                .size(90.dp),
+                            modifier = Modifier.size(90.dp),
                             colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
                         )
                         Text(
