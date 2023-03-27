@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -27,8 +28,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -53,6 +56,7 @@ fun Modifier.vertical() =
 @Preview
 @Composable
 fun InfoSection() {
+    val rupee = painterResource(id = R.drawable.rupee)
     val shape = RoundedCornerShape(
         topStart = 24.dp,
         topEnd = 24.dp,
@@ -95,16 +99,27 @@ fun InfoSection() {
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(0.dp, 0.dp)
                         )
-                        Text(
-                            text = "$1,50,000",
-                            color = MaterialTheme.colors.secondary,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 20.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(0.dp, 0.dp)
-                        )
+                        Row(horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically) {
+                            Image(
+                                painter = rupee,
+                                contentDescription = "rupee",
+                                modifier = Modifier.size(16.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary),
+                                alignment = Alignment.Center
+                            )
+                            Text(
+                                text = "1,50,000",
+                                color = MaterialTheme.colors.secondary,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(fontWeight = FontWeight.Bold),
+                                fontSize = 20.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(0.dp, 0.dp)
+                            )
+                        }
+
                     }
                     Canvas(
                         modifier = Modifier

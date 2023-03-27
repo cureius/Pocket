@@ -45,18 +45,21 @@ fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
     val nonMutableNodeList = nodeList.toList()
     Log.d("Nodes", "ConfigurePotsScreen: $nonMutableNodeList")
     Scaffold(bottomBar = {
-        CutCornerButton(
-            onClick = {
-                viewModel.onEvent(
-                    ConfigurePotsEvent.SaveConfiguration
-                )
-            },
-            label = "Set Configuration",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp)
-                .padding(horizontal = 20.dp)
-        )
+        Column {
+            CutCornerButton(
+                onClick = {
+                    viewModel.onEvent(
+                        ConfigurePotsEvent.SaveConfiguration
+                    )
+                },
+                label = "Set Configuration",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .padding(horizontal = 20.dp)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+        }
     }) {
         Column {
             Column(
@@ -96,7 +99,9 @@ fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
             }
 
             LazyColumn(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
             ) {
                 itemsIndexed(potTemplateList) { ix, pot ->
                     nodeList[ix]?.let { it1 ->

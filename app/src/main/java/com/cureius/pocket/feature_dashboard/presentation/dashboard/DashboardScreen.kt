@@ -34,7 +34,6 @@ fun DashboardScreen(navHostController: NavHostController) {
     val save = ImageVector.vectorResource(id = R.drawable.save)
     val wallet = ImageVector.vectorResource(id = R.drawable.wallet)
     val emi = ImageVector.vectorResource(id = R.drawable.coins)
-    val invest = ImageVector.vectorResource(id = R.drawable.shop)
     val add = ImageVector.vectorResource(id = R.drawable.add)
 
     val food = ImageVector.vectorResource(id = R.drawable.food)
