@@ -39,7 +39,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashBoardViewModel
 
 
 fun Modifier.vertical() = layout { measurable, constraints ->
@@ -54,7 +56,7 @@ fun Modifier.vertical() = layout { measurable, constraints ->
 
 @Preview
 @Composable
-fun InfoSection() {
+fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel()) {
     val rupee = painterResource(id = R.drawable.rupee)
     val shape = RoundedCornerShape(
         topStart = 24.dp, topEnd = 24.dp, bottomStart = 24.dp, bottomEnd = 24.dp
@@ -104,7 +106,7 @@ fun InfoSection() {
                                 alignment = Alignment.Center
                             )
                             Text(
-                                text = " 1,50,000",
+                                text = " ${viewModel.totalBalance.value}",
                                 color = MaterialTheme.colors.secondary,
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(fontWeight = FontWeight.Bold),
@@ -174,7 +176,7 @@ fun InfoSection() {
                                         alignment = Alignment.Center
                                     )
                                     Text(
-                                        text = " 20,000",
+                                        text = " ${viewModel.incomeMtd.value}",
                                         color = MaterialTheme.colors.primaryVariant,
                                         textAlign = TextAlign.Center,
                                         style = TextStyle(fontWeight = FontWeight.Bold),
@@ -209,7 +211,7 @@ fun InfoSection() {
                                         alignment = Alignment.Center
                                     )
                                     Text(
-                                        text = " 5,000",
+                                        text = " ${viewModel.spentMtd.value}",
                                         color = MaterialTheme.colors.primaryVariant,
                                         textAlign = TextAlign.Center,
                                         style = TextStyle(fontWeight = FontWeight.Bold),

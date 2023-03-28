@@ -26,8 +26,30 @@ class DashBoardViewModel @Inject constructor(
     private val _creditDetectionPromptVisibility = mutableStateOf(false)
     val creditDetectionPromptVisibility: State<Boolean> = _creditDetectionPromptVisibility
 
-    private val _totalBalance = mutableStateOf("1,50,000")
+    private val _totalBalance = mutableStateOf("------")
     val totalBalance: State<String> = _totalBalance
 
+    private val _incomeMtd = mutableStateOf("------")
+    val incomeMtd: State<String> = _incomeMtd
+
+    private val _spentMtd = mutableStateOf("------")
+    val spentMtd: State<String> = _spentMtd
+
+    fun onEvent(event: DashBoardEvent){
+        when (event){
+            is DashBoardEvent.ToggleInfoSectionVisibility -> {
+                _infoSectionVisibility.value = !infoSectionVisibility.value
+            }
+            is DashBoardEvent.ChangeTotalBalance -> {
+                _totalBalance.value = event.balance
+            }
+            is DashBoardEvent.ChangeIncomeMtd -> {
+                _incomeMtd.value = event.value
+            }
+            is DashBoardEvent.ChangeSpentMtd -> {
+                _spentMtd.value = event.value
+            }
+        }
+    }
 
 }

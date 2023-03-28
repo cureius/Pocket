@@ -20,6 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_dashboard.domain.PotType
@@ -30,7 +31,7 @@ import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.util.ScreenDimensions
 
 @Composable
-fun DashboardScreen(navHostController: NavHostController) {
+fun DashboardScreen(navHostController: NavHostController, viewModel: DashBoardViewModel = hiltViewModel()) {
     val save = ImageVector.vectorResource(id = R.drawable.save)
     val wallet = ImageVector.vectorResource(id = R.drawable.wallet)
     val emi = ImageVector.vectorResource(id = R.drawable.coins)
@@ -136,7 +137,9 @@ fun DashboardScreen(navHostController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             DashBoardHeader(navHostController)
-            InfoSection()
+            if(viewModel.infoSectionVisibility.value){
+                InfoSection(viewModel)
+            }
         }
         Box(contentAlignment = Alignment.TopCenter) {
             LazyColumn(
