@@ -2,7 +2,16 @@ package com.cureius.pocket.feature_dashboard.presentation.dashboard
 
 import android.util.Log
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -23,15 +32,38 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
+import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
+import com.cureius.pocket.feature_account.presentation.add_account.AddAccountFormDialog
+import com.cureius.pocket.feature_account.presentation.add_account.AddAccountViewModel
 import com.cureius.pocket.feature_dashboard.domain.PotType
-import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.*
-import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.AddAccountRequest
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.AddPotRequest
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.CurveBottomMask
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.DashBoardHeader
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.IncomeCreditPrompt
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.InfoSection
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.ItemRow
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.PotItem
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.RoundIconButton
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.SyncSMS
 import com.cureius.pocket.feature_pot.domain.model.Pot
-import com.cureius.pocket.feature_pot.domain.util.IconDictionary
+import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotEvent
+import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
+import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
+import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
+import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
 import com.cureius.pocket.util.ScreenDimensions
 
 @Composable
-fun DashboardScreen(navHostController: NavHostController, viewModel: DashBoardViewModel = hiltViewModel()) {
+fun DashboardScreen(
+    navHostController: NavHostController,
+    viewModel: DashBoardViewModel = hiltViewModel(),
+    accountsViewModel: AccountsViewModel = hiltViewModel(),
+    addAccountViewModel: AddAccountViewModel = hiltViewModel(),
+    potsViewModel: PotsViewModel = hiltViewModel(),
+    addPotViewModel: AddPotViewModel = hiltViewModel()
+) {
     val save = ImageVector.vectorResource(id = R.drawable.save)
     val wallet = ImageVector.vectorResource(id = R.drawable.wallet)
     val emi = ImageVector.vectorResource(id = R.drawable.coins)
@@ -137,7 +169,7 @@ fun DashboardScreen(navHostController: NavHostController, viewModel: DashBoardVi
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             DashBoardHeader(navHostController)
-            if(viewModel.infoSectionVisibility.value){
+            if (viewModel.infoSectionVisibility.value) {
                 InfoSection(viewModel)
             }
         }
@@ -149,10 +181,18 @@ fun DashboardScreen(navHostController: NavHostController, viewModel: DashBoardVi
                 contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp)
             ) {
                 item {
-                    AddAccountRequest(position = -1)
+                    if (accountsViewModel.state.value.isEmpty()) {
+                        AddAccountRequest(position = -1) {
+                            addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
+                        }
+                    }
                 }
                 item {
-                    AddPotRequest(position = 0)
+                    if (potsViewModel.state.value.isEmpty()) {
+                        AddPotRequest(position = 0) {
+                            addPotViewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
+                        }
+                    }
                 }
                 item {
                     SyncSMS(position = 0)
@@ -247,13 +287,27 @@ fun DashboardScreen(navHostController: NavHostController, viewModel: DashBoardVi
                                 } else {
                                     (rowCap * (it - 1)) + rowCap
                                 }
-                            ), modifier = Modifier.padding( start = startPadding.dp)
+                            ), modifier = Modifier.padding(start = startPadding.dp)
                         )
                     }
                 }
                 item { Spacer(modifier = Modifier.height(88.dp)) }
             }
             CurveBottomMask(cornerColor = MaterialTheme.colors.surface)
+        }
+        if (addAccountViewModel.dialogVisibility.value) {
+            AddAccountFormDialog(onDismiss = {
+                addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
+            }, onSubmit = {
+
+            })
+        }
+        if (addPotViewModel.dialogVisibility.value) {
+            AddPotDialog(onDismiss = {
+                addPotViewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
+            }, onSubmit = {
+
+            })
         }
     }
 }

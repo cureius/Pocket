@@ -2,6 +2,7 @@ package com.cureius.pocket.feature_dashboard.presentation.dashboard.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,14 +24,12 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cureius.pocket.R
 
-@Preview
 @Composable
-fun AddPotRequest(position: Int = 0){
+fun AddPotRequest(position: Int = 0, onClick: () -> Unit) {
     val pot = ImageVector.vectorResource(id = R.drawable.pot)
 
     val buttonShape = RoundedCornerShape(
@@ -81,12 +80,19 @@ fun AddPotRequest(position: Int = 0){
                 }
             )
             .padding(8.dp)
+            .clickable {
+                onClick()
+            }
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Column(modifier = Modifier.fillMaxWidth(0.75f).padding(start = 8.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(0.75f)
+                    .padding(start = 8.dp)
+            ) {
                 Text(
                     text = "Add Pots",
                     color = MaterialTheme.colors.onBackground,
@@ -109,7 +115,7 @@ fun AddPotRequest(position: Int = 0){
                 contentAlignment = Alignment.Center
             ) {
                 IconButton(onClick = {
-
+                    onClick()
                 }) {
                     Icon(
                         imageVector = pot,

@@ -32,7 +32,7 @@ import com.cureius.pocket.R
 @Composable
 fun SyncSMS(position: Int = 0){
 
-    val pot = ImageVector.vectorResource(id = R.drawable.pot)
+    val download = ImageVector.vectorResource(id = R.drawable.download)
 
     val buttonShape = RoundedCornerShape(
         topStart = 12.dp,
@@ -113,7 +113,7 @@ fun SyncSMS(position: Int = 0){
 
                 }) {
                     Icon(
-                        imageVector = pot,
+                        imageVector = download,
                         contentDescription = "Add Pots",
                         tint = MaterialTheme.colors.secondary
                     )
