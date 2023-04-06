@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
@@ -69,6 +70,8 @@ fun DashboardScreen(
     potsViewModel: PotsViewModel = hiltViewModel(),
     addPotViewModel: AddPotViewModel = hiltViewModel()
 ) {
+//    val myViewModel = ViewModelProvider(this).get(MyViewModel::class.java)
+
     val save = ImageVector.vectorResource(id = R.drawable.save)
     val wallet = ImageVector.vectorResource(id = R.drawable.wallet)
     val emi = ImageVector.vectorResource(id = R.drawable.coins)
@@ -415,6 +418,7 @@ fun MultiplePermissionExample(viewModel: DashBoardViewModel) {
         }
         if (checkAllPermission){
 //            Start The SMS reading process
+            viewModel.onEvent(DashBoardEvent.ReadAllSMS)
         }
     }
 }
