@@ -2,6 +2,7 @@ package com.cureius.pocket.feature_dashboard.presentation.dashboard.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,7 +31,7 @@ import com.cureius.pocket.R
 
 @Preview
 @Composable
-fun SyncSMS(position: Int = 0){
+fun SyncSMS(position: Int = 0, onClick : () -> Unit){
 
     val download = ImageVector.vectorResource(id = R.drawable.download)
 
@@ -82,6 +83,9 @@ fun SyncSMS(position: Int = 0){
                 }
             )
             .padding(8.dp)
+            .clickable {
+                onClick()
+            }
     ) {
         Row(
             modifier = Modifier
@@ -110,7 +114,7 @@ fun SyncSMS(position: Int = 0){
                 contentAlignment = Alignment.Center
             ) {
                 IconButton(onClick = {
-
+                    onClick()
                 }) {
                     Icon(
                         imageVector = download,

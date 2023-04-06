@@ -19,9 +19,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +32,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
@@ -54,6 +58,7 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialo
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
 import com.cureius.pocket.util.ScreenDimensions
+import com.google.accompanist.permissions.*
 
 @Composable
 fun DashboardScreen(
@@ -195,10 +200,19 @@ fun DashboardScreen(
                     }
                 }
                 item {
-                    SyncSMS(position = 0)
+                    if (viewModel.startSyncPromptVisibility.value) {
+                        SyncSMS(position = 0) {
+                            viewModel.onEvent(DashBoardEvent.ToggleAskPermission)
+                        }
+                    }
+                    if (viewModel.permissionPrompt.value) {
+                        MultiplePermissionExample(viewModel)
+                    }
                 }
                 item {
-                    IncomeCreditPrompt(position = 1)
+                    if (viewModel.creditDetectionPromptVisibility.value) {
+                        IncomeCreditPrompt(position = 1)
+                    }
                 }
                 item {
                     Text(
@@ -309,5 +323,99 @@ fun DashboardScreen(
 
             })
         }
+
     }
 }
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun PermissionExample() {
+    val permissionState = rememberPermissionState(permission = android.Manifest.permission.READ_SMS)
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(key1 = lifecycleOwner) {
+
+        val observer = LifecycleEventObserver { source, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> {
+                    permissionState.launchPermissionRequest()
+                }
+
+                else -> {
+
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        if (permissionState.status.isGranted) {
+            Text(text = "Permission Granted")
+        } else {
+            val text = if (permissionState.status.shouldShowRationale) {
+                "Permission Required"
+            } else {
+                "Please provide Permission"
+            }
+            Text(text = text)
+        }
+    }
+}
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+fun MultiplePermissionExample(viewModel: DashBoardViewModel) {
+
+    val permissionState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            android.Manifest.permission.READ_SMS,
+            android.Manifest.permission.RECEIVE_SMS,
+            android.Manifest.permission.SEND_SMS
+        )
+    )
+
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(key1 = lifecycleOwner) {
+        val observer = LifecycleEventObserver { source, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> {
+                    permissionState.launchMultiplePermissionRequest()
+                }
+
+                else -> {
+
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            viewModel.onEvent(DashBoardEvent.ToggleAskPermission)
+        }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        var checkAllPermission = true;
+        permissionState.permissions.forEach {
+            if(!it.status.isGranted){
+                checkAllPermission = false
+            }
+        }
+        if (checkAllPermission){
+//            Start The SMS reading process
+        }
+    }
+}
+

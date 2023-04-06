@@ -20,8 +20,11 @@ class DashBoardViewModel @Inject constructor(
     private val _addPotPromptVisibility = mutableStateOf(false)
     val addPotPromptVisibility: State<Boolean> = _addPotPromptVisibility
 
-    private val _startSyncPromptVisibility = mutableStateOf(false)
+    private val _startSyncPromptVisibility = mutableStateOf(true)
     val startSyncPromptVisibility: State<Boolean> = _startSyncPromptVisibility
+
+    private val _permissionPrompt = mutableStateOf(false)
+    val permissionPrompt: State<Boolean> = _permissionPrompt
 
     private val _creditDetectionPromptVisibility = mutableStateOf(false)
     val creditDetectionPromptVisibility: State<Boolean> = _creditDetectionPromptVisibility
@@ -39,6 +42,9 @@ class DashBoardViewModel @Inject constructor(
         when (event){
             is DashBoardEvent.ToggleInfoSectionVisibility -> {
                 _infoSectionVisibility.value = !infoSectionVisibility.value
+            }
+            is DashBoardEvent.ToggleAskPermission -> {
+                _permissionPrompt.value = !permissionPrompt.value
             }
             is DashBoardEvent.ChangeTotalBalance -> {
                 _totalBalance.value = event.balance

@@ -97,5 +97,7 @@ dependencies {
     implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.21'
     implementation "com.airbnb.android:lottie-compose:4.1.0"
 
+    //Permission
+    implementation "com.google.accompanist:accompanist-permissions:0.28.0"
 
 }

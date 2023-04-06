@@ -98,7 +98,6 @@ class ConfigurePotsViewModel @Inject constructor(
                                     1.0f
                                 )
                             } else {
-                                Log.d("previous node", "getTemplatePots: ${nodes.value[index - 1]?.value}")
                                 mutableStateOf(
                                     mutableState.value +
                                         _nodes.value[index]?.value!!
@@ -107,7 +106,6 @@ class ConfigurePotsViewModel @Inject constructor(
                         } else {
                             mutableStateOf(
                                 mutableState.value + (if (index > 0) {
-                                    Log.d("previous node", "getTemplatePots: ${nodes.value[index - 1]?.value}")
                                     _nodes.value[index]?.value
                                 } else {
                                     0.0f
@@ -123,7 +121,6 @@ class ConfigurePotsViewModel @Inject constructor(
                                     1.0f
                                 )
                             } else {
-                                Log.d("previous node", "getTemplatePots: ${nodes.value[index - 1]?.value}")
                                 mutableStateOf(
                                     0.0f +
                                             _nodes.value[index]?.value!!
@@ -132,7 +129,6 @@ class ConfigurePotsViewModel @Inject constructor(
                         } else {
                             mutableStateOf(
                                 0.0f + (if (index > 0) {
-                                    Log.d("previous node", "getTemplatePots: ${nodes.value[index - 1]?.value}")
                                     _nodes.value[index]?.value
                                 } else {
                                     0.0f
