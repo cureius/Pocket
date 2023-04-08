@@ -114,23 +114,6 @@ class DashBoardViewModel @Inject constructor(
         fun onError(throwable: Throwable)
     }
 
-
-//    @RequiresApi(Build.VERSION_CODES.M)
-//    private fun initialSmsSync(activity: ComponentActivity) {
-//        val myViewModel = ViewModelProvider(activity)[AddTransactionViewModel::class.java]
-//        val isFirstLoad: Boolean =
-//            SharedPreferencesUtil.getBooleanValueToSharedPreferences(activity, "initial_sync")
-//        if (isFirstLoad) {
-//            myViewModel.onEvent(AddTransactionEvent.EnteredTransactionsList(readSMS()))
-//            myViewModel.onEvent(AddTransactionEvent.SaveAllTransactions)
-//            SharedPreferencesUtil.setBooleanValueToSharedPreferences(
-//                activity,
-//                "initial_sync",
-//                false
-//            )
-//        }
-//    }
-
     private fun getAllSms(listener: LongTaskListener): List<Transaction> {
         val transactionList = mutableListOf<Transaction>()
         val cursor = contentResolver.query(
