@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
@@ -58,6 +57,7 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
+import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
 import com.cureius.pocket.util.ScreenDimensions
 import com.google.accompanist.permissions.*
 
@@ -68,7 +68,8 @@ fun DashboardScreen(
     accountsViewModel: AccountsViewModel = hiltViewModel(),
     addAccountViewModel: AddAccountViewModel = hiltViewModel(),
     potsViewModel: PotsViewModel = hiltViewModel(),
-    addPotViewModel: AddPotViewModel = hiltViewModel()
+    addPotViewModel: AddPotViewModel = hiltViewModel(),
+    addTransactionViewModel: AddTransactionViewModel = hiltViewModel()
 ) {
 //    val myViewModel = ViewModelProvider(this).get(MyViewModel::class.java)
 
@@ -209,7 +210,7 @@ fun DashboardScreen(
                         }
                     }
                     if (viewModel.permissionPrompt.value) {
-                        MultiplePermissionExample(viewModel)
+                        MultiplePermissionExample(viewModel, addTransactionViewModel)
                     }
                 }
                 item {
@@ -375,7 +376,7 @@ fun PermissionExample() {
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun MultiplePermissionExample(viewModel: DashBoardViewModel) {
+fun MultiplePermissionExample(viewModel: DashBoardViewModel, addTransactionViewModel : AddTransactionViewModel) {
 
     val permissionState = rememberMultiplePermissionsState(
         permissions = listOf(
