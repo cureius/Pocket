@@ -2,6 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.telephony"
+        android:required="true" />
+
     <uses-permission android:name="android.permission.CAMERA"/>
 
     <uses-permission android:name="android.permission.READ_SMS"/>
@@ -36,6 +43,14 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <receiver android:name="com.cureius.pocket.feature_sms_sync.domain.SmsReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+            </intent-filter>
+        </receiver>
+        <service android:name="com.cureius.pocket.feature_sms_sync.domain.SmsService" />
+
     </application>
 
 </manifest>

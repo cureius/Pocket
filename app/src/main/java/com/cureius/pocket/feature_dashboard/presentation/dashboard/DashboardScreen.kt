@@ -1,5 +1,7 @@
 package com.cureius.pocket.feature_dashboard.presentation.dashboard
 
+import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +26,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
@@ -31,6 +35,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -57,6 +62,7 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
+import com.cureius.pocket.feature_sms_sync.domain.SmsService
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
 import com.cureius.pocket.util.ScreenDimensions
 import com.google.accompanist.permissions.*
@@ -71,8 +77,8 @@ fun DashboardScreen(
     addPotViewModel: AddPotViewModel = hiltViewModel(),
     addTransactionViewModel: AddTransactionViewModel = hiltViewModel()
 ) {
-//    val myViewModel = ViewModelProvider(this).get(MyViewModel::class.java)
 
+    val context : Context = LocalContext.current
     val save = ImageVector.vectorResource(id = R.drawable.save)
     val wallet = ImageVector.vectorResource(id = R.drawable.wallet)
     val emi = ImageVector.vectorResource(id = R.drawable.coins)
@@ -168,6 +174,7 @@ fun DashboardScreen(
         (gridItems.size / rowCap) + 1
     }
     val startPadding = ((screenWeight - (rowCap * 80)) / 2)
+    val intent = Intent(context, SmsService::class.java)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -207,10 +214,19 @@ fun DashboardScreen(
                     if (viewModel.startSyncPromptVisibility.value) {
                         SyncSMS(position = 0) {
                             viewModel.onEvent(DashBoardEvent.ToggleAskPermission)
+                            context.startService(intent)
                         }
                     }
                     if (viewModel.permissionPrompt.value) {
                         MultiplePermissionExample(viewModel, addTransactionViewModel)
+                    }
+                }
+                item { 
+                    Button(onClick = { 
+                    /*TODO*/
+                        context.stopService(intent)
+                    }) {
+                        Text(text = "Stop Service")
                     }
                 }
                 item {
@@ -418,7 +434,6 @@ fun MultiplePermissionExample(viewModel: DashBoardViewModel, addTransactionViewM
             }
         }
         if (checkAllPermission){
-//            Start The SMS reading process
             viewModel.onEvent(DashBoardEvent.ReadAllSMS)
         }
     }
