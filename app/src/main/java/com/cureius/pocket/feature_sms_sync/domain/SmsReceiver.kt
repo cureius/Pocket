@@ -8,6 +8,7 @@ import android.provider.Telephony
 import android.telephony.SmsMessage
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.cureius.pocket.feature_sms_sync.presentation.PopUpService
 import com.cureius.pocket.feature_sms_sync.util.SyncUtils
 import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,6 +22,8 @@ class SmsReceiver : BroadcastReceiver() {
     @Inject
     lateinit var transactionUseCases: TransactionUseCases
     private val scope = CoroutineScope(Dispatchers.IO)
+    private val mService: PopUpService? = null
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onReceive(context: Context, intent: Intent) {
         val tag = "SMS Receiver"
@@ -29,6 +32,9 @@ class SmsReceiver : BroadcastReceiver() {
         // initialize the addTransactionViewModel property
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
             val bundle = intent.extras
+
+            val showIntent = Intent("com.example.ACTION_SHOW_FLOATING_WINDOW")
+            val hideIntent = Intent("com.example.ACTION_HIDE_FLOATING_WINDOW")
             if (bundle != null) {
                 val pdus = bundle.get("pdus") as Array<*>
                 for (i in pdus.indices) {
@@ -39,6 +45,11 @@ class SmsReceiver : BroadcastReceiver() {
                     if ((body.lowercase().contains("a/c") || body.lowercase()
                             .contains("card")) && (body.contains("credited") || body.contains("debited"))
                     ) {
+                        if (mService == null) {
+                            Log.d(tag, "onReceive: triggering")
+                            val serviceIntent = Intent(context, PopUpService::class.java)
+                            context.startService(serviceIntent)
+                        }
                         if (address != null) {
                             SyncUtils.extractTransactionalDetails(
                                 date, address, body

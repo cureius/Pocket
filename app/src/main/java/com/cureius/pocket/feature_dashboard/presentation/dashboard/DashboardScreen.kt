@@ -2,7 +2,11 @@ package com.cureius.pocket.feature_dashboard.presentation.dashboard
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -63,10 +67,12 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialo
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
 import com.cureius.pocket.feature_sms_sync.domain.SmsService
+import com.cureius.pocket.feature_sms_sync.presentation.PopUpService
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
 import com.cureius.pocket.util.ScreenDimensions
 import com.google.accompanist.permissions.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DashboardScreen(
     navHostController: NavHostController,
@@ -78,7 +84,7 @@ fun DashboardScreen(
     addTransactionViewModel: AddTransactionViewModel = hiltViewModel()
 ) {
 
-    val context : Context = LocalContext.current
+    val context: Context = LocalContext.current
     val save = ImageVector.vectorResource(id = R.drawable.save)
     val wallet = ImageVector.vectorResource(id = R.drawable.wallet)
     val emi = ImageVector.vectorResource(id = R.drawable.coins)
@@ -175,6 +181,7 @@ fun DashboardScreen(
     }
     val startPadding = ((screenWeight - (rowCap * 80)) / 2)
     val intent = Intent(context, SmsService::class.java)
+    val popUpIntent = Intent(context, PopUpService::class.java)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -221,10 +228,12 @@ fun DashboardScreen(
                         MultiplePermissionExample(viewModel, addTransactionViewModel)
                     }
                 }
-                item { 
-                    Button(onClick = { 
-                    /*TODO*/
-                        context.stopService(intent)
+                item {
+                    Button(onClick = {
+                        /*TODO*/
+                        requestOverlayPermission(context)
+                        context.startService(popUpIntent)
+                        viewModel.onEvent(DashBoardEvent.ToggleInfoSectionVisibility)
                     }) {
                         Text(text = "Stop Service")
                     }
@@ -392,7 +401,10 @@ fun PermissionExample() {
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun MultiplePermissionExample(viewModel: DashBoardViewModel, addTransactionViewModel : AddTransactionViewModel) {
+fun MultiplePermissionExample(
+    viewModel: DashBoardViewModel,
+    addTransactionViewModel: AddTransactionViewModel
+) {
 
     val permissionState = rememberMultiplePermissionsState(
         permissions = listOf(
@@ -429,13 +441,23 @@ fun MultiplePermissionExample(viewModel: DashBoardViewModel, addTransactionViewM
     ) {
         var checkAllPermission = true;
         permissionState.permissions.forEach {
-            if(!it.status.isGranted){
+            if (!it.status.isGranted) {
                 checkAllPermission = false
             }
         }
-        if (checkAllPermission){
+        if (checkAllPermission) {
             viewModel.onEvent(DashBoardEvent.ReadAllSMS)
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.M)
+private fun requestOverlayPermission(context: Context) {
+    if (!Settings.canDrawOverlays(context)) {
+        val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION).apply {
+            data = Uri.parse("package:${context.packageName}")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        context.startActivity(intent)
+    }
+}

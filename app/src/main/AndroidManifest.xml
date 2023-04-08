@@ -17,6 +17,8 @@
     <uses-permission android:name="android.permission.RECEIVE_SMS"/>
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
     <application
         android:name=".PocketApp"
         android:allowBackup="true"
@@ -42,6 +44,14 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <receiver android:name="com.cureius.pocket.feature_sms_sync.presentation.PopUpReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.example.ACTION_SHOW_FLOATING_WINDOW" />
+                <action android:name="com.example.ACTION_HIDE_FLOATING_WINDOW" />
+            </intent-filter>
+        </receiver>
+
         <!-- Declare your app as the default SMS app -->
         <receiver android:name="com.cureius.pocket.feature_sms_sync.domain.SmsReceiver"
             android:exported="true">
@@ -66,6 +76,7 @@
             </intent-filter>
         </receiver>
         <service android:name="com.cureius.pocket.feature_sms_sync.domain.SmsService" />
+        <service android:name="com.cureius.pocket.feature_sms_sync.presentation.PopUpService" />
     </application>
 
 </manifest>
