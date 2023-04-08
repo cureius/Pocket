@@ -1,4 +1,4 @@
-package com.cureius.pocket.feature_sms_sync.domain
+package com.cureius.pocket.feature_sms_sync.presentation
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -45,15 +45,19 @@ class SmsReceiver : BroadcastReceiver() {
                     if ((body.lowercase().contains("a/c") || body.lowercase()
                             .contains("card")) && (body.contains("credited") || body.contains("debited"))
                     ) {
-                        if (mService == null) {
-                            Log.d(tag, "onReceive: triggering")
-                            val serviceIntent = Intent(context, PopUpService::class.java)
-                            context.startService(serviceIntent)
-                        }
+
                         if (address != null) {
                             SyncUtils.extractTransactionalDetails(
                                 date, address, body
                             ).let {
+//                                if (mService == null) {
+                                    Log.d(tag, "onReceive: triggering")
+                                    val serviceIntent = Intent(context, PopUpService::class.java)
+                                    serviceIntent.putExtra("detected-transaction-date", date)
+                                    serviceIntent.putExtra("detected-transaction-address", address)
+                                    serviceIntent.putExtra("detected-transaction-body", body)
+                                    context.startService(serviceIntent)
+//                                }
                                 Log.d(tag, "onReceive: $it")
                                 scope.launch {
                                     transactionUseCases.addTransaction(it)

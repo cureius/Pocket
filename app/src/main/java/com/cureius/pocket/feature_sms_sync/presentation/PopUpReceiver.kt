@@ -11,7 +11,6 @@ class PopUpReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == ACTION_SHOW_FLOATING_WINDOW) {
             // Start the service to show the floating window
-            Log.d("POP UP", "onReceive: received pop up request ")
             if (mService == null) {
                 val serviceIntent = Intent(context, PopUpService::class.java)
                 context.startService(serviceIntent)

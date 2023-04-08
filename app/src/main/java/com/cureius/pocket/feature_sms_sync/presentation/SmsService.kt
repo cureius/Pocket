@@ -1,9 +1,10 @@
-package com.cureius.pocket.feature_sms_sync.domain
+package com.cureius.pocket.feature_sms_sync.presentation
 
 import android.app.Service
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
+import com.cureius.pocket.feature_sms_sync.presentation.SmsReceiver
 
 class SmsService : Service() {
 

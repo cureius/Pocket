@@ -39,7 +39,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -66,7 +65,7 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
-import com.cureius.pocket.feature_sms_sync.domain.SmsService
+import com.cureius.pocket.feature_sms_sync.presentation.SmsService
 import com.cureius.pocket.feature_sms_sync.presentation.PopUpService
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
 import com.cureius.pocket.util.ScreenDimensions
@@ -229,16 +228,6 @@ fun DashboardScreen(
                     }
                 }
                 item {
-                    Button(onClick = {
-                        /*TODO*/
-                        requestOverlayPermission(context)
-                        context.startService(popUpIntent)
-                        viewModel.onEvent(DashBoardEvent.ToggleInfoSectionVisibility)
-                    }) {
-                        Text(text = "Stop Service")
-                    }
-                }
-                item {
                     if (viewModel.creditDetectionPromptVisibility.value) {
                         IncomeCreditPrompt(position = 1)
                     }
@@ -332,6 +321,28 @@ fun DashboardScreen(
                                 }
                             ), modifier = Modifier.padding(start = startPadding.dp)
                         )
+                    }
+                }
+                item {
+                    Spacer(modifier = Modifier.height(100.dp))
+                }
+                item {
+                    Button(onClick = {
+                        /*TODO*/
+                        requestOverlayPermission(context)
+                        context.startService(popUpIntent)
+                        viewModel.onEvent(DashBoardEvent.ToggleInfoSectionVisibility)
+                    }) {
+                        Text(text = "Stop Service")
+                    }
+                }
+                item {
+                    Button(onClick = {
+                        /*TODO*/
+                        context.stopService(popUpIntent)
+                        viewModel.onEvent(DashBoardEvent.ToggleInfoSectionVisibility)
+                    }) {
+                        Text(text = "Stop Service")
                     }
                 }
                 item { Spacer(modifier = Modifier.height(88.dp)) }

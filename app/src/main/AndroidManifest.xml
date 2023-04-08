@@ -53,7 +53,7 @@
         </receiver>
 
         <!-- Declare your app as the default SMS app -->
-        <receiver android:name="com.cureius.pocket.feature_sms_sync.domain.SmsReceiver"
+        <receiver android:name="com.cureius.pocket.feature_sms_sync.presentation.SmsReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
@@ -75,7 +75,7 @@
                 <action android:name="android.provider.Telephony.SMS_EMERGENCY_CB_RECEIVED" />
             </intent-filter>
         </receiver>
-        <service android:name="com.cureius.pocket.feature_sms_sync.domain.SmsService" />
+        <service android:name="com.cureius.pocket.feature_sms_sync.presentation.SmsService" />
         <service android:name="com.cureius.pocket.feature_sms_sync.presentation.PopUpService" />
     </application>
 
