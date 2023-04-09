@@ -8,6 +8,7 @@ import android.provider.Telephony
 import android.telephony.SmsMessage
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_sms_sync.presentation.PopUpService
 import com.cureius.pocket.feature_sms_sync.util.SyncUtils
 import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
@@ -21,6 +22,10 @@ import javax.inject.Inject
 class SmsReceiver : BroadcastReceiver() {
     @Inject
     lateinit var transactionUseCases: TransactionUseCases
+
+    @Inject
+    lateinit var potsViewModel: PotsViewModel
+
     private val scope = CoroutineScope(Dispatchers.IO)
     private val mService: PopUpService? = null
 
@@ -50,14 +55,13 @@ class SmsReceiver : BroadcastReceiver() {
                             SyncUtils.extractTransactionalDetails(
                                 date, address, body
                             ).let {
-//                                if (mService == null) {
-                                    Log.d(tag, "onReceive: triggering")
-                                    val serviceIntent = Intent(context, PopUpService::class.java)
-                                    serviceIntent.putExtra("detected-transaction-date", date)
-                                    serviceIntent.putExtra("detected-transaction-address", address)
-                                    serviceIntent.putExtra("detected-transaction-body", body)
-                                    context.startService(serviceIntent)
-//                                }
+                                Log.d(tag, "onReceive: triggering")
+                                val serviceIntent = Intent(context, PopUpService::class.java)
+                                serviceIntent.putExtra("detected-transaction-date", date)
+                                serviceIntent.putExtra("detected-transaction-address", address)
+                                serviceIntent.putExtra("detected-transaction-body", body)
+
+                                context.startService(serviceIntent)
                                 Log.d(tag, "onReceive: $it")
                                 scope.launch {
                                     transactionUseCases.addTransaction(it)

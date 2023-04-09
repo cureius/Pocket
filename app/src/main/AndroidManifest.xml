@@ -9,15 +9,16 @@
         android:name="android.hardware.telephony"
         android:required="true" />
 
-    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAMERA" />
 
-    <uses-permission android:name="android.permission.READ_SMS"/>
-    <uses-permission android:name="android.permission.WRITE_SMS"/>
-    <uses-permission android:name="android.permission.SEND_SMS"/>
-    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.WRITE_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
     <uses-permission android:name="android.permission.VIBRATE" />
 
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".PocketApp"
@@ -44,7 +45,8 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <receiver android:name="com.cureius.pocket.feature_sms_sync.presentation.PopUpReceiver"
+        <receiver
+            android:name="com.cureius.pocket.feature_sms_sync.presentation.PopUpReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.example.ACTION_SHOW_FLOATING_WINDOW" />
@@ -53,20 +55,23 @@
         </receiver>
 
         <!-- Declare your app as the default SMS app -->
-        <receiver android:name="com.cureius.pocket.feature_sms_sync.presentation.SmsReceiver"
+        <receiver
+            android:name="com.cureius.pocket.feature_sms_sync.presentation.SmsReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_DELIVER" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.DATA_SMS_RECEIVED" />
+
                 <data android:scheme="sms" />
-                <data android:host="*"/>
+                <data android:host="*" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.DATA_SMS_RECEIVED" />
+
                 <data android:scheme="mms" />
-                <data android:host="*"/>
+                <data android:host="*" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.provider.Telephony.SMS_CB_RECEIVED" />
@@ -75,8 +80,14 @@
                 <action android:name="android.provider.Telephony.SMS_EMERGENCY_CB_RECEIVED" />
             </intent-filter>
         </receiver>
+
         <service android:name="com.cureius.pocket.feature_sms_sync.presentation.SmsService" />
-        <service android:name="com.cureius.pocket.feature_sms_sync.presentation.PopUpService" />
+        <service
+            android:name="com.cureius.pocket.feature_sms_sync.presentation.PopUpService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection"
+            tools:targetApi="q" />
     </application>
 
 </manifest>

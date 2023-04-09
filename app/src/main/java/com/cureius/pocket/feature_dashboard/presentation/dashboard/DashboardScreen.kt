@@ -328,17 +328,15 @@ fun DashboardScreen(
                 }
                 item {
                     Button(onClick = {
-                        /*TODO*/
                         requestOverlayPermission(context)
                         context.startService(popUpIntent)
                         viewModel.onEvent(DashBoardEvent.ToggleInfoSectionVisibility)
                     }) {
-                        Text(text = "Stop Service")
+                        Text(text = "Start Service")
                     }
                 }
                 item {
                     Button(onClick = {
-                        /*TODO*/
                         context.stopService(popUpIntent)
                         viewModel.onEvent(DashBoardEvent.ToggleInfoSectionVisibility)
                     }) {

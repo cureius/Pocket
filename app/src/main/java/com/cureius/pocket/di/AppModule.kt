@@ -17,6 +17,7 @@ import com.cureius.pocket.feature_pot.domain.use_case.DeletePot
 import com.cureius.pocket.feature_pot.domain.use_case.GetPot
 import com.cureius.pocket.feature_pot.domain.use_case.GetPots
 import com.cureius.pocket.feature_pot.domain.use_case.PotUseCases
+import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_transaction.data.data_source.TransactionDatabase
 import com.cureius.pocket.feature_transaction.data.repository.TransactionRepositoryImpl
 import com.cureius.pocket.feature_transaction.domain.repository.TransactionRepository
@@ -40,7 +41,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTransactionDatabase(app: Application): TransactionDatabase{
+    fun provideTransactionDatabase(app: Application): TransactionDatabase {
         return Room.databaseBuilder(
             app,
             TransactionDatabase::class.java,
@@ -50,13 +51,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideTransactionRepository(db: TransactionDatabase): TransactionRepository{
+    fun provideTransactionRepository(db: TransactionDatabase): TransactionRepository {
         return TransactionRepositoryImpl(db.transactionDao)
     }
 
     @Provides
     @Singleton
-    fun provideTransactionUseCases(repository: TransactionRepository): TransactionUseCases{
+    fun provideTransactionUseCases(repository: TransactionRepository): TransactionUseCases {
         return TransactionUseCases(
             getTransaction = GetTransaction(repository),
             deleteTransaction = DeleteTransaction(repository),
@@ -68,7 +69,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAccountDatabase(app: Application): AccountDatabase{
+    fun provideAccountDatabase(app: Application): AccountDatabase {
         return Room.databaseBuilder(
             app,
             AccountDatabase::class.java,
@@ -96,7 +97,7 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providePotDatabase(app: Application): PotDatabase{
+    fun providePotDatabase(app: Application): PotDatabase {
         return Room.databaseBuilder(
             app,
             PotDatabase::class.java,
@@ -119,6 +120,16 @@ object AppModule {
             addPot = AddPot(repository),
             addPots = AddPots(repository),
             getPots = GetPots(repository)
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun providePotsViewModel(
+        potsUseCases: PotUseCases,
+    ): PotsViewModel {
+        return PotsViewModel(
+            potsUseCases,
         )
     }
 }
