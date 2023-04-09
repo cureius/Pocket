@@ -287,9 +287,11 @@ fun DashboardScreen(
                         items(potItems) { item ->
                             item.filled?.let {
                                 item.type?.let { it1 ->
-                                    PotItem(
-                                        item.icon, it, item.title, it1
-                                    )
+                                    item.title?.let { it2 ->
+                                        PotItem(
+                                            item.icon, it, it2, it1
+                                        )
+                                    }
                                 }
                             }
                         }

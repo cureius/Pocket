@@ -1,34 +1,33 @@
 package com.cureius.pocket.feature_sms_sync.presentation
 
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.cardview.widget.CardView
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.cureius.pocket.R
-import com.cureius.pocket.feature_pot.domain.model.Pot
+import com.cureius.pocket.feature_category.domain.model.Category
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 
-class PotAdapter(var dataList: List<Pot>, private val currentPosition: Int?) :
-    RecyclerView.Adapter<PotAdapter.ViewHolder>() {
+class CategoryAdapter(var dataList: List<Category>, private val currentPosition: Int?) :
+    RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view =
-            LayoutInflater.from(parent.context).inflate(R.layout.pop_up_pot_item, parent, false)
+            LayoutInflater.from(parent.context).inflate(R.layout.pop_up_category_item, parent, false)
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val data = dataList[position]
-        holder.potName.text = data.title
-        holder.potIcon.setImageDrawable(
+        holder.categoryTitle.text = data.title
+        holder.categoryIcon.setImageDrawable(
             ContextCompat.getDrawable(
-                holder.potIcon.context, (IconDictionary.allIcons[data.icon]!!)
+                holder.categoryIcon.context, (IconDictionary.allIcons[data.icon]!!)
             )
         )
     }
@@ -38,8 +37,8 @@ class PotAdapter(var dataList: List<Pot>, private val currentPosition: Int?) :
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val potIcon: ImageView = itemView.findViewById(R.id.pot_icon)
-        val potName: TextView = itemView.findViewById(R.id.pot_name)
-        val potContainer: CardView = itemView.findViewById(R.id.pot_item)
+        val categoryIcon: ImageView = itemView.findViewById(R.id.category_icon)
+        val categoryTitle: TextView = itemView.findViewById(R.id.category_title)
+        val categoryContainer: CardView = itemView.findViewById(R.id.category_container)
     }
 }

@@ -35,10 +35,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+import com.cureius.pocket.feature_category.domain.model.Category
 @AndroidEntryPoint
 class PopUpService : Service() {
     @Inject
@@ -70,28 +69,77 @@ class PopUpService : Service() {
     override fun onCreate() {
         super.onCreate()
 
+        val context = this
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) startMyOwnForeground() else startForeground(
             1,
             Notification()
         )
+
+        val categories = listOf(
+            Category(
+                icon = "food",
+                title = "Food",
+            ),
+            Category(
+                icon = "entertainment",
+                title = "Fun",
+            ),
+            Category(
+                icon = "travel",
+                title = "Travel",
+            ),
+            Category(
+                icon = "house",
+                title = "House",
+            ),
+            Category(
+                icon = "fuel",
+                title = "Fuel",
+            ),
+            Category(
+                icon = "health",
+                title = "Health",
+            ),
+            Category(
+                icon = "shopping",
+                title = "Shopping",
+            ),
+            Category(
+                icon = "grocery",
+                title = "Grocery",
+            ),
+        )
         // Create the floating view
         mFloatingView = LayoutInflater.from(this).inflate(R.layout.pop_up_window, null)
 
-        var dataList: List<Pot> = listOf()
-        val layoutFlag: Int
-        potUseCases.getPots().onEach {
-            pots = it
-            dataList = it
-        }.launchIn(scope)
-
-
         val amount = mFloatingView!!.findViewById<TextView>(R.id.detected_amount)
         val account = mFloatingView!!.findViewById<TextView>(R.id.detected_account)
-        val type = mFloatingView!!.findViewById<TextView>(R.id.detection_type)
+        val type = mFloatingView!!.findViewById<TextView>(R.id.category_title)
         val body = mFloatingView!!.findViewById<TextView>(R.id.detection_message)
-        val icon = mFloatingView!!.findViewById<ImageView>(R.id.imageView)
-        val categoryRecyclerView = mFloatingView!!.findViewById<RecyclerView>(R.id.categoryRecyclerView)
+        val categoryRecyclerView =
+            mFloatingView!!.findViewById<RecyclerView>(R.id.categoryRecyclerView)
         val potRecyclerView = mFloatingView!!.findViewById<RecyclerView>(R.id.potRecyclerView)
+
+        var dataList: List<Pot> = listOf()
+        val layoutFlag: Int
+        val potAdapter = PotAdapter(dataList, currentPosition)
+        val categoryAdapter = CategoryAdapter(categories, currentPosition)
+
+        scope.launch {
+            potUseCases.getPots().collect {
+                pots = it
+                potAdapter.dataList = it
+            }
+        }
+        scope.launch {
+            potRecyclerView.adapter = potAdapter
+            potRecyclerView.layoutManager =
+                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            categoryRecyclerView.adapter = categoryAdapter
+            categoryRecyclerView.layoutManager =
+                LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+        }
+
 
         mWindowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
@@ -137,12 +185,6 @@ class PopUpService : Service() {
 
         val rootContainer =
             mFloatingView!!.findViewById<View>(R.id.root_container) as RelativeLayout
-
-        var myAdapter = PotAdapter(dataList, currentPosition)
-
-        potRecyclerView.adapter = myAdapter
-        potRecyclerView.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
 
         mFloatingView!!.findViewById<View>(R.id.root_container)
             .setOnTouchListener(object : OnTouchListener {
@@ -197,7 +239,6 @@ class PopUpService : Service() {
                             //Calculate the X and Y coordinates of the view.
                             params.x = initialX + (event.rawX - initialTouchX).toInt()
                             params.y = initialY + (event.rawY - initialTouchY).toInt()
-
 
                             //Update the layout with new X & Y coordinate
                             mWindowManager!!.updateViewLayout(mFloatingView, params)
