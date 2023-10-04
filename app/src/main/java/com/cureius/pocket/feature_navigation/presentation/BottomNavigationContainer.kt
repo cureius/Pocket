@@ -35,6 +35,8 @@ import com.cureius.pocket.feature_account.presentation.add_account.AddAccountVie
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotEvent
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
+import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionEvent
+import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionForm
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -102,9 +104,7 @@ fun BottomNavigationContainer(
                         }
 
                         "records" -> {
-                            Toast.makeText(
-                                context, "Records Screen !", Toast.LENGTH_SHORT
-                            ).show()
+                            addTransactionViewModel.onEvent(AddTransactionEvent.ToggleAddTransactionDialog)
                         }
 
                         "pots" -> {
@@ -143,6 +143,13 @@ fun BottomNavigationContainer(
     if (addPotViewModel.dialogVisibility.value) {
         AddPotDialog(onDismiss = {
             addPotViewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
+        }, onSubmit = {
+
+        })
+    }
+    if (addTransactionViewModel.dialogVisibility.value) {
+        AddTransactionForm(onDismiss = {
+            addTransactionViewModel.onEvent(AddTransactionEvent.ToggleAddTransactionDialog)
         }, onSubmit = {
 
         })

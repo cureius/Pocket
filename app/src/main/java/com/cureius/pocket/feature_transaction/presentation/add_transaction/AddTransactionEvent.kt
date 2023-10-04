@@ -1,6 +1,7 @@
 package com.cureius.pocket.feature_transaction.presentation.add_transaction
 
 import androidx.compose.ui.focus.FocusState
+import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 
 sealed class AddTransactionEvent {
@@ -24,5 +25,7 @@ sealed class AddTransactionEvent {
 
     data class EnteredTransactionsList(val value: List<Transaction>) : AddTransactionEvent()
     object SaveAllTransactions : AddTransactionEvent()
+    object ToggleAddTransactionDialog : AddTransactionEvent()
+
 
 }

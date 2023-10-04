@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
 import com.cureius.pocket.feature_transaction.domain.model.InvalidTransactionException
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
@@ -20,6 +21,10 @@ import javax.inject.Inject
 class AddTransactionViewModel @Inject constructor(
     private val transactionUseCases: TransactionUseCases, savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val _dialogVisibility = mutableStateOf(false)
+    val dialogVisibility: State<Boolean> = _dialogVisibility
+
     private val _transactionType = mutableStateOf(
         TransactionTextFieldState(
             hint = "Enter Title"
@@ -104,6 +109,10 @@ class AddTransactionViewModel @Inject constructor(
 
     fun onEvent(event: AddTransactionEvent) {
         when (event) {
+            is AddTransactionEvent.ToggleAddTransactionDialog -> {
+                _dialogVisibility.value = !_dialogVisibility.value
+            }
+
             is AddTransactionEvent.EnteredType -> {
                 _transactionType.value = transactionType.value.copy(
                     text = event.value
