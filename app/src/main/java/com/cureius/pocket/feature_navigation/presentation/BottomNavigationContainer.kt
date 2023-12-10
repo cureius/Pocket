@@ -147,7 +147,7 @@ fun BottomNavigationContainer(
 
         })
     }
-    if (addTransactionViewModel.dialogVisibility.value) {
+    if (/*addTransactionViewModel.dialogVisibility.value */true) {
         AddTransactionForm(onDismiss = {
             addTransactionViewModel.onEvent(AddTransactionEvent.ToggleAddTransactionDialog)
         }, onSubmit = {

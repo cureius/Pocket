@@ -1,9 +1,13 @@
 package com.cureius.pocket.feature_transaction.presentation.add_transaction
 
 import android.widget.Toast
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +17,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,25 +31,29 @@ import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -53,7 +62,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_account.domain.model.Bank
 import com.cureius.pocket.feature_account.presentation.add_account.components.OutlineTextBox
-import com.cureius.pocket.feature_account.presentation.add_account.components.SeparatedNumberField
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -68,10 +76,10 @@ fun AddTransactionForm(
     val transactionBalance = viewModel.transactionBalance.value
     val transactionType = viewModel.transactionType.value
     val transactionColor = viewModel.transactionColor.value
-
+    var selectedTab by remember { mutableStateOf(0) }
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
-
+    val mode = remember { mutableStateOf(false) }
     val banks = listOf(
         Bank(
             icon = painterResource(id = R.drawable.pnb), name = "PNB"
@@ -173,6 +181,29 @@ fun AddTransactionForm(
                     }
                     item {
                         Spacer(modifier = Modifier.height(20.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(40.dp)
+                        ) {
+                            TransactionTypeSwitcher(
+                                size = 80.dp,
+                                padding = 2.dp,
+                                height = 40.dp,
+                                width = 150.dp,
+                                isSpending = mode.value,
+                                parentShape = RoundedCornerShape(50),
+                                toggleShape = RoundedCornerShape(50),
+                                onClick = { mode.value = !mode.value }
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(20.dp))
                     }
                     item {
                         Box(
@@ -216,7 +247,7 @@ fun AddTransactionForm(
                                 Box(
                                     modifier = Modifier
                                         .clickable(onClick = {
-                                           /* viewModel.onEvent(AddAccountEvent.SelectedBank(item))*/
+                                            /* viewModel.onEvent(AddAccountEvent.SelectedBank(item))*/
                                         })
                                         .width(60.dp)
                                         .height(76.dp)
@@ -399,3 +430,75 @@ fun AddTransactionForm(
     }
 }
 
+
+@Composable
+fun TransactionTypeSwitcher(
+    isSpending: Boolean = false,
+    size: Dp = 150.dp,
+    height: Dp = 50.dp,
+    width: Dp = 100.dp,
+    iconSize: Dp = size / 3,
+    padding: Dp = 10.dp,
+    borderWidth: Dp = 1.dp,
+    parentShape: Shape = RoundedCornerShape(20),
+    toggleShape: Shape = RoundedCornerShape(20),
+    animationSpec: AnimationSpec<Dp> = tween(durationMillis = 300),
+    onClick: () -> Unit
+) {
+    val offset by animateDpAsState(
+        targetValue = if (isSpending) 0.dp else (width - (padding * 3f)),
+        animationSpec = animationSpec, label = ""
+    )
+
+    Box(modifier = Modifier
+        .width(width * 2)
+        .height(height)
+        .clip(shape = parentShape)
+        .clickable { onClick() }
+        .background(MaterialTheme.colors.surface)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(width - (padding * 2.8f))
+                .height(height)
+                .offset(x = offset)
+                .padding(all = padding)
+                .clip(shape = toggleShape)
+                .background(MaterialTheme.colors.primary)
+        ) {}
+        Row(
+            modifier = Modifier
+                .border(
+                    border = BorderStroke(
+                        width = borderWidth,
+                        color = MaterialTheme.colors.primary
+                    ),
+                    shape = parentShape
+                )
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(width)/*
+                    .background(MaterialTheme.colors.primary)*/,
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "Spending",
+                    style = MaterialTheme.typography.body1,
+                    color = if (offset == 0.dp) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface
+                )
+            }
+            Box(
+                modifier = Modifier.size(width),
+                contentAlignment = Alignment.Center
+            ) {
+
+                Text(
+                    text = "Income",
+                    style = MaterialTheme.typography.body1,
+                    color = if (offset == (width - (padding * 3f))) MaterialTheme.colors.onPrimary else MaterialTheme.colors.onSurface
+                )
+            }
+        }
+    }
+}
