@@ -61,13 +61,20 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_account.domain.model.Bank
+import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
 import com.cureius.pocket.feature_account.presentation.add_account.components.OutlineTextBox
+import com.cureius.pocket.feature_pot.domain.util.IconDictionary
+import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AddTransactionForm(
-    onDismiss: () -> Unit, onSubmit: () -> Unit, viewModel: AddTransactionViewModel = hiltViewModel()
+    onDismiss: () -> Unit,
+    onSubmit: () -> Unit,
+    viewModel: AddTransactionViewModel = hiltViewModel(),
+    potsViewModel: PotsViewModel = hiltViewModel(),
+    accountsViewModel: AccountsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val transactionAccount = viewModel.transactionAccount.value
@@ -76,6 +83,8 @@ fun AddTransactionForm(
     val transactionBalance = viewModel.transactionBalance.value
     val transactionType = viewModel.transactionType.value
     val transactionColor = viewModel.transactionColor.value
+    val selectedPot = viewModel.pot.value
+    val selectedAccount = viewModel.account.value
     var selectedTab by remember { mutableStateOf(0) }
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
@@ -91,6 +100,8 @@ fun AddTransactionForm(
             icon = painterResource(id = R.drawable.sbi), name = "SBI"
         )
     )
+    val pots = potsViewModel.state.value
+    val accounts = accountsViewModel.state.value
     val color1 = MaterialTheme.colors.background
     val color2 = MaterialTheme.colors.surface
     val mixedColor = Color(
@@ -101,6 +112,8 @@ fun AddTransactionForm(
     val potShape = RoundedCornerShape(
         topStart = 12.dp, topEnd = 12.dp, bottomStart = 12.dp, bottomEnd = 12.dp
     )
+//    Retrieve Pots Data from db
+
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -144,7 +157,6 @@ fun AddTransactionForm(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             modifier = Modifier.fillMaxWidth()
                         ) {
-                            val checkedState = remember { mutableStateOf(false) }
                             Text(
                                 text = "Add Transaction",
                                 color = MaterialTheme.colors.onBackground,
@@ -155,33 +167,12 @@ fun AddTransactionForm(
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.padding(4.dp, 0.dp)
                             )
-                            Box() {
-                                Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    /*Text(
-                                        text = "Primary",
-                                        color = MaterialTheme.colors.onBackground,
-                                        textAlign = TextAlign.Center,
-                                        style = TextStyle(fontWeight = FontWeight.Bold),
-                                        fontSize = 12.sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.padding(0.dp, 0.dp)
-                                    )
-                                    Switch(checked = viewModel.isPrimaryAccount.value,
-                                        onCheckedChange = {
-                                            viewModel.onEvent(AddAccountEvent.ToggleIsPrimaryAccount)
-                                        }
-                                    )*/
-                                }
-                            }
                         }
                     }
                     item {
                         Spacer(modifier = Modifier.height(20.dp))
-
+                    }
+                    item {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -198,9 +189,6 @@ fun AddTransactionForm(
                                 onClick = { mode.value = !mode.value }
                             )
                         }
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
                     }
                     item {
                         Spacer(modifier = Modifier.height(20.dp))
@@ -210,12 +198,12 @@ fun AddTransactionForm(
                             modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
                         ) {
                             TextField(
-                                value = "holderName",
+                                value = "",
                                 onValueChange = { _ ->
                                     /*viewModel.onEvent(AddTransactionViewModel.EnteredHolderName(newText))*/
                                 },
-                                label = { Text(text = "Holder Name") },
-                                placeholder = { Text(text = "Enter Account Holders Name") },
+                                label = { Text(text = "What is it!") },
+                                placeholder = { Text(text = "Enter Transaction Name") },
                             )
                         }
                     }
@@ -238,26 +226,25 @@ fun AddTransactionForm(
                     }
                     item {
                         LazyRow(
-                            modifier = Modifier.height(80.dp),
+                            modifier = Modifier.height(100.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            items(banks) { item ->
+                            items(pots) { item ->
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Box(
                                     modifier = Modifier
                                         .clickable(onClick = {
-                                            /* viewModel.onEvent(AddAccountEvent.SelectedBank(item))*/
+                                            viewModel.onEvent(AddTransactionEvent.SelectedPot(item))
                                         })
                                         .width(60.dp)
-                                        .height(76.dp)
+                                        .height(90.dp)
                                         .background(
-                                            color = MaterialTheme.colors.primary.copy(alpha = 0.5f),
-                                            /*color = if (selectedBank == item) {
+                                            color = if (selectedPot == item) {
                                                 MaterialTheme.colors.primary.copy(alpha = 0.5f)
                                             } else {
                                                 MaterialTheme.colors.surface
-                                            },*/ potShape
+                                            }, potShape
                                         ),
                                 ) {
                                     Column(
@@ -274,14 +261,14 @@ fun AddTransactionForm(
                                                 .padding(8.dp)
                                         ) {
                                             Image(
-                                                painter = item.icon!!,
-                                                contentDescription = item.name,
-                                                modifier = Modifier.size(20.dp),
+                                                painter = painterResource(id = IconDictionary.allIcons[item.icon]!!),
+                                                contentDescription = item.title!!,
+                                                modifier = Modifier.size(40.dp),
+                                                colorFilter = null
                                             )
-
                                         }
                                         Text(
-                                            text = item.name!!,
+                                            text = item.title!!,
                                             color = MaterialTheme.colors.onSurface,
                                             textAlign = TextAlign.Center,
                                             style = TextStyle(fontWeight = FontWeight.Bold),
@@ -292,6 +279,94 @@ fun AddTransactionForm(
                                                 .fillMaxWidth()
                                                 .padding(4.dp, 8.dp)
                                         )
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(6.dp))
+                            }
+                        }
+
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(10.dp))
+                    }
+                    item {
+                        Text(
+                            text = "Choose Account",
+                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Start,
+                            style = TextStyle(fontWeight = FontWeight.SemiBold),
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .padding(4.dp, 0.dp)
+                                .fillMaxWidth()
+                        )
+                    }
+                    item {
+                        LazyRow(
+                            modifier = Modifier.height(100.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            items(accounts) { item ->
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .clickable(onClick = {
+//                                            viewModel.onEvent(AddTransactionEvent.SelectedPot(item))
+                                        })
+                                        .width(60.dp)
+                                        .height(90.dp)
+                                        .background(
+                                            color = if (selectedAccount != null) {
+                                                MaterialTheme.colors.primary.copy(alpha = 0.5f)
+                                            } else {
+                                                MaterialTheme.colors.surface
+                                            }, potShape
+                                        ),
+                                ) {
+                                    Column(
+                                        modifier = Modifier.fillMaxHeight(),
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Bottom
+                                    ) {
+                                        Box(
+                                            contentAlignment = Alignment.BottomCenter,
+                                            modifier = Modifier
+                                                .background(
+                                                    Color.Green.copy(alpha = 0.1f), CircleShape
+                                                )
+                                                .padding(8.dp)
+                                        ) {
+                                            print(" item is here " + item.toString())
+                                            IconDictionary.allIcons[item.bank]?.let {
+                                                painterResource(
+                                                    id = it
+                                                )
+                                            }?.let {
+                                                Image(
+                                                    painter = it,
+                                                    contentDescription = item.bank!!,
+                                                    modifier = Modifier.size(40.dp),
+                                                    colorFilter = null
+                                                )
+                                            }
+                                        }
+                                        item.card_number?.let {
+                                            Text(
+                                                text = it,
+                                                color = MaterialTheme.colors.onSurface,
+                                                textAlign = TextAlign.Center,
+                                                style = TextStyle(fontWeight = FontWeight.Bold),
+                                                fontSize = 12.sp,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(4.dp, 8.dp)
+                                            )
+                                        }
                                     }
                                 }
                                 Spacer(modifier = Modifier.width(6.dp))

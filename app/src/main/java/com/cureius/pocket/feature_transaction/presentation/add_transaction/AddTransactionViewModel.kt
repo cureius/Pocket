@@ -6,7 +6,8 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
+import com.cureius.pocket.feature_account.domain.model.Account
+import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_transaction.domain.model.InvalidTransactionException
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
@@ -59,6 +60,12 @@ class AddTransactionViewModel @Inject constructor(
         )
     )
     val transactionBalance: State<TransactionTextFieldState> = _transactionBalance
+
+    private val _pot = mutableStateOf<Pot?>(null)
+    val pot: State<Pot?> = _pot
+
+    private val _account = mutableStateOf<Account?>(null)
+    val account: State<Account?> = _account
 
     private val _transactionColor = mutableStateOf(Transaction.transactionColors.random().toArgb())
     val transactionColor: State<Int> = _transactionColor
@@ -162,6 +169,7 @@ class AddTransactionViewModel @Inject constructor(
                     text = event.value.toString()
                 )
             }
+
             is AddTransactionEvent.ChangeBalanceFocus -> {
                 _transactionBalance.value = transactionBalance.value.copy(
                     isHintVisible = !event.focusState.isFocused && transactionBalance.value.text.isBlank()
@@ -171,6 +179,11 @@ class AddTransactionViewModel @Inject constructor(
             is AddTransactionEvent.EnteredTransactionsList -> {
                 _transactionsList.value = transactionsList.value + event.value
             }
+
+            is AddTransactionEvent.SelectedPot -> {
+                _pot.value = event.value
+            }
+
             is AddTransactionEvent.SaveAllTransactions -> {
                 viewModelScope.launch {
                     try {

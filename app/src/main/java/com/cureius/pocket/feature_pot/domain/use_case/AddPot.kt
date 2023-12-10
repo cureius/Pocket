@@ -9,7 +9,7 @@ class AddPot(
 ) {
     @Throws(InvalidPotException::class)
     suspend operator fun invoke(pot: Pot) {
-        if (pot.title.isBlank()) {
+        if (pot.title?.isBlank() == true) {
             throw InvalidPotException("A Pot Need A Title")
         }
         repository.insertPot(pot)

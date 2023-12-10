@@ -111,34 +111,36 @@ fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
                                     pot.id, it2.value.minus(it1.value)
                                 )
                             )
-                            ConfigurablePotItem(
-                                initialStart = it1.value,
-                                initialEnd = it2.value,
-                                onStartChange = {
-                                    if (potTemplateList.indexOf(pot) != 0) {
-                                        val startNode =
-                                            ((it * 100.0).roundToInt() / 100.0).toFloat()
-                                        viewModel.onEvent(
-                                            ConfigurePotsEvent.RangeChange(
-                                                ix, startNode
+                            pot.title?.let { it3 ->
+                                ConfigurablePotItem(
+                                    initialStart = it1.value,
+                                    initialEnd = it2.value,
+                                    onStartChange = {
+                                        if (potTemplateList.indexOf(pot) != 0) {
+                                            val startNode =
+                                                ((it * 100.0).roundToInt() / 100.0).toFloat()
+                                            viewModel.onEvent(
+                                                ConfigurePotsEvent.RangeChange(
+                                                    ix, startNode
+                                                )
                                             )
-                                        )
-                                    }
-                                },
-                                onEndChange = {
-                                    if (potTemplateList.indexOf(pot) != (potTemplateList.size - 1)) {
-                                        val endNode = ((it * 100.0).roundToInt() / 100.0).toFloat()
-                                        viewModel.onEvent(
-                                            ConfigurePotsEvent.RangeChange(
-                                                ix + 1, endNode
+                                        }
+                                    },
+                                    onEndChange = {
+                                        if (potTemplateList.indexOf(pot) != (potTemplateList.size - 1)) {
+                                            val endNode = ((it * 100.0).roundToInt() / 100.0).toFloat()
+                                            viewModel.onEvent(
+                                                ConfigurePotsEvent.RangeChange(
+                                                    ix + 1, endNode
+                                                )
                                             )
-                                        )
-                                    }
-                                },
-                                totalCapacity = (income),
-                                label = pot.title,
-                                icon = pot.icon,
-                            )
+                                        }
+                                    },
+                                    totalCapacity = (income),
+                                    label = it3,
+                                    icon = pot.icon,
+                                )
+                            }
                         }
                     }
                 }
