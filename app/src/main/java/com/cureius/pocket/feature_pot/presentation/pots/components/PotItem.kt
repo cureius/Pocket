@@ -98,16 +98,18 @@ fun PotItem(
                                 )
                             }
                         }
-                        Text(
-                            text = pot.title,
-                            color = MaterialTheme.colors.onBackground,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 16.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(4.dp, 0.dp)
-                        )
+                        pot.title?.let {
+                            Text(
+                                text = it,
+                                color = MaterialTheme.colors.onBackground,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(fontWeight = FontWeight.Bold),
+                                fontSize = 16.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(4.dp, 0.dp)
+                            )
+                        }
                     }
 
                     Box(

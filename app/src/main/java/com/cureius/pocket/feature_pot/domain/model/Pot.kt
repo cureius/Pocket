@@ -1,6 +1,5 @@
 package com.cureius.pocket.feature_pot.domain.model
 
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
@@ -8,7 +7,7 @@ import androidx.room.PrimaryKey
 
 @Entity(indices = [Index(value = ["title"], unique = true)])
 data class Pot(
-    @ColumnInfo(name = "title") val title: String,
+    @ColumnInfo(name = "title") val title: String?,
     @ColumnInfo(name = "weight") val weight: Float? = null,
     @ColumnInfo(name = "capacity") val capacity: Double? = null,
     @ColumnInfo(name = "type") val type: String? = "liability",
