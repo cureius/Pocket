@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -31,6 +32,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
@@ -50,8 +53,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -95,7 +100,8 @@ fun AddTransactionForm(
     val selectedPot = viewModel.pot.value
     val selectedAccount = viewModel.account.value
     var selectedTab by remember { mutableStateOf(0) }
-    var showDatePicker by remember { mutableStateOf(true) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val mode = remember { mutableStateOf(false) }
@@ -114,6 +120,9 @@ fun AddTransactionForm(
     val accounts = accountsViewModel.state.value
     val color1 = MaterialTheme.colors.background
     val color2 = MaterialTheme.colors.surface
+    val calendar = ImageVector.vectorResource(id = R.drawable.edit_calendar)
+    val clock = ImageVector.vectorResource(id = R.drawable.clock)
+
     val mixedColor = Color(
         (color1.red + color2.red) / 2f,
         (color1.green + color2.green) / 2f,
@@ -241,6 +250,127 @@ fun AddTransactionForm(
                     item {
                         Spacer(modifier = Modifier.height(20.dp))
                     } // Spacer 20
+                    item {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(2.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp)
+                                    .weight(1f)
+                                    .border(
+                                        1.dp,
+                                        MaterialTheme.colors.primaryVariant,
+                                        RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(horizontal = 2.dp).clickable {
+                                        showDatePicker = true
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(
+
+                                    ) {
+                                        Text(
+                                            text = "Date",
+                                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                                            textAlign = TextAlign.Start,
+                                            style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                            fontSize = 8.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier
+                                                .padding(4.dp, 0.dp)
+                                        )
+                                        Text(
+                                            text = if(selectedDates.value.toString() == "[]") "Select Date" else selectedDates.value.toString(),
+                                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.9f),
+                                            textAlign = TextAlign.Start,
+                                            style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier
+                                                .padding(4.dp, 0.dp)
+                                        )
+                                    }
+                                    IconButton(onClick = {
+                                    }) {
+                                        Icon(
+                                            imageVector = calendar,
+                                            contentDescription = "Select date",
+                                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
+                                        )
+                                    }
+                                }
+                            }
+                            Spacer(
+                                modifier =
+                                Modifier.width(8.dp)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(48.dp)
+                                    .weight(1f)
+                                    .border(
+                                        1.dp,
+                                        MaterialTheme.colors.primaryVariant,
+                                        RoundedCornerShape(8.dp)
+                                    )
+                                    .padding(horizontal = 2.dp).clickable {
+                                        showTimePicker = true
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Column(
+
+                                    ) {
+                                        Text(
+                                            text = "Time",
+                                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                                            textAlign = TextAlign.Start,
+                                            style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                            fontSize = 8.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier
+                                                .padding(4.dp, 0.dp)
+                                        )
+                                        Text(
+                                            text = "10:15 AM",
+                                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.9f),
+                                            textAlign = TextAlign.Start,
+                                            style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                            fontSize = 16.sp,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
+                                            modifier = Modifier
+                                                .padding(4.dp, 0.dp)
+                                        )
+                                    }
+                                    IconButton(onClick = {
+                                    }) {
+                                        Icon(
+                                            imageVector = clock,
+                                            contentDescription = "Select time",
+                                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
+                    } // Transaction Date Text Field
 
 
                     item {
@@ -483,6 +613,7 @@ fun AddTransactionForm(
                 style = CalendarStyle.MONTH,
             ),
             selection = CalendarSelection.Dates { newDates ->
+                print("newDates $newDates");
                 selectedDates.value = newDates
             },
         )
@@ -529,10 +660,10 @@ fun TransactionTypeSwitcher(
         ) {}
         Row(
             modifier = Modifier.border(
-                    border = BorderStroke(
-                        width = borderWidth, color = MaterialTheme.colors.primary
-                    ), shape = parentShape
-                )
+                border = BorderStroke(
+                    width = borderWidth, color = MaterialTheme.colors.primary
+                ), shape = parentShape
+            )
         ) {
             Box(
                 modifier = Modifier.size(width)/*

@@ -135,6 +135,7 @@ fun BottomNavigationContainer(
             navController = navController, bottomNavHostController = bottomNavController
         )
     }
+
     if (addAccountViewModel.dialogVisibility.value) {
         AddAccountFormDialog(onDismiss = {
             addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
