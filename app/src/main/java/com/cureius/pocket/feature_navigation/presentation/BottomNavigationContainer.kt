@@ -1,33 +1,30 @@
 package com.cureius.pocket.feature_navigation.presentation
 
+import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionScreen
-import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsScreen
-import com.cureius.pocket.feature_transaction.presentation.util.Screen
-import com.cureius.pocket.util.components.BottomNavigationBar
-import com.cureius.pocket.util.model.BottomNavItem
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountFormDialog
@@ -37,7 +34,12 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionEvent
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionForm
+import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionScreen
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
+import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsScreen
+import com.cureius.pocket.feature_transaction.presentation.util.Screen
+import com.cureius.pocket.util.components.BottomNavigationBar
+import com.cureius.pocket.util.model.BottomNavItem
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -148,11 +150,13 @@ fun BottomNavigationContainer(
         })
     }
     if (/*addTransactionViewModel.dialogVisibility.value */true) {
-        AddTransactionForm(onDismiss = {
-            addTransactionViewModel.onEvent(AddTransactionEvent.ToggleAddTransactionDialog)
-        }, onSubmit = {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            AddTransactionForm(onDismiss = {
+                addTransactionViewModel.onEvent(AddTransactionEvent.ToggleAddTransactionDialog)
+            }, onSubmit = {
 
-        })
+            })
+        }
     }
 }
 

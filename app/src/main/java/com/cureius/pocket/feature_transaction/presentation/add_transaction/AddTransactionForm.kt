@@ -1,6 +1,8 @@
 package com.cureius.pocket.feature_transaction.presentation.add_transaction
 
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -46,6 +48,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -62,11 +65,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_account.domain.model.Bank
 import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
-import com.cureius.pocket.feature_account.presentation.add_account.components.OutlineTextBox
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
+import com.maxkeppeker.sheets.core.models.base.SheetState
+import com.maxkeppeler.sheets.calendar.CalendarDialog
+import com.maxkeppeler.sheets.calendar.models.CalendarConfig
+import com.maxkeppeler.sheets.calendar.models.CalendarSelection
+import com.maxkeppeler.sheets.calendar.models.CalendarStyle
 import kotlinx.coroutines.flow.collectLatest
+import java.time.LocalDate
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AddTransactionForm(
@@ -86,6 +95,7 @@ fun AddTransactionForm(
     val selectedPot = viewModel.pot.value
     val selectedAccount = viewModel.account.value
     var selectedTab by remember { mutableStateOf(0) }
+    var showDatePicker by remember { mutableStateOf(true) }
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     val mode = remember { mutableStateOf(false) }
@@ -112,7 +122,13 @@ fun AddTransactionForm(
     val potShape = RoundedCornerShape(
         topStart = 12.dp, topEnd = 12.dp, bottomStart = 12.dp, bottomEnd = 12.dp
     )
-//    Retrieve Pots Data from db
+
+    val selectedDates = remember { mutableStateOf<List<LocalDate>>(listOf()) }
+    val disabledDates = listOf(
+        LocalDate.now().minusDays(7),
+        LocalDate.now().minusDays(12),
+        LocalDate.now().plusDays(3),
+    )
 
 
     LaunchedEffect(key1 = true) {
@@ -168,31 +184,29 @@ fun AddTransactionForm(
                                 modifier = Modifier.padding(4.dp, 0.dp)
                             )
                         }
-                    }
+                    } // Add Transaction Header
                     item {
                         Spacer(modifier = Modifier.height(20.dp))
-                    }
+                    } // Spacer 20
                     item {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(40.dp)
                         ) {
-                            TransactionTypeSwitcher(
-                                size = 80.dp,
+                            TransactionTypeSwitcher(size = 80.dp,
                                 padding = 2.dp,
                                 height = 40.dp,
                                 width = 150.dp,
                                 isSpending = mode.value,
                                 parentShape = RoundedCornerShape(50),
                                 toggleShape = RoundedCornerShape(50),
-                                onClick = { mode.value = !mode.value }
-                            )
+                                onClick = { mode.value = !mode.value })
                         }
-                    }
+                    } // Spending Income Toggle
                     item {
                         Spacer(modifier = Modifier.height(20.dp))
-                    }
+                    } // Spacer 20
                     item {
                         Box(
                             modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
@@ -206,10 +220,125 @@ fun AddTransactionForm(
                                 placeholder = { Text(text = "Enter Transaction Name") },
                             )
                         }
-                    }
+                    } // Transaction Name Text Field
                     item {
                         Spacer(modifier = Modifier.height(20.dp))
-                    }
+                    } // Spacer 20
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
+                        ) {
+                            TextField(
+                                value = "",
+                                onValueChange = { _ ->
+                                    /*viewModel.onEvent(AddTransactionViewModel.EnteredHolderName(newText))*/
+                                },
+                                label = { Text(text = "How much?") },
+                                placeholder = { Text(text = "Enter Transaction Amount") },
+                            )
+                        }
+                    } // Transaction Amount Text Field
+                    item {
+                        Spacer(modifier = Modifier.height(20.dp))
+                    } // Spacer 20
+
+
+                    item {
+                        Text(
+                            text = "Choose Account",
+                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                            textAlign = TextAlign.Start,
+                            style = TextStyle(fontWeight = FontWeight.SemiBold),
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .padding(4.dp, 0.dp)
+                                .fillMaxWidth()
+                        )
+                    } // Choose Accounts
+                    item {
+                        LazyRow(
+                            modifier = Modifier.height(100.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            items(accounts) { item ->
+                                Box(
+                                    modifier = Modifier
+                                        .clickable(onClick = {
+//                                            viewModel.onEvent(AddTransactionEvent.SelectedPot(item))
+                                        })
+                                        .width(60.dp)
+                                        .height(90.dp)
+                                        .background(
+                                            color = if (selectedAccount != null) {
+                                                MaterialTheme.colors.primary.copy(alpha = 0.5f)
+                                            } else {
+                                                MaterialTheme.colors.surface
+                                            }, potShape
+                                        ),
+                                ) {
+                                    var bank = banks.find {
+                                        it.name == item.bank;
+                                    }
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .clickable(onClick = {})
+                                            .width(60.dp)
+                                            .height(76.dp)
+                                            .background(
+                                                color = /*if (selectedBank == item) {
+                                                            MaterialTheme.colors.primary.copy(alpha = 0.5f)
+                                                        } else {*/
+                                                MaterialTheme.colors.surface/*}*/, potShape
+                                            ),
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.fillMaxHeight(),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.Bottom
+                                        ) {
+                                            Box(
+                                                contentAlignment = Alignment.BottomCenter,
+                                                modifier = Modifier
+                                                    .background(
+                                                        Color.Green.copy(alpha = 0.1f), CircleShape
+                                                    )
+                                                    .padding(8.dp)
+                                            ) {
+                                                Image(
+                                                    painter = bank!!.icon!!,
+                                                    contentDescription = bank.name,
+                                                    modifier = Modifier.size(20.dp),
+                                                )
+
+                                            }
+                                            item.card_number?.let {
+                                                Text(
+                                                    text = it,
+                                                    color = MaterialTheme.colors.onSurface,
+                                                    textAlign = TextAlign.Center,
+                                                    style = TextStyle(fontWeight = FontWeight.Bold),
+                                                    fontSize = 12.sp,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .padding(4.dp, 8.dp)
+                                                )
+                                            }
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                }
+                            }
+                        }
+                    } // Row Of Selectable Pre-added Accounts
+                    item {
+                        Spacer(modifier = Modifier.height(10.dp))
+                    } // Spacer 20
                     item {
                         Text(
                             text = "Choose Pot",
@@ -223,7 +352,7 @@ fun AddTransactionForm(
                                 .padding(4.dp, 0.dp)
                                 .fillMaxWidth()
                         )
-                    }
+                    } // Choose Pots Header
                     item {
                         LazyRow(
                             modifier = Modifier.height(100.dp),
@@ -254,17 +383,21 @@ fun AddTransactionForm(
                                     ) {
                                         Box(
                                             contentAlignment = Alignment.BottomCenter,
-                                            modifier = Modifier
-                                                .background(
-                                                    Color.Green.copy(alpha = 0.1f), CircleShape
-                                                )
-                                                .padding(8.dp)
+                                            modifier = Modifier.padding(8.dp)
                                         ) {
                                             Image(
                                                 painter = painterResource(id = IconDictionary.allIcons[item.icon]!!),
                                                 contentDescription = item.title!!,
                                                 modifier = Modifier.size(40.dp),
-                                                colorFilter = null
+                                                colorFilter = if (selectedPot == item) {
+                                                    ColorFilter.tint(MaterialTheme.colors.surface)
+                                                } else {
+                                                    ColorFilter.tint(
+                                                        MaterialTheme.colors.primary.copy(
+                                                            alpha = 0.5f
+                                                        )
+                                                    )
+                                                }
                                             )
                                         }
                                         Text(
@@ -285,180 +418,16 @@ fun AddTransactionForm(
                             }
                         }
 
-                    }
+                    } // Row Of Selectable Pre-added Pots
                     item {
                         Spacer(modifier = Modifier.height(10.dp))
-                    }
-                    item {
-                        Text(
-                            text = "Choose Account",
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-                            textAlign = TextAlign.Start,
-                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(4.dp, 0.dp)
-                                .fillMaxWidth()
-                        )
-                    }
-                    item {
-                        LazyRow(
-                            modifier = Modifier.height(100.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            items(accounts) { item ->
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .clickable(onClick = {
-//                                            viewModel.onEvent(AddTransactionEvent.SelectedPot(item))
-                                        })
-                                        .width(60.dp)
-                                        .height(90.dp)
-                                        .background(
-                                            color = if (selectedAccount != null) {
-                                                MaterialTheme.colors.primary.copy(alpha = 0.5f)
-                                            } else {
-                                                MaterialTheme.colors.surface
-                                            }, potShape
-                                        ),
-                                ) {
-                                    Column(
-                                        modifier = Modifier.fillMaxHeight(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Bottom
-                                    ) {
-                                        Box(
-                                            contentAlignment = Alignment.BottomCenter,
-                                            modifier = Modifier
-                                                .background(
-                                                    Color.Green.copy(alpha = 0.1f), CircleShape
-                                                )
-                                                .padding(8.dp)
-                                        ) {
-                                            print(" item is here " + item.toString())
-                                            IconDictionary.allIcons[item.bank]?.let {
-                                                painterResource(
-                                                    id = it
-                                                )
-                                            }?.let {
-                                                Image(
-                                                    painter = it,
-                                                    contentDescription = item.bank!!,
-                                                    modifier = Modifier.size(40.dp),
-                                                    colorFilter = null
-                                                )
-                                            }
-                                        }
-                                        item.card_number?.let {
-                                            Text(
-                                                text = it,
-                                                color = MaterialTheme.colors.onSurface,
-                                                textAlign = TextAlign.Center,
-                                                style = TextStyle(fontWeight = FontWeight.Bold),
-                                                fontSize = 12.sp,
-                                                maxLines = 1,
-                                                overflow = TextOverflow.Ellipsis,
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(4.dp, 8.dp)
-                                            )
-                                        }
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(6.dp))
-                            }
-                        }
-
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
+                    } // Spacer 20
                     item {
                         Divider()
-                    }
+                    } // Divider
                     item {
                         Spacer(modifier = Modifier.height(10.dp))
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(14.dp))
-                    }
-                    item {
-                        Text(
-                            text = "Last 3 Digit Of Account Number",
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-                            textAlign = TextAlign.End,
-                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(4.dp, 0.dp)
-                                .fillMaxWidth()
-                        )
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
-                        ) {
-                            OutlineTextBox("....XXXXXXXXXXX")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            /*SeparatedNumberField(
-                                *//*digitText = accountNumber,*//*
-                                digitCount = 3,
-                                onNumberChange = { value, _ ->
-                                    viewModel.onEvent(AddAccountEvent.EnteredAccountNumber(value))
-                                },
-                            )*/
-                        }
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
-                    item {
-                        Text(
-                            text = "Last 4 Digit Of Card Number",
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-                            textAlign = TextAlign.End,
-                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(4.dp, 0.dp)
-                                .fillMaxWidth()
-                        )
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                    }
-                    item {
-                        Row(
-                            horizontalArrangement = Arrangement.End,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            OutlineTextBox("....XXXX-XXXX")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            /*SeparatedNumberField(
-                                digitText = cardNumber,
-                                digitCount = 4,
-                                onNumberChange = { value, _ ->
-                                    viewModel.onEvent(AddAccountEvent.EnteredCardNumber(value))
-                                },
-                            )*/
-                        }
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
+                    } // Spacer 20
                     item {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -498,11 +467,28 @@ fun AddTransactionForm(
                                 Text(text = "Confirm")
                             }
                         }
-                    }
+                    } // Cancel And Submit Buttons
                 }
             }
         }
     }
+
+    if (showDatePicker) {
+        val selectedDates = remember { mutableStateOf<List<LocalDate>>(listOf()) }
+        CalendarDialog(
+            state = SheetState(visible = true, onCloseRequest = { showDatePicker = false }),
+            config = CalendarConfig(
+                yearSelection = true,
+                monthSelection = true,
+                style = CalendarStyle.MONTH,
+            ),
+            selection = CalendarSelection.Dates { newDates ->
+                selectedDates.value = newDates
+            },
+        )
+    }
+
+
 }
 
 
@@ -522,7 +508,8 @@ fun TransactionTypeSwitcher(
 ) {
     val offset by animateDpAsState(
         targetValue = if (isSpending) 0.dp else (width - (padding * 3f)),
-        animationSpec = animationSpec, label = ""
+        animationSpec = animationSpec,
+        label = ""
     )
 
     Box(modifier = Modifier
@@ -530,8 +517,7 @@ fun TransactionTypeSwitcher(
         .height(height)
         .clip(shape = parentShape)
         .clickable { onClick() }
-        .background(MaterialTheme.colors.surface)
-    ) {
+        .background(MaterialTheme.colors.surface)) {
         Box(
             modifier = Modifier
                 .width(width - (padding * 2.8f))
@@ -542,20 +528,15 @@ fun TransactionTypeSwitcher(
                 .background(MaterialTheme.colors.primary)
         ) {}
         Row(
-            modifier = Modifier
-                .border(
+            modifier = Modifier.border(
                     border = BorderStroke(
-                        width = borderWidth,
-                        color = MaterialTheme.colors.primary
-                    ),
-                    shape = parentShape
+                        width = borderWidth, color = MaterialTheme.colors.primary
+                    ), shape = parentShape
                 )
         ) {
             Box(
-                modifier = Modifier
-                    .size(width)/*
-                    .background(MaterialTheme.colors.primary)*/,
-                contentAlignment = Alignment.Center
+                modifier = Modifier.size(width)/*
+                    .background(MaterialTheme.colors.primary)*/, contentAlignment = Alignment.Center
             ) {
                 Text(
                     text = "Spending",
@@ -564,8 +545,7 @@ fun TransactionTypeSwitcher(
                 )
             }
             Box(
-                modifier = Modifier.size(width),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.size(width), contentAlignment = Alignment.Center
             ) {
 
                 Text(
