@@ -1,0 +1,19 @@
+
+Vkotlin:S1172‰"1Remove this unused function parameter "iconSize".(ýÀž¢ûÿÿÿÿ8œ¥ß×Ç1
+=kotlin:S125æ"Remove this commented out code.(éÏ‚28­¥ß×Ç1
+=kotlin:S125÷"Remove this commented out code.(éÏ‚28­¥ß×Ç1
+>kotlin:S125”"Remove this commented out code.(Õ°Ëû8®¥ß×Ç1
+>kotlin:S125Å"Remove this commented out code.(×ùšå8¯¥ß×Ç1
+lkotlin:S107„"HThis function has 11 parameters, which is greater than the 7 authorized.(Ú®§ÿÿÿÿÿ8Ö¥ß×Ç1
+Rkotlin:S1481Œ"2Remove this unused "disabledDates" local variable.(‰ª‰Ç8ò¥ß×Ç1
+Nkotlin:S1481n"*Remove this unused "scope" local variable.(Ö °Ÿÿÿÿÿÿ8ò¥ß×Ç1
+Okotlin:S1481j"0Remove this unused "selectedTab" local variable.(Î™ý8ò¥ß×Ç1
+Tkotlin:S1481g"5Remove this unused "transactionColor" local variable.(‘“ÅØ8ò¥ß×Ç1
+Xkotlin:S1481f"4Remove this unused "transactionType" local variable.(Ÿåîìøÿÿÿÿ8ò¥ß×Ç1
+Vkotlin:S1481e"7Remove this unused "transactionBalance" local variable.(åÂè¯8ó¥ß×Ç1
+Xkotlin:S1481d"4Remove this unused "transactionDate" local variable.(þ¥‡ùÿÿÿÿ8ó¥ß×Ç1
+Zkotlin:S1481c"6Remove this unused "transactionAmount" local variable.(»×©¬üÿÿÿÿ8ó¥ß×Ç1
+[kotlin:S1481b"7Remove this unused "transactionAccount" local variable.(®‡éûÿÿÿÿ8ó¥ß×Ç1
+>kotlin:S1128"Remove this unused import.(Ýß¶Âýÿÿÿÿ8†¦ß×Ç1
+9kotlin:S1128"Remove this unused import.(™òæÜ8†¦ß×Ç1
+pkotlin:S3776Z"RRefactor this method to reduce its Cognitive Complexity from 45 to the 15 allowed.(Á»ì,8”¦ß×Ç1
