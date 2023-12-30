@@ -109,7 +109,7 @@ dependencies {
 //    implementation("com.maxkeppeler.sheets-compose-dialogs:info:$sheetsVersion")
 //    implementation("com.maxkeppeler.sheets-compose-dialogs:color:$sheetsVersion")
     implementation("com.maxkeppeler.sheets-compose-dialogs:calendar:$sheetsVersion")
-//    implementation("com.maxkeppeler.sheets-compose-dialogs:clock:$sheetsVersion")
+    implementation("com.maxkeppeler.sheets-compose-dialogs:clock:$sheetsVersion")
 //    implementation("com.maxkeppeler.sheets-compose-dialogs:duration:$sheetsVersion")
 //    implementation("com.maxkeppeler.sheets-compose-dialogs:date-time:$sheetsVersion")
 //    implementation("com.maxkeppeler.sheets-compose-dialogs:option:$sheetsVersion")

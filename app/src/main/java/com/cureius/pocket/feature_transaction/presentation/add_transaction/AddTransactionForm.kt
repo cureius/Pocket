@@ -77,8 +77,12 @@ import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import com.maxkeppeler.sheets.calendar.models.CalendarStyle
+import com.maxkeppeler.sheets.clock.ClockDialog
+import com.maxkeppeler.sheets.clock.models.ClockConfig
+import com.maxkeppeler.sheets.clock.models.ClockSelection
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
+import java.time.LocalTime
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalComposeUiApi::class)
@@ -619,7 +623,20 @@ fun AddTransactionForm(
         )
     }
 
-
+    if (showTimePicker) {
+        val selectedTime = remember { mutableStateOf(LocalTime.of(8, 20, 0)) }
+        ClockDialog(
+            state = SheetState(visible = true, onCloseRequest = { showTimePicker = false }),
+            selection = ClockSelection.HoursMinutes { hours, minutes ->
+                selectedTime.value = LocalTime.of(hours, minutes, 0)
+            },
+            config = ClockConfig(
+//                boundary = LocalTime.of(0, 0, 0)..LocalTime.of(12, 59, 0),
+                defaultTime = selectedTime.value,
+                is24HourFormat = true
+            ),
+        )
+    }
 }
 
 
