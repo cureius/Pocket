@@ -98,12 +98,14 @@ fun AddTransactionForm(
     accountsViewModel: AccountsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val transactionType = viewModel.transactionType.value
     val transactionTitle = viewModel.transactionTitle.value
-    val transactionAccount = viewModel.transactionAccount.value
     val transactionAmount = viewModel.transactionAmount.value
     val transactionDate = viewModel.transactionDate.value
+    val transactionTime = viewModel.transactionTime.value
+    val transactionAccount = viewModel.transactionAccount.value
+    val transactionPot = viewModel.transactionPot.value
     val transactionBalance = viewModel.transactionBalance.value
-    val transactionType = viewModel.transactionType.value
     val transactionColor = viewModel.transactionColor.value
     val selectedPot = viewModel.pot.value
     val selectedAccount = viewModel.account.value
@@ -448,76 +450,67 @@ fun AddTransactionForm(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     items(accounts) { item ->
+                                        var bank = banks.find {
+                                            it.name == item.bank;
+                                        }
+                                        Spacer(modifier = Modifier.width(6.dp))
                                         Box(
                                             modifier = Modifier
                                                 .clickable(onClick = {
-//                                            viewModel.onEvent(AddTransactionEvent.SelectedPot(item))
+                                                    viewModel.onEvent(
+                                                        AddTransactionEvent.SelectedAccount(
+                                                            item
+                                                        )
+                                                    )
                                                 })
                                                 .width(60.dp)
                                                 .height(90.dp)
                                                 .background(
-                                                    color = if (selectedAccount != null) {
+                                                    color = if (selectedAccount == item) {
                                                         MaterialTheme.colors.primary.copy(alpha = 0.5f)
                                                     } else {
                                                         MaterialTheme.colors.surface
                                                     }, potShape
                                                 ),
                                         ) {
-                                            var bank = banks.find {
-                                                it.name == item.bank;
-                                            }
-                                            Spacer(modifier = Modifier.width(6.dp))
-                                            Box(
-                                                modifier = Modifier
-                                                    .clickable(onClick = {})
-                                                    .width(60.dp)
-                                                    .height(76.dp)
-                                                    .background(
-                                                        color = /*if (selectedBank == item) {
-                                                            MaterialTheme.colors.primary.copy(alpha = 0.5f)
-                                                        } else {*/
-                                                        MaterialTheme.colors.surface/*}*/, potShape
-                                                    ),
+                                            Column(
+                                                modifier = Modifier.fillMaxHeight(),
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.Bottom
                                             ) {
-                                                Column(
-                                                    modifier = Modifier.fillMaxHeight(),
-                                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                                    verticalArrangement = Arrangement.Bottom
+                                                Box(
+                                                    contentAlignment = Alignment.BottomCenter,
+                                                    modifier = Modifier
+                                                        .background(
+                                                            Color.Green.copy(alpha = 0.1f),
+                                                            CircleShape
+                                                        )
+                                                        .padding(8.dp)
                                                 ) {
-                                                    Box(
-                                                        contentAlignment = Alignment.BottomCenter,
-                                                        modifier = Modifier
-                                                            .background(
-                                                                Color.Green.copy(alpha = 0.1f),
-                                                                CircleShape
-                                                            )
-                                                            .padding(8.dp)
-                                                    ) {
-                                                        Image(
-                                                            painter = bank!!.icon!!,
-                                                            contentDescription = bank.name,
-                                                            modifier = Modifier.size(20.dp),
-                                                        )
+                                                    Image(
+                                                        painter = bank!!.icon!!,
+                                                        contentDescription = bank.name,
+                                                        modifier = Modifier.size(20.dp),
+                                                    )
 
-                                                    }
-                                                    item.card_number?.let {
-                                                        Text(
-                                                            text = it,
-                                                            color = MaterialTheme.colors.onSurface,
-                                                            textAlign = TextAlign.Center,
-                                                            style = TextStyle(fontWeight = FontWeight.Bold),
-                                                            fontSize = 12.sp,
-                                                            maxLines = 1,
-                                                            overflow = TextOverflow.Ellipsis,
-                                                            modifier = Modifier
-                                                                .fillMaxWidth()
-                                                                .padding(4.dp, 8.dp)
-                                                        )
-                                                    }
+                                                }
+                                                item.card_number?.let {
+                                                    Text(
+                                                        text = it,
+                                                        color = MaterialTheme.colors.onSurface,
+                                                        textAlign = TextAlign.Center,
+                                                        style = TextStyle(fontWeight = FontWeight.Bold),
+                                                        fontSize = 12.sp,
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis,
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .padding(4.dp, 8.dp)
+                                                    )
                                                 }
                                             }
-                                            Spacer(modifier = Modifier.width(6.dp))
                                         }
+                                        Spacer(modifier = Modifier.width(6.dp))
                                     }
                                 }
                             } // Row Of Selectable Pre-added Accounts

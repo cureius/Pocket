@@ -46,7 +46,7 @@ fun AccountItem(
     ) {
         Box(
             modifier = Modifier
-                .background(Transaction.transactionColors.random())
+                .background(MaterialTheme.colors.primary.copy(alpha = 0.1f))
                 .fillMaxSize()
                 .padding(16.dp)
         ) {

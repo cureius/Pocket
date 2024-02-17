@@ -1,6 +1,7 @@
 package com.cureius.pocket.feature_transaction.presentation.add_transaction
 
 import androidx.compose.ui.focus.FocusState
+import com.cureius.pocket.feature_account.domain.model.Account
 import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 
@@ -13,6 +14,7 @@ sealed class AddTransactionEvent {
     data class ChangeAccountFocus(val focusState: FocusState) : AddTransactionEvent()
 
     data class SelectedPot(val value: Pot) : AddTransactionEvent()
+    data class SelectedAccount(val value: Account) : AddTransactionEvent()
     data class EnteredAmount(val value: String) : AddTransactionEvent()
     data class ChangeAmountFocus(val focusState: FocusState) : AddTransactionEvent()
 

@@ -44,6 +44,11 @@ class AddTransactionViewModel @Inject constructor(
     )
     val transactionAccount: State<String> = _transactionAccount
 
+    private val _transactionPot = mutableStateOf(
+        ""
+    )
+    val transactionPot: State<String> = _transactionAccount
+
     private val _transactionAmount = mutableStateOf(
         ""
     )
@@ -53,6 +58,11 @@ class AddTransactionViewModel @Inject constructor(
         ""
     )
     val transactionDate: State<String> = _transactionDate
+
+    private val _transactionTime = mutableStateOf(
+        ""
+    )
+    val transactionTime: State<String> = _transactionTime
 
     private val _transactionBalance = mutableStateOf(
         ""
@@ -124,8 +134,19 @@ class AddTransactionViewModel @Inject constructor(
                 _transactionDate.value = event.value.toString()
 
             }
+
             is AddTransactionEvent.ChangeDateFocus -> {
                 _transactionDate.value = (!event.focusState.isFocused).toString()
+
+            }
+
+            is AddTransactionEvent.EnteredTime -> {
+                _transactionTime.value = event.value.toString()
+
+            }
+
+            is AddTransactionEvent.ChangeTimeFocus -> {
+                _transactionTime.value = (!event.focusState.isFocused).toString()
 
             }
 
@@ -145,6 +166,10 @@ class AddTransactionViewModel @Inject constructor(
 
             is AddTransactionEvent.SelectedPot -> {
                 _pot.value = event.value
+            }
+
+            is AddTransactionEvent.SelectedAccount -> {
+                _account.value = event.value
             }
 
             is AddTransactionEvent.SaveAllTransactions -> {
@@ -173,12 +198,14 @@ class AddTransactionViewModel @Inject constructor(
                             Transaction(
                                 title = transactionTitle.value,
                                 type = transactionType.value,
-//                                account = transactionAccount.value,
-                                amount = transactionAmount.value.toDouble(),
+                                amount = transactionAmount.value.ifBlank { "0" }.toDouble(),
 //                                balance = transactionBalance.value.toDouble(),
                                 date = transactionDate.value.ifEmpty { "0" }.toLong(),
+                                date_time = transactionDate.value + " | " + transactionTime.value,
                                 timestamp = System.currentTimeMillis(),
 //                                color = transactionColor.value,
+                                account = account.value?.account_number,
+                                pot = pot.value?.title,
                                 id = currentTransactionId
                             )
                         )
