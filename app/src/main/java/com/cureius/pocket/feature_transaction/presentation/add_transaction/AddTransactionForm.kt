@@ -615,21 +615,9 @@ fun AddTransactionForm(
                             }
                             Button(
                                 onClick = {
-                                    /*viewModel.onEvent(
-                                        AddAccountEvent.SaveAccount
-                                    )
                                     viewModel.onEvent(
-                                        AddAccountEvent.EnteredHolderName("")
+                                        AddTransactionEvent.SaveTransaction
                                     )
-                                    viewModel.onEvent(
-                                        AddAccountEvent.EnteredAccountNumber("")
-                                    )
-                                    viewModel.onEvent(
-                                        AddAccountEvent.EnteredCardNumber("")
-                                    )
-                                    viewModel.onEvent(
-                                        AddAccountEvent.SelectedBank(Bank(null, null))
-                                    )*/
                                     onSubmit()
                                 },
                                 modifier = Modifier.padding(8.dp),

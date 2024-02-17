@@ -1,5 +1,6 @@
 package com.cureius.pocket.feature_navigation.presentation
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -41,6 +42,7 @@ import com.cureius.pocket.feature_transaction.presentation.util.Screen
 import com.cureius.pocket.util.components.BottomNavigationBar
 import com.cureius.pocket.util.model.BottomNavItem
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun BottomNavigationContainer(
@@ -150,12 +152,12 @@ fun BottomNavigationContainer(
 
         })
     }
-    if (/*addTransactionViewModel.dialogVisibility.value */true) {
+    if (addTransactionViewModel.dialogVisibility.value ) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             AddTransactionForm(onDismiss = {
                 addTransactionViewModel.onEvent(AddTransactionEvent.ToggleAddTransactionDialog)
             }, onSubmit = {
-
+                addTransactionViewModel.onEvent(AddTransactionEvent.ToggleAddTransactionDialog)
             })
         }
     }

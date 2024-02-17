@@ -42,19 +42,25 @@ fun TransactionItem(
             }
 
             clipPath(clipPath) {
-                drawRoundRect(
-                    color = Color(transaction.color),
-                    size = size,
-                    cornerRadius = CornerRadius(cornerRadius.toPx())
-                )
-                drawRoundRect(
-                    color = Color(
-                        ColorUtils.blendARGB(transaction.color, 0x000000, 0.2f)
-                    ),
-                    topLeft = Offset(size.width - cutCornerSize.toPx(), -100f),
-                    size = Size(cutCornerSize.toPx() + 100f, cutCornerSize.toPx() + 100f),
-                    cornerRadius = CornerRadius(cornerRadius.toPx())
-                )
+                transaction?.color?.let { Color(it) }?.let {
+                    drawRoundRect(
+                        color = it,
+                        size = size,
+                        cornerRadius = CornerRadius(cornerRadius.toPx())
+                    )
+                }
+                transaction.color?.let { ColorUtils.blendARGB(it, 0x000000, 0.2f) }?.let {
+                    Color(
+                        it
+                    )
+                }?.let {
+                    drawRoundRect(
+                        color = it,
+                        topLeft = Offset(size.width - cutCornerSize.toPx(), -100f),
+                        size = Size(cutCornerSize.toPx() + 100f, cutCornerSize.toPx() + 100f),
+                        cornerRadius = CornerRadius(cornerRadius.toPx())
+                    )
+                }
             }
         }
 
@@ -64,13 +70,15 @@ fun TransactionItem(
                 .padding(16.dp)
                 .padding(end = 32.dp)
         ) {
-            Text(
-                text = transaction.type.uppercase(),
-                style = MaterialTheme.typography.h6,
-                color = Color.Black,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+            transaction.type?.uppercase()?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.h6,
+                    color = Color.Black,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = transaction.amount.toString(),

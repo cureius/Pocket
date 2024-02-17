@@ -12,11 +12,12 @@ import com.cureius.pocket.ui.theme.Violet
 data class Transaction(
     /*-------------From-SMS---------------*/
     val title: String? = null,
-    val type: String,
-    val account: String,
-    val amount: Double,
-    val date: Long,
-    val balance: Double,
+    val type: String? = null,
+    val account: String? = null,
+    val amount: Double? = null,
+    val date: Long? = null,
+    val date_time: String? = null,
+    val balance: Double? = null,
     val day: String? = null,
     val amount_string: String? = null,
     val UPI_ref: String? = null,
@@ -28,7 +29,7 @@ data class Transaction(
     val latitude: Double? = null,
     val longitude: Double? = null,
     /*----------For-Flow-Tracking---------*/
-    val color: Int,
+    val color: Int? = null,
     val kind: String? = null,
     val pot: String? = null,
     val expense_type: String? = null,
