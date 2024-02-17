@@ -206,289 +206,398 @@ fun AddTransactionForm(
                     .background(mixedColor)
                     .padding(16.dp)
             ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
+                Column {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
 
-                    item {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text(
-                                text = "Add Transaction",
-                                color = MaterialTheme.colors.onBackground,
-                                textAlign = TextAlign.Center,
-                                style = TextStyle(fontWeight = FontWeight.Bold),
-                                fontSize = 20.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(4.dp, 0.dp)
-                            )
-                        }
-                    } // Add Transaction Header
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
-                    } // Spacer 20
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(40.dp)
-                        ) {
-                            TransactionTypeSwitcher(size = 80.dp,
-                                padding = 2.dp,
-                                height = 40.dp,
-                                width = 150.dp,
-                                isSpending = mode.value,
-                                parentShape = RoundedCornerShape(50),
-                                toggleShape = RoundedCornerShape(50),
-                                onClick = { mode.value = !mode.value })
-                        }
-                    } // Spending Income Toggle
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
-                    } // Spacer 20
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
-                        ) {
-                            TextField(
-                                value = transactionTitle,
-                                onValueChange = { transactionName ->
-                                    viewModel.onEvent(
-                                        AddTransactionEvent.EnteredTitle(
-                                            transactionName
-                                        )
-                                    )
-                                },
-                                label = { Text(text = "What is it!") },
-                                placeholder = { Text(text = "Enter Transaction Name") },
-                            )
-                        }
-                    } // Transaction Name Text Field
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
-                    } // Spacer 20
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
-                        ) {
-                            TextField(
-                                value = transactionAmount,
-                                onValueChange = { amount ->
-                                    viewModel.onEvent(AddTransactionEvent.EnteredAmount(amount))
-                                },
-                                label = { Text(text = "How much?") },
-                                placeholder = { Text(text = "Enter Transaction Amount") },
-                            )
-                        }
-                    } // Transaction Amount Text Field
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
-                    } // Spacer 20
-                    item {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(2.dp)
-                        ) {
+                        item {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "Add Transaction",
+                                    color = MaterialTheme.colors.onBackground,
+                                    textAlign = TextAlign.Center,
+                                    style = TextStyle(fontWeight = FontWeight.Bold),
+                                    fontSize = 20.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(4.dp, 0.dp)
+                                )
+                            }
+                        } // Add Transaction Header
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
+                        } // Spacer 20
+                        item {
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(48.dp)
-                                    .weight(1f)
-                                    .border(
-                                        1.dp,
-                                        MaterialTheme.colors.primaryVariant,
-                                        RoundedCornerShape(8.dp)
-                                    )
-                                    .padding(horizontal = 2.dp)
-                                    .clickable {
-//                                        showDatePicker = true
-                                        dateDialogState.show()
-                                    },
+                                    .height(40.dp)
+                            ) {
+                                viewModel.onEvent(AddTransactionEvent.EnteredType(if (mode.value) "Spending" else "Income"))
+                                TransactionTypeSwitcher(size = 80.dp,
+                                    padding = 2.dp,
+                                    height = 40.dp,
+                                    width = 150.dp,
+                                    isSpending = mode.value,
+                                    parentShape = RoundedCornerShape(50),
+                                    toggleShape = RoundedCornerShape(50),
+                                    onClick = {
+                                        mode.value = !mode.value
+                                        viewModel.onEvent(AddTransactionEvent.EnteredType(if (mode.value) "Spending" else "Income"))
+                                    })
+                            }
+                        } // Spending Income Toggle
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
+                        } // Spacer 20
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(
-
-                                    ) {
-                                        Text(
-                                            text = "Date",
-                                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-                                            textAlign = TextAlign.Start,
-                                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                                            fontSize = 8.sp,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier
-                                                .padding(4.dp, 0.dp)
+                                TextField(
+                                    value = transactionTitle,
+                                    onValueChange = { transactionName ->
+                                        viewModel.onEvent(
+                                            AddTransactionEvent.EnteredTitle(
+                                                transactionName
+                                            )
                                         )
-                                        Text(
-                                            text = if (formattedDate.toString() == "") "Select Date" else formattedDate.toString(),
-                                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.9f),
-                                            textAlign = TextAlign.Start,
-                                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                                            fontSize = 16.sp,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier
-                                                .padding(4.dp, 0.dp)
-                                        )
-                                    }
-                                    IconButton(onClick = {
-                                    }) {
-                                        Icon(
-                                            imageVector = calendar,
-                                            contentDescription = "Select date",
-                                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
-                                        )
-                                    }
-                                }
+                                    },
+                                    label = { Text(text = "What is it!") },
+                                    placeholder = { Text(text = "Enter Transaction Name") },
+                                )
                             }
-                            Spacer(
-                                modifier =
-                                Modifier.width(8.dp)
-                            )
+                        } // Transaction Name Text Field
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
+                        } // Spacer 20
+                        item {
                             Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                TextField(
+                                    value = transactionAmount,
+                                    onValueChange = { amount ->
+                                        viewModel.onEvent(AddTransactionEvent.EnteredAmount(amount))
+                                    },
+                                    label = { Text(text = "How much?") },
+                                    placeholder = { Text(text = "Enter Transaction Amount") },
+                                )
+                            }
+                        } // Transaction Amount Text Field
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
+                        } // Spacer 20
+                        item {
+                            Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(48.dp)
-                                    .weight(1f)
-                                    .border(
-                                        1.dp,
-                                        MaterialTheme.colors.primaryVariant,
-                                        RoundedCornerShape(8.dp)
-                                    )
-                                    .padding(horizontal = 2.dp)
-                                    .clickable {
-//                                        showTimePicker = true
-                                        timeDialogState.show()
-                                    },
-                                contentAlignment = Alignment.Center
+                                    .padding(2.dp)
                             ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column(
-
-                                    ) {
-                                        Text(
-                                            text = "Time",
-                                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-                                            textAlign = TextAlign.Start,
-                                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                                            fontSize = 8.sp,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier
-                                                .padding(4.dp, 0.dp)
-                                        )
-                                        Text(
-                                            text = if (formattedTime.toString() == "") "-- --" else formattedTime.toString(),
-                                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.9f),
-                                            textAlign = TextAlign.Start,
-                                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                                            fontSize = 16.sp,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier
-                                                .padding(4.dp, 0.dp)
-                                        )
-                                    }
-                                    IconButton(onClick = {
-                                    }) {
-                                        Icon(
-                                            imageVector = clock,
-                                            contentDescription = "Select time",
-                                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                    } // Transaction Date Text Field
-
-
-                    item {
-                        Text(
-                            text = "Choose Account",
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-                            textAlign = TextAlign.Start,
-                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(4.dp, 0.dp)
-                                .fillMaxWidth()
-                        )
-                    } // Choose Accounts
-                    item {
-                        LazyRow(
-                            modifier = Modifier.height(100.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            items(accounts) { item ->
                                 Box(
                                     modifier = Modifier
-                                        .clickable(onClick = {
-//                                            viewModel.onEvent(AddTransactionEvent.SelectedPot(item))
-                                        })
-                                        .width(60.dp)
-                                        .height(90.dp)
-                                        .background(
-                                            color = if (selectedAccount != null) {
-                                                MaterialTheme.colors.primary.copy(alpha = 0.5f)
-                                            } else {
-                                                MaterialTheme.colors.surface
-                                            }, potShape
-                                        ),
+                                        .fillMaxWidth()
+                                        .height(48.dp)
+                                        .weight(1f)
+                                        .border(
+                                            1.dp,
+                                            MaterialTheme.colors.primaryVariant,
+                                            RoundedCornerShape(8.dp)
+                                        )
+                                        .padding(horizontal = 2.dp)
+                                        .clickable {
+//                                        showDatePicker = true
+                                            dateDialogState.show()
+                                        },
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    var bank = banks.find {
-                                        it.name == item.bank;
-                                    }
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Box(
-                                        modifier = Modifier
-                                            .clickable(onClick = {})
-                                            .width(60.dp)
-                                            .height(76.dp)
-                                            .background(
-                                                color = /*if (selectedBank == item) {
-                                                            MaterialTheme.colors.primary.copy(alpha = 0.5f)
-                                                        } else {*/
-                                                MaterialTheme.colors.surface/*}*/, potShape
-                                            ),
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Column(
-                                            modifier = Modifier.fillMaxHeight(),
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.Bottom
-                                        ) {
-                                            Box(
-                                                contentAlignment = Alignment.BottomCenter,
-                                                modifier = Modifier
-                                                    .background(
-                                                        Color.Green.copy(alpha = 0.1f), CircleShape
-                                                    )
-                                                    .padding(8.dp)
-                                            ) {
-                                                Image(
-                                                    painter = bank!!.icon!!,
-                                                    contentDescription = bank.name,
-                                                    modifier = Modifier.size(20.dp),
-                                                )
 
+                                        ) {
+                                            Text(
+                                                text = "Date",
+                                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                                                textAlign = TextAlign.Start,
+                                                style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                                fontSize = 8.sp,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier
+                                                    .padding(4.dp, 0.dp)
+                                            )
+                                            Text(
+                                                text = if (formattedDate.toString() == "") "Select Date" else formattedDate.toString(),
+                                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.9f),
+                                                textAlign = TextAlign.Start,
+                                                style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                                fontSize = 16.sp,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier
+                                                    .padding(4.dp, 0.dp)
+                                            )
+                                        }
+                                        IconButton(onClick = {
+                                        }) {
+                                            Icon(
+                                                imageVector = calendar,
+                                                contentDescription = "Select date",
+                                                tint = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
+                                            )
+                                        }
+                                    }
+                                }
+                                Spacer(
+                                    modifier =
+                                    Modifier.width(8.dp)
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(48.dp)
+                                        .weight(1f)
+                                        .border(
+                                            1.dp,
+                                            MaterialTheme.colors.primaryVariant,
+                                            RoundedCornerShape(8.dp)
+                                        )
+                                        .padding(horizontal = 2.dp)
+                                        .clickable {
+//                                        showTimePicker = true
+                                            timeDialogState.show()
+                                        },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Column(
+
+                                        ) {
+                                            Text(
+                                                text = "Time",
+                                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                                                textAlign = TextAlign.Start,
+                                                style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                                fontSize = 8.sp,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier
+                                                    .padding(4.dp, 0.dp)
+                                            )
+                                            Text(
+                                                text = if (formattedTime.toString() == "") "-- --" else formattedTime.toString(),
+                                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.9f),
+                                                textAlign = TextAlign.Start,
+                                                style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                                fontSize = 16.sp,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier
+                                                    .padding(4.dp, 0.dp)
+                                            )
+                                        }
+                                        IconButton(onClick = {
+                                        }) {
+                                            Icon(
+                                                imageVector = clock,
+                                                contentDescription = "Select time",
+                                                tint = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                        } // Transaction Date Text Field
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
+                        } // Spacer 20
+                    }
+                    if (accounts.isNotEmpty()) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            item {
+                                Text(
+                                    text = "Choose Account",
+                                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                                    textAlign = TextAlign.Start,
+                                    style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                    fontSize = 12.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier
+                                        .padding(4.dp, 0.dp)
+                                        .fillMaxWidth()
+                                )
+                            } // Choose Accounts
+                            item {
+                                LazyRow(
+                                    modifier = Modifier.height(100.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    items(accounts) { item ->
+                                        Box(
+                                            modifier = Modifier
+                                                .clickable(onClick = {
+//                                            viewModel.onEvent(AddTransactionEvent.SelectedPot(item))
+                                                })
+                                                .width(60.dp)
+                                                .height(90.dp)
+                                                .background(
+                                                    color = if (selectedAccount != null) {
+                                                        MaterialTheme.colors.primary.copy(alpha = 0.5f)
+                                                    } else {
+                                                        MaterialTheme.colors.surface
+                                                    }, potShape
+                                                ),
+                                        ) {
+                                            var bank = banks.find {
+                                                it.name == item.bank;
                                             }
-                                            item.card_number?.let {
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Box(
+                                                modifier = Modifier
+                                                    .clickable(onClick = {})
+                                                    .width(60.dp)
+                                                    .height(76.dp)
+                                                    .background(
+                                                        color = /*if (selectedBank == item) {
+                                                            MaterialTheme.colors.primary.copy(alpha = 0.5f)
+                                                        } else {*/
+                                                        MaterialTheme.colors.surface/*}*/, potShape
+                                                    ),
+                                            ) {
+                                                Column(
+                                                    modifier = Modifier.fillMaxHeight(),
+                                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                                    verticalArrangement = Arrangement.Bottom
+                                                ) {
+                                                    Box(
+                                                        contentAlignment = Alignment.BottomCenter,
+                                                        modifier = Modifier
+                                                            .background(
+                                                                Color.Green.copy(alpha = 0.1f),
+                                                                CircleShape
+                                                            )
+                                                            .padding(8.dp)
+                                                    ) {
+                                                        Image(
+                                                            painter = bank!!.icon!!,
+                                                            contentDescription = bank.name,
+                                                            modifier = Modifier.size(20.dp),
+                                                        )
+
+                                                    }
+                                                    item.card_number?.let {
+                                                        Text(
+                                                            text = it,
+                                                            color = MaterialTheme.colors.onSurface,
+                                                            textAlign = TextAlign.Center,
+                                                            style = TextStyle(fontWeight = FontWeight.Bold),
+                                                            fontSize = 12.sp,
+                                                            maxLines = 1,
+                                                            overflow = TextOverflow.Ellipsis,
+                                                            modifier = Modifier
+                                                                .fillMaxWidth()
+                                                                .padding(4.dp, 8.dp)
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                            Spacer(modifier = Modifier.width(6.dp))
+                                        }
+                                    }
+                                }
+                            } // Row Of Selectable Pre-added Accounts
+                            item {
+                                Spacer(modifier = Modifier.height(10.dp))
+                            } // Spacer 20
+
+                        }
+                    }
+                    if (pots.isNotEmpty()) {
+                        LazyColumn(
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            item {
+                                Text(
+                                    text = "Choose Pot",
+                                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                                    textAlign = TextAlign.Start,
+                                    style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                    fontSize = 12.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier
+                                        .padding(4.dp, 0.dp)
+                                        .fillMaxWidth()
+                                )
+                            } // Choose Pots Header
+                            item {
+                                LazyRow(
+                                    modifier = Modifier.height(100.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    items(pots) { item ->
+                                        Spacer(modifier = Modifier.width(6.dp))
+                                        Box(
+                                            modifier = Modifier
+                                                .clickable(onClick = {
+                                                    viewModel.onEvent(
+                                                        AddTransactionEvent.SelectedPot(
+                                                            item
+                                                        )
+                                                    )
+                                                })
+                                                .width(60.dp)
+                                                .height(90.dp)
+                                                .background(
+                                                    color = if (selectedPot == item) {
+                                                        MaterialTheme.colors.primary.copy(alpha = 0.5f)
+                                                    } else {
+                                                        MaterialTheme.colors.surface
+                                                    }, potShape
+                                                ),
+                                        ) {
+                                            Column(
+                                                modifier = Modifier.fillMaxHeight(),
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.Bottom
+                                            ) {
+                                                Box(
+                                                    contentAlignment = Alignment.BottomCenter,
+                                                    modifier = Modifier.padding(8.dp)
+                                                ) {
+                                                    Image(
+                                                        painter = painterResource(id = IconDictionary.allIcons[item.icon]!!),
+                                                        contentDescription = item.title!!,
+                                                        modifier = Modifier.size(40.dp),
+                                                        colorFilter = if (selectedPot == item) {
+                                                            ColorFilter.tint(MaterialTheme.colors.surface)
+                                                        } else {
+                                                            ColorFilter.tint(
+                                                                MaterialTheme.colors.primary.copy(
+                                                                    alpha = 0.5f
+                                                                )
+                                                            )
+                                                        }
+                                                    )
+                                                }
                                                 Text(
-                                                    text = it,
+                                                    text = item.title!!,
                                                     color = MaterialTheme.colors.onSurface,
                                                     textAlign = TextAlign.Center,
                                                     style = TextStyle(fontWeight = FontWeight.Bold),
@@ -501,132 +610,52 @@ fun AddTransactionForm(
                                                 )
                                             }
                                         }
-                                    }
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                }
-                            }
-                        }
-                    } // Row Of Selectable Pre-added Accounts
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                    } // Spacer 20
-                    item {
-                        Text(
-                            text = "Choose Pot",
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-                            textAlign = TextAlign.Start,
-                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(4.dp, 0.dp)
-                                .fillMaxWidth()
-                        )
-                    } // Choose Pots Header
-                    item {
-                        LazyRow(
-                            modifier = Modifier.height(100.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            items(pots) { item ->
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .clickable(onClick = {
-                                            viewModel.onEvent(AddTransactionEvent.SelectedPot(item))
-                                        })
-                                        .width(60.dp)
-                                        .height(90.dp)
-                                        .background(
-                                            color = if (selectedPot == item) {
-                                                MaterialTheme.colors.primary.copy(alpha = 0.5f)
-                                            } else {
-                                                MaterialTheme.colors.surface
-                                            }, potShape
-                                        ),
-                                ) {
-                                    Column(
-                                        modifier = Modifier.fillMaxHeight(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Bottom
-                                    ) {
-                                        Box(
-                                            contentAlignment = Alignment.BottomCenter,
-                                            modifier = Modifier.padding(8.dp)
-                                        ) {
-                                            Image(
-                                                painter = painterResource(id = IconDictionary.allIcons[item.icon]!!),
-                                                contentDescription = item.title!!,
-                                                modifier = Modifier.size(40.dp),
-                                                colorFilter = if (selectedPot == item) {
-                                                    ColorFilter.tint(MaterialTheme.colors.surface)
-                                                } else {
-                                                    ColorFilter.tint(
-                                                        MaterialTheme.colors.primary.copy(
-                                                            alpha = 0.5f
-                                                        )
-                                                    )
-                                                }
-                                            )
-                                        }
-                                        Text(
-                                            text = item.title!!,
-                                            color = MaterialTheme.colors.onSurface,
-                                            textAlign = TextAlign.Center,
-                                            style = TextStyle(fontWeight = FontWeight.Bold),
-                                            fontSize = 12.sp,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(4.dp, 8.dp)
-                                        )
+                                        Spacer(modifier = Modifier.width(6.dp))
                                     }
                                 }
-                                Spacer(modifier = Modifier.width(6.dp))
-                            }
-                        }
 
-                    } // Row Of Selectable Pre-added Pots
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                    } // Spacer 20
-                    item {
-                        Divider()
-                    } // Divider
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                    } // Spacer 20
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            // Rounded Button
-                            OutlinedButton(
-                                onClick = { onDismiss() },
-                                border = BorderStroke(1.dp, MaterialTheme.colors.onBackground),
-                                modifier = Modifier.padding(8.dp),
-                                shape = RoundedCornerShape(20.dp)
-                            ) {
-                                Text(text = "Cancel")
-                            }
-                            Button(
-                                onClick = {
-                                    viewModel.onEvent(
-                                        AddTransactionEvent.SaveTransaction
-                                    )
-                                    onSubmit()
-                                },
-                                modifier = Modifier.padding(8.dp),
-                                shape = RoundedCornerShape(20.dp)
-                            ) {
-                                Text(text = "Confirm")
-                            }
+                            } // Row Of Selectable Pre-added Pots
+                            item {
+                                Spacer(modifier = Modifier.height(10.dp))
+                            } // Spacer 20
                         }
-                    } // Cancel And Submit Buttons
+                    }
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        item {
+                            Divider()
+                        } // Divider
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+                        } // Spacer 20
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                // Rounded Button
+                                OutlinedButton(
+                                    onClick = { onDismiss() },
+                                    border = BorderStroke(1.dp, MaterialTheme.colors.onBackground),
+                                    modifier = Modifier.padding(8.dp),
+                                    shape = RoundedCornerShape(20.dp)
+                                ) {
+                                    Text(text = "Cancel")
+                                }
+                                Button(
+                                    onClick = {
+                                        viewModel.onEvent(
+                                            AddTransactionEvent.SaveTransaction
+                                        )
+                                        onSubmit()
+                                    },
+                                    modifier = Modifier.padding(8.dp),
+                                    shape = RoundedCornerShape(20.dp)
+                                ) {
+                                    Text(text = "Confirm")
+                                }
+                            }
+                        } // Cancel And Submit Buttons
+                    }
                 }
             }
         }
@@ -644,6 +673,7 @@ fun AddTransactionForm(
             title = "Pick a date",
         ) {
             pickedDate = it
+            viewModel.onEvent(AddTransactionEvent.EnteredDate(it.toEpochDay()))
         }
     }
 
@@ -655,10 +685,11 @@ fun AddTransactionForm(
         }
     ) {
         timepicker(
-            initialTime = LocalTime.NOON,
+            initialTime = LocalTime.now(),
             title = "Pick a time",
         ) {
             pickedTime = it
+            viewModel.onEvent(AddTransactionEvent.EnteredTime(it.toNanoOfDay()))
         }
     }
 }

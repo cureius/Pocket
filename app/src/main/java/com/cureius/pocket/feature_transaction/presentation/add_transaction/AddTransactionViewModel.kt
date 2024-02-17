@@ -172,11 +172,11 @@ class AddTransactionViewModel @Inject constructor(
                         transactionUseCases.addTransaction(
                             Transaction(
                                 title = transactionTitle.value,
-//                                type = transactionType.value,
+                                type = transactionType.value,
 //                                account = transactionAccount.value,
                                 amount = transactionAmount.value.toDouble(),
 //                                balance = transactionBalance.value.toDouble(),
-//                                date = transactionDate.value.toLong(),
+                                date = transactionDate.value.ifEmpty { "0" }.toLong(),
                                 timestamp = System.currentTimeMillis(),
 //                                color = transactionColor.value,
                                 id = currentTransactionId

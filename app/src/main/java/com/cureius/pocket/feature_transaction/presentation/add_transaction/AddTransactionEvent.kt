@@ -19,6 +19,9 @@ sealed class AddTransactionEvent {
     data class EnteredDate(val value: Long) : AddTransactionEvent()
     data class ChangeDateFocus(val focusState: FocusState) : AddTransactionEvent()
 
+    data class EnteredTime(val value: Long) : AddTransactionEvent()
+    data class ChangeTimeFocus(val focusState: FocusState) : AddTransactionEvent()
+
     data class EnteredBalance(val value: Double) : AddTransactionEvent()
     data class ChangeBalanceFocus(val focusState: FocusState) : AddTransactionEvent()
 
