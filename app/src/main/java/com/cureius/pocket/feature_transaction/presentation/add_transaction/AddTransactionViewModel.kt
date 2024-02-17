@@ -11,7 +11,6 @@ import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_transaction.domain.model.InvalidTransactionException
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
-import com.cureius.pocket.feature_transaction.domain.util.TransactionTextFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -26,40 +25,39 @@ class AddTransactionViewModel @Inject constructor(
     private val _dialogVisibility = mutableStateOf(false)
     val dialogVisibility: State<Boolean> = _dialogVisibility
 
-    private val _transactionType = mutableStateOf(
-        TransactionTextFieldState(
-            hint = "Enter Title"
-        )
+    private val _potTitle = mutableStateOf("")
+    val potTitle: State<String> = _potTitle
+
+
+    private val _transactionTitle = mutableStateOf(
+        ""
     )
-    val transactionType: State<TransactionTextFieldState> = _transactionType
+    val transactionTitle: State<String> = _transactionTitle
+
+    private val _transactionType = mutableStateOf(
+        ""
+    )
+    val transactionType: State<String> = _transactionType
 
     private val _transactionAccount = mutableStateOf(
-        TransactionTextFieldState(
-            hint = "Enter Account"
-        )
+        ""
     )
-    val transactionAccount: State<TransactionTextFieldState> = _transactionAccount
+    val transactionAccount: State<String> = _transactionAccount
 
     private val _transactionAmount = mutableStateOf(
-        TransactionTextFieldState(
-            hint = "Enter Amount"
-        )
+        ""
     )
-    val transactionAmount: State<TransactionTextFieldState> = _transactionAmount
+    val transactionAmount: State<String> = _transactionAmount
 
     private val _transactionDate = mutableStateOf(
-        TransactionTextFieldState(
-            hint = "Enter Date"
-        )
+        ""
     )
-    val transactionDate: State<TransactionTextFieldState> = _transactionDate
+    val transactionDate: State<String> = _transactionDate
 
     private val _transactionBalance = mutableStateOf(
-        TransactionTextFieldState(
-            hint = "Enter Balance"
-        )
+        ""
     )
-    val transactionBalance: State<TransactionTextFieldState> = _transactionBalance
+    val transactionBalance: State<String> = _transactionBalance
 
     private val _pot = mutableStateOf<Pot?>(null)
     val pot: State<Pot?> = _pot
@@ -84,96 +82,61 @@ class AddTransactionViewModel @Inject constructor(
     }
 
 
-    init {
-        savedStateHandle.get<Long>("transactionId")?.let { id ->
-            if (id.toInt() != -1) {
-                viewModelScope.launch {
-                    transactionUseCases.getTransaction(id)?.also { transaction ->
-                        currentTransactionId = transaction.id
-                        _transactionType.value = transactionType.value.copy(
-                            text = transaction.type, isHintVisible = false
-                        )
-                        _transactionAccount.value = transactionAccount.value.copy(
-                            text = transaction.account, isHintVisible = false
-                        )
-                        _transactionAmount.value = transactionAmount.value.copy(
-                            text = transaction.amount.toString(), isHintVisible = false
-                        )
-                        _transactionDate.value = transactionDate.value.copy(
-                            text = transaction.date.toString(), isHintVisible = false
-                        )
-                        _transactionBalance.value = transactionBalance.value.copy(
-                            text = transaction.balance.toString(), isHintVisible = false
-                        )
-
-                        _transactionColor.value = transaction.color
-                    }
-                }
-            }
-        }
-    }
-
-
     fun onEvent(event: AddTransactionEvent) {
         when (event) {
             is AddTransactionEvent.ToggleAddTransactionDialog -> {
                 _dialogVisibility.value = !_dialogVisibility.value
             }
 
-            is AddTransactionEvent.EnteredType -> {
-                _transactionType.value = transactionType.value.copy(
-                    text = event.value
-                )
+            is AddTransactionEvent.EnteredTitle -> {
+                _transactionTitle.value = event.value
             }
+
+            is AddTransactionEvent.EnteredType -> {
+                _transactionType.value = event.value
+
+            }
+
             is AddTransactionEvent.ChangeTypeFocus -> {
-                _transactionType.value = transactionType.value.copy(
-                    isHintVisible = !event.focusState.isFocused && transactionType.value.text.isBlank()
-                )
+                _transactionType.value = (!event.focusState.isFocused).toString()
+
             }
 
             is AddTransactionEvent.EnteredAccount -> {
-                _transactionAccount.value = transactionAccount.value.copy(
-                    text = event.value
-                )
+                _transactionAccount.value = event.value
+
             }
             is AddTransactionEvent.ChangeAccountFocus -> {
-                _transactionAccount.value = transactionAccount.value.copy(
-                    isHintVisible = !event.focusState.isFocused && transactionAccount.value.text.isBlank()
-                )
+                _transactionAccount.value = (!event.focusState.isFocused).toString()
+
             }
 
             is AddTransactionEvent.EnteredAmount -> {
-                _transactionAmount.value = transactionAmount.value.copy(
-                    text = event.value.toString()
-                )
+                _transactionAmount.value = event.value
+
             }
             is AddTransactionEvent.ChangeAmountFocus -> {
-                _transactionAmount.value = transactionAmount.value.copy(
-                    isHintVisible = !event.focusState.isFocused && transactionAmount.value.text.isBlank()
-                )
+                _transactionAmount.value = (!event.focusState.isFocused).toString()
+
             }
 
             is AddTransactionEvent.EnteredDate -> {
-                _transactionDate.value = transactionDate.value.copy(
-                    text = event.value.toString()
-                )
+                _transactionDate.value = event.value.toString()
+
             }
             is AddTransactionEvent.ChangeDateFocus -> {
-                _transactionDate.value = transactionDate.value.copy(
-                    isHintVisible = !event.focusState.isFocused && transactionDate.value.text.isBlank()
-                )
+                _transactionDate.value = (!event.focusState.isFocused).toString()
+
             }
 
             is AddTransactionEvent.EnteredBalance -> {
-                _transactionBalance.value = transactionBalance.value.copy(
-                    text = event.value.toString()
-                )
+                _transactionBalance.value = event.value.toString()
+
             }
 
             is AddTransactionEvent.ChangeBalanceFocus -> {
-                _transactionBalance.value = transactionBalance.value.copy(
-                    isHintVisible = !event.focusState.isFocused && transactionBalance.value.text.isBlank()
-                )
+                _transactionBalance.value = (!event.focusState.isFocused).toString()
+
             }
 
             is AddTransactionEvent.EnteredTransactionsList -> {
@@ -208,11 +171,11 @@ class AddTransactionViewModel @Inject constructor(
                     try {
                         transactionUseCases.addTransaction(
                             Transaction(
-                                type = transactionType.value.text,
-                                account = transactionAccount.value.text,
-                                amount = transactionAmount.value.text.toDouble(),
-                                balance = transactionBalance.value.text.toDouble(),
-                                date = transactionDate.value.text.toLong(),
+                                type = transactionType.value,
+                                account = transactionAccount.value,
+                                amount = transactionAmount.value.toDouble(),
+                                balance = transactionBalance.value.toDouble(),
+                                date = transactionDate.value.toLong(),
                                 timestamp = System.currentTimeMillis(),
                                 color = transactionColor.value,
                                 id = currentTransactionId

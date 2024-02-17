@@ -5,6 +5,7 @@ import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 
 sealed class AddTransactionEvent {
+    data class EnteredTitle(val value: String) : AddTransactionEvent()
     data class EnteredType(val value: String) : AddTransactionEvent()
     data class ChangeTypeFocus(val focusState: FocusState) : AddTransactionEvent()
 
@@ -12,7 +13,7 @@ sealed class AddTransactionEvent {
     data class ChangeAccountFocus(val focusState: FocusState) : AddTransactionEvent()
 
     data class SelectedPot(val value: Pot) : AddTransactionEvent()
-    data class EnteredAmount(val value: Double) : AddTransactionEvent()
+    data class EnteredAmount(val value: String) : AddTransactionEvent()
     data class ChangeAmountFocus(val focusState: FocusState) : AddTransactionEvent()
 
     data class EnteredDate(val value: Long) : AddTransactionEvent()

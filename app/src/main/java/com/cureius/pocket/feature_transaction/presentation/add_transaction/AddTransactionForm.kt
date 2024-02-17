@@ -1,5 +1,11 @@
 package com.cureius.pocket.feature_transaction.presentation.add_transaction
 
+//import androidx.compose.material3.DatePicker
+//import androidx.compose.material3.DatePickerDialog
+//import androidx.compose.material3.DisplayMode
+//import androidx.compose.material3.ExperimentalMaterial3Api
+//import androidx.compose.material3.TextButton
+//import androidx.compose.material3.rememberDatePickerState
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -17,7 +23,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -41,6 +46,7 @@ import androidx.compose.material.TextField
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -72,17 +78,14 @@ import com.cureius.pocket.feature_account.domain.model.Bank
 import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
-import com.maxkeppeker.sheets.core.models.base.SheetState
-import com.maxkeppeler.sheets.calendar.CalendarDialog
-import com.maxkeppeler.sheets.calendar.models.CalendarConfig
-import com.maxkeppeler.sheets.calendar.models.CalendarSelection
-import com.maxkeppeler.sheets.calendar.models.CalendarStyle
-import com.maxkeppeler.sheets.clock.ClockDialog
-import com.maxkeppeler.sheets.clock.models.ClockConfig
-import com.maxkeppeler.sheets.clock.models.ClockSelection
+import com.vanpra.composematerialdialogs.MaterialDialog
+import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.vanpra.composematerialdialogs.datetime.time.timepicker
+import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalComposeUiApi::class)
@@ -95,6 +98,7 @@ fun AddTransactionForm(
     accountsViewModel: AccountsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val transactionTitle = viewModel.transactionTitle.value
     val transactionAccount = viewModel.transactionAccount.value
     val transactionAmount = viewModel.transactionAmount.value
     val transactionDate = viewModel.transactionDate.value
@@ -106,9 +110,34 @@ fun AddTransactionForm(
     var selectedTab by remember { mutableStateOf(0) }
     var showDatePicker by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
+
+    var pickedDate by remember {
+        mutableStateOf(LocalDate.now())
+    }
+    var pickedTime by remember {
+        mutableStateOf(LocalTime.now())
+    }
+    val formattedDate by remember {
+        derivedStateOf {
+            DateTimeFormatter
+                .ofPattern("dd MMM yyyy")
+                .format(pickedDate)
+        }
+    }
+    val formattedTime by remember {
+        derivedStateOf {
+            DateTimeFormatter
+                .ofPattern("hh:mm a")
+                .format(pickedTime)
+        }
+    }
+
+    val dateDialogState = rememberMaterialDialogState()
+    val timeDialogState = rememberMaterialDialogState()
+
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
-    val mode = remember { mutableStateOf(false) }
+    val mode = remember { mutableStateOf(true) }
     val banks = listOf(
         Bank(
             icon = painterResource(id = R.drawable.pnb), name = "PNB"
@@ -225,9 +254,13 @@ fun AddTransactionForm(
                             modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
                         ) {
                             TextField(
-                                value = "",
-                                onValueChange = { _ ->
-                                    /*viewModel.onEvent(AddTransactionViewModel.EnteredHolderName(newText))*/
+                                value = transactionTitle,
+                                onValueChange = { transactionName ->
+                                    viewModel.onEvent(
+                                        AddTransactionEvent.EnteredTitle(
+                                            transactionName
+                                        )
+                                    )
                                 },
                                 label = { Text(text = "What is it!") },
                                 placeholder = { Text(text = "Enter Transaction Name") },
@@ -242,9 +275,9 @@ fun AddTransactionForm(
                             modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
                         ) {
                             TextField(
-                                value = "",
-                                onValueChange = { _ ->
-                                    /*viewModel.onEvent(AddTransactionViewModel.EnteredHolderName(newText))*/
+                                value = transactionAmount,
+                                onValueChange = { amount ->
+                                    viewModel.onEvent(AddTransactionEvent.EnteredAmount(amount))
                                 },
                                 label = { Text(text = "How much?") },
                                 placeholder = { Text(text = "Enter Transaction Amount") },
@@ -270,8 +303,10 @@ fun AddTransactionForm(
                                         MaterialTheme.colors.primaryVariant,
                                         RoundedCornerShape(8.dp)
                                     )
-                                    .padding(horizontal = 2.dp).clickable {
-                                        showDatePicker = true
+                                    .padding(horizontal = 2.dp)
+                                    .clickable {
+//                                        showDatePicker = true
+                                        dateDialogState.show()
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -293,7 +328,7 @@ fun AddTransactionForm(
                                                 .padding(4.dp, 0.dp)
                                         )
                                         Text(
-                                            text = if(selectedDates.value.toString() == "[]") "Select Date" else selectedDates.value.toString(),
+                                            text = if (formattedDate.toString() == "") "Select Date" else formattedDate.toString(),
                                             color = MaterialTheme.colors.onSurface.copy(alpha = 0.9f),
                                             textAlign = TextAlign.Start,
                                             style = TextStyle(fontWeight = FontWeight.SemiBold),
@@ -328,8 +363,10 @@ fun AddTransactionForm(
                                         MaterialTheme.colors.primaryVariant,
                                         RoundedCornerShape(8.dp)
                                     )
-                                    .padding(horizontal = 2.dp).clickable {
-                                        showTimePicker = true
+                                    .padding(horizontal = 2.dp)
+                                    .clickable {
+//                                        showTimePicker = true
+                                        timeDialogState.show()
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
@@ -351,7 +388,7 @@ fun AddTransactionForm(
                                                 .padding(4.dp, 0.dp)
                                         )
                                         Text(
-                                            text = "10:15 AM",
+                                            text = if (formattedTime.toString() == "") "-- --" else formattedTime.toString(),
                                             color = MaterialTheme.colors.onSurface.copy(alpha = 0.9f),
                                             textAlign = TextAlign.Start,
                                             style = TextStyle(fontWeight = FontWeight.SemiBold),
@@ -607,35 +644,34 @@ fun AddTransactionForm(
         }
     }
 
-    if (showDatePicker) {
-        val selectedDates = remember { mutableStateOf<List<LocalDate>>(listOf()) }
-        CalendarDialog(
-            state = SheetState(visible = true, onCloseRequest = { showDatePicker = false }),
-            config = CalendarConfig(
-                yearSelection = true,
-                monthSelection = true,
-                style = CalendarStyle.MONTH,
-            ),
-            selection = CalendarSelection.Dates { newDates ->
-                print("newDates $newDates");
-                selectedDates.value = newDates
-            },
-        )
+    MaterialDialog(
+        dialogState = dateDialogState,
+        buttons = {
+            positiveButton(text = "Ok")
+            negativeButton(text = "Cancel")
+        }
+    ) {
+        datepicker(
+            initialDate = LocalDate.now(),
+            title = "Pick a date",
+        ) {
+            pickedDate = it
+        }
     }
 
-    if (showTimePicker) {
-        val selectedTime = remember { mutableStateOf(LocalTime.of(8, 20, 0)) }
-        ClockDialog(
-            state = SheetState(visible = true, onCloseRequest = { showTimePicker = false }),
-            selection = ClockSelection.HoursMinutes { hours, minutes ->
-                selectedTime.value = LocalTime.of(hours, minutes, 0)
-            },
-            config = ClockConfig(
-//                boundary = LocalTime.of(0, 0, 0)..LocalTime.of(12, 59, 0),
-                defaultTime = selectedTime.value,
-                is24HourFormat = true
-            ),
-        )
+    MaterialDialog(
+        dialogState = timeDialogState,
+        buttons = {
+            positiveButton(text = "Ok")
+            negativeButton(text = "Cancel")
+        }
+    ) {
+        timepicker(
+            initialTime = LocalTime.NOON,
+            title = "Pick a time",
+        ) {
+            pickedTime = it
+        }
     }
 }
 

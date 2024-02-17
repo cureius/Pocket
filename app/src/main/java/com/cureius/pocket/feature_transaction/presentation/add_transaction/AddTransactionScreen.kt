@@ -65,128 +65,128 @@ fun AddTransactionScreen(
         }
     }
 
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    viewModel.onEvent(AddTransactionEvent.SaveTransaction)
-                }, backgroundColor = MaterialTheme.colors.primary
-            ) {
-                Icon(imageVector = Icons.Default.Save, contentDescription = "Save Transaction")
-            }
-        }, scaffoldState = scaffoldState
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(backgroundAnimation.value)
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Transaction.transactionColors.forEach { color ->
-                    val colorInt = color.toArgb()
-                    Box(modifier = Modifier
-                        .size(50.dp)
-                        .shadow(15.dp, CircleShape)
-                        .clip(CircleShape)
-                        .background(color)
-                        .border(
-                            width = 3.dp,
-                            color = if (viewModel.transactionColor.value == colorInt) {
-                                Color.Black
-                            } else Color.Transparent,
-                            shape = CircleShape
-                        )
-                        .clickable {
-                            scope.launch {
-                                backgroundAnimation.animateTo(
-                                    targetValue = Color(colorInt), animationSpec = tween(
-                                        durationMillis = 500
-                                    )
-                                )
-                            }
-                            viewModel.onEvent(AddTransactionEvent.ChangeColor(colorInt))
-                        })
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            TransparentHintTextField(
-                text = typeState.text,
-                hint = typeState.hint,
-                onValueChange = {
-                    viewModel.onEvent(AddTransactionEvent.EnteredType(it))
-                },
-                onFocusChange = {
-                    viewModel.onEvent(AddTransactionEvent.ChangeTypeFocus(it))
-                },
-                isHintVisible = typeState.isHintVisible,
-                singleLine = true,
-                textStyle = MaterialTheme.typography.h5
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            TransparentHintTextField(
-                text = accountState.text,
-                hint = accountState.hint,
-                onValueChange = {
-                    viewModel.onEvent(AddTransactionEvent.EnteredAccount(it))
-                },
-                onFocusChange = {
-                    viewModel.onEvent(AddTransactionEvent.ChangeAccountFocus(it))
-                },
-                isHintVisible = accountState.isHintVisible,
-                textStyle = MaterialTheme.typography.body1,
-                singleLine = true,
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            TransparentHintTextField(
-                text = amountState.text,
-                hint = amountState.hint,
-                onValueChange = {
-                    viewModel.onEvent(AddTransactionEvent.EnteredAmount(it.toDouble()))
-                },
-                onFocusChange = {
-                    viewModel.onEvent(AddTransactionEvent.ChangeAmountFocus(it))
-                },
-                isHintVisible = amountState.isHintVisible,
-                textStyle = MaterialTheme.typography.body1,
-                singleLine = true
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            TransparentHintTextField(
-                text = dateState.text,
-                hint = dateState.hint,
-                onValueChange = {
-                    viewModel.onEvent(AddTransactionEvent.EnteredDate(it.toLong()))
-                },
-                onFocusChange = {
-                    viewModel.onEvent(AddTransactionEvent.ChangeDateFocus(it))
-                },
-                isHintVisible = dateState.isHintVisible,
-                textStyle = MaterialTheme.typography.body1,
-                singleLine = true
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            TransparentHintTextField(
-                text = balanceState.text,
-                hint = balanceState.hint,
-                onValueChange = {
-                    viewModel.onEvent(AddTransactionEvent.EnteredBalance(it.toDouble()))
-                },
-                onFocusChange = {
-                    viewModel.onEvent(AddTransactionEvent.ChangeBalanceFocus(it))
-                },
-                isHintVisible = balanceState.isHintVisible,
-                textStyle = MaterialTheme.typography.body1,
-                singleLine = true
-            )
-
-        }
-    }
+//    Scaffold(
+//        floatingActionButton = {
+//            FloatingActionButton(
+//                onClick = {
+//                    viewModel.onEvent(AddTransactionEvent.SaveTransaction)
+//                }, backgroundColor = MaterialTheme.colors.primary
+//            ) {
+//                Icon(imageVector = Icons.Default.Save, contentDescription = "Save Transaction")
+//            }
+//        }, scaffoldState = scaffoldState
+//    ) {
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .background(backgroundAnimation.value)
+//                .padding(16.dp)
+//        ) {
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(8.dp),
+//                horizontalArrangement = Arrangement.SpaceBetween
+//            ) {
+//                Transaction.transactionColors.forEach { color ->
+//                    val colorInt = color.toArgb()
+//                    Box(modifier = Modifier
+//                        .size(50.dp)
+//                        .shadow(15.dp, CircleShape)
+//                        .clip(CircleShape)
+//                        .background(color)
+//                        .border(
+//                            width = 3.dp,
+//                            color = if (viewModel.transactionColor.value == colorInt) {
+//                                Color.Black
+//                            } else Color.Transparent,
+//                            shape = CircleShape
+//                        )
+//                        .clickable {
+//                            scope.launch {
+//                                backgroundAnimation.animateTo(
+//                                    targetValue = Color(colorInt), animationSpec = tween(
+//                                        durationMillis = 500
+//                                    )
+//                                )
+//                            }
+//                            viewModel.onEvent(AddTransactionEvent.ChangeColor(colorInt))
+//                        })
+//                }
+//            }
+//            Spacer(modifier = Modifier.height(16.dp))
+//            TransparentHintTextField(
+//                text = typeState.text,
+//                hint = typeState.hint,
+//                onValueChange = {
+//                    viewModel.onEvent(AddTransactionEvent.EnteredType(it))
+//                },
+//                onFocusChange = {
+//                    viewModel.onEvent(AddTransactionEvent.ChangeTypeFocus(it))
+//                },
+//                isHintVisible = typeState.isHintVisible,
+//                singleLine = true,
+//                textStyle = MaterialTheme.typography.h5
+//            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//            TransparentHintTextField(
+//                text = accountState.text,
+//                hint = accountState.hint,
+//                onValueChange = {
+//                    viewModel.onEvent(AddTransactionEvent.EnteredAccount(it))
+//                },
+//                onFocusChange = {
+//                    viewModel.onEvent(AddTransactionEvent.ChangeAccountFocus(it))
+//                },
+//                isHintVisible = accountState.isHintVisible,
+//                textStyle = MaterialTheme.typography.body1,
+//                singleLine = true,
+//            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//            TransparentHintTextField(
+//                text = amountState.text,
+//                hint = amountState.hint,
+//                onValueChange = {
+//                    viewModel.onEvent(AddTransactionEvent.EnteredAmount(it.toDouble()))
+//                },
+//                onFocusChange = {
+//                    viewModel.onEvent(AddTransactionEvent.ChangeAmountFocus(it))
+//                },
+//                isHintVisible = amountState.isHintVisible,
+//                textStyle = MaterialTheme.typography.body1,
+//                singleLine = true
+//            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//            TransparentHintTextField(
+//                text = dateState.text,
+//                hint = dateState.hint,
+//                onValueChange = {
+//                    viewModel.onEvent(AddTransactionEvent.EnteredDate(it.toLong()))
+//                },
+//                onFocusChange = {
+//                    viewModel.onEvent(AddTransactionEvent.ChangeDateFocus(it))
+//                },
+//                isHintVisible = dateState.isHintVisible,
+//                textStyle = MaterialTheme.typography.body1,
+//                singleLine = true
+//            )
+//            Spacer(modifier = Modifier.height(16.dp))
+//            TransparentHintTextField(
+//                text = balanceState.text,
+//                hint = balanceState.hint,
+//                onValueChange = {
+//                    viewModel.onEvent(AddTransactionEvent.EnteredBalance(it.toDouble()))
+//                },
+//                onFocusChange = {
+//                    viewModel.onEvent(AddTransactionEvent.ChangeBalanceFocus(it))
+//                },
+//                isHintVisible = balanceState.isHintVisible,
+//                textStyle = MaterialTheme.typography.body1,
+//                singleLine = true
+//            )
+//
+//        }
+//    }
 
 
 }

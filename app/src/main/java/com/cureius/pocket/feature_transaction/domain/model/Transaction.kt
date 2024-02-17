@@ -2,12 +2,16 @@ package com.cureius.pocket.feature_transaction.domain.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.cureius.pocket.ui.theme.*
-import java.util.Date
+import com.cureius.pocket.ui.theme.BabyBlue
+import com.cureius.pocket.ui.theme.LightGreen
+import com.cureius.pocket.ui.theme.RedOrange
+import com.cureius.pocket.ui.theme.RedPink
+import com.cureius.pocket.ui.theme.Violet
 
 @Entity
 data class Transaction(
     /*-------------From-SMS---------------*/
+    val title: String? = null,
     val type: String,
     val account: String,
     val amount: Double,
