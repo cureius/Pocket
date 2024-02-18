@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.cureius.pocket.feature_account.domain.model.Account
 import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.domain.use_case.PotUseCases
+import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_transaction.domain.model.InvalidTransactionException
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
@@ -25,6 +26,7 @@ import javax.inject.Inject
 class AddTransactionViewModel @Inject constructor(
     private val transactionUseCases: TransactionUseCases,
     private val potUseCases: PotUseCases,
+    private val potsViewModel: PotsViewModel,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -124,6 +126,7 @@ class AddTransactionViewModel @Inject constructor(
                 _transactionAccount.value = event.value
 
             }
+
             is AddTransactionEvent.ChangeAccountFocus -> {
                 _transactionAccount.value = (!event.focusState.isFocused).toString()
 
@@ -133,6 +136,7 @@ class AddTransactionViewModel @Inject constructor(
                 _transactionAmount.value = event.value
 
             }
+
             is AddTransactionEvent.ChangeAmountFocus -> {
                 _transactionAmount.value = (!event.focusState.isFocused).toString()
 
@@ -196,9 +200,11 @@ class AddTransactionViewModel @Inject constructor(
                     }
                 }
             }
+
             is AddTransactionEvent.ChangeColor -> {
                 _transactionColor.value = event.color
             }
+
             is AddTransactionEvent.SaveTransaction -> {
                 viewModelScope.launch {
                     try {
@@ -217,6 +223,12 @@ class AddTransactionViewModel @Inject constructor(
                                 id = currentTransactionId
                             )
                         )
+
+
+//                        If a transaction is being created for the first time in the running month then create a new pot object and push it to db
+//                        IF there is already a pot by this name for this running month then just update the pot values
+
+
                         // Get the current date
                         val currentDate = LocalDate.now()
                         // Get the last day of the current month
@@ -226,11 +238,10 @@ class AddTransactionViewModel @Inject constructor(
                         // Convert the LocalDateTime to a Unix timestamp (in seconds)
                         val validityTimestamp = midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC)
                         // Now, you can call the DAO method to get the pots with the calculated validity timestamp
-                        val pots = potUseCases.getPotsWithValidity(validityTimestamp).firstOrNull()
-                        println("Pots: $pots")
-                        val filteredPot = pots?.firstOrNull { it.title == pot.value?.title }
+                        val pots = potsViewModel.validPots.value
+                        val filteredPot = pots.firstOrNull { it.title == pot.value?.title }
                         if (filteredPot == null) {
-                            potUseCases.addPot(
+                            if (transactionType.value != "Income") potUseCases.addPot(
                                 Pot(
                                     title = pot.value?.title ?: "Default",
                                     weight = pot.value?.weight,
@@ -250,7 +261,6 @@ class AddTransactionViewModel @Inject constructor(
                                 )
                             )
                         } else {
-
                             potUseCases.updatePot(
                                 filteredPot.copy(
                                     amount = filteredPot.amount?.plus(transactionAmount.value.toDouble()),
@@ -259,8 +269,28 @@ class AddTransactionViewModel @Inject constructor(
                             )
                         }
 
-//                        If a transaction is being created for the first time in the running month then create a new pot object and push it to db
-//                        IF there is already a pot by this name for this running month then just update the pot values
+//                        If it is a income kine of a transaction then it should be responsible for increasing the all pot capacity based on the weight of the pot
+                        if (transactionType.value == "Income") {
+                            val pots =
+                                potsViewModel.validPots.value
+                            pots.forEach {
+                                potUseCases.updatePot(
+                                    it.copy(
+                                        capacity = if (it.capacity != null) {
+                                            it.capacity.plus(
+                                                it.weight?.times(
+                                                    transactionAmount.value.toDouble()
+                                                ) ?: 0.0
+                                            )
+                                        } else {
+                                            it.weight?.times(
+                                                transactionAmount.value.toDouble()
+                                            )
+                                        }, timestamp = System.currentTimeMillis()
+                                    )
+                                )
+                            }
+                        }
 
                         _eventFlow.emit(UiEvent.SaveTransaction)
                     } catch (e: InvalidTransactionException) {
