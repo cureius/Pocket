@@ -1,12 +1,10 @@
 package com.cureius.pocket.feature_pot.presentation.pots
 
 import android.annotation.SuppressLint
-import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,8 +21,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -38,18 +34,19 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.cureius.pocket.R
-import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotEvent
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_pot.presentation.pots.components.AddPotCard
 import com.cureius.pocket.feature_pot.presentation.pots.components.PotItem
+import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsViewModel
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun PotsScreen(
     navHostController: NavHostController,
     viewModel: PotsViewModel = hiltViewModel(),
+    transactionViewModel: TransactionsViewModel = hiltViewModel(),
     addPotViewModel: AddPotViewModel = hiltViewModel()
 ) {
     val monthlyPots = viewModel.validPots.value
@@ -104,13 +101,10 @@ fun PotsScreen(
                 }
                 Spacer(modifier = Modifier.height(20.dp))
             }
-            items(templatePots) { pot ->
-                if(pot.title !in monthlyPots.map { it.title }){
+            for (pot in templatePots) {
+                item {
                     PotItem(pot)
                 }
-            }
-            items(monthlyPots) { pot ->
-                PotItem(pot)
             }
             item {
                 AddPotCard(addPotViewModel)

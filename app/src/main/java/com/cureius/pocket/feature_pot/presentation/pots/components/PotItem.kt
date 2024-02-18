@@ -20,7 +20,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -30,14 +29,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cureius.pocket.feature_pot.domain.util.IconDictionary
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.feature_pot.domain.model.Pot
-import java.util.Random
+import com.cureius.pocket.feature_pot.domain.util.IconDictionary
+import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsViewModel
 import kotlin.math.roundToInt
 
 @Composable
 fun PotItem(
-    pot: Pot, data: Map<String, Float>? = mapOf(
+    pot: Pot,
+    transactionsViewModel: TransactionsViewModel = hiltViewModel(),
+    data: Map<String, Float>? = mapOf(
         Pair("mo", 0.0f),
         Pair("tu", 0.0f),
         Pair("we", 0.0f),
@@ -47,19 +49,28 @@ fun PotItem(
         Pair("su", 0.0f),
     )
 ) {
-    var filled = 0.0;
-    if (pot.capacity != null && pot.amount != null) {
-        filled = pot.amount / pot.capacity;
-    } else {
-        filled = pot.filled?.toDouble() ?: 0.0;
-    }
+
     var mData: Map<String, Float>? = data
     val icon = IconDictionary.allIcons[pot.icon]
-    val maxValue = (pot.capacity?.let { data?.values?.maxOrNull()?.times(it) })?.roundToInt()
     val paddingModifier = Modifier
         .padding(8.dp)
         .fillMaxWidth()
         .height(168.dp)
+    val transactions = transactionsViewModel.state.value.transactions.filter { it.pot == pot.title }
+    val totalAmount = transactions.sumOf { it.amount!! }
+    val totalCapacity =
+        transactionsViewModel.state.value.transactions.filter { it.type == "Income" }
+            .sumOf { it.amount!! }
+    var actualCapacity = 0.0;
+    var filled = 0.0f;
+    if (pot.weight != null) {
+        actualCapacity = totalCapacity * pot.weight!!
+        if (actualCapacity.toFloat() != 0.0f) {
+            filled = totalAmount.toFloat() / actualCapacity.toFloat();
+        }
+    }
+    val maxValue = (actualCapacity.let { data?.values?.maxOrNull()?.times(it) })?.roundToInt()
+
     Card(
         shape = RoundedCornerShape(20.dp),
         elevation = 4.dp,
@@ -90,7 +101,8 @@ fun PotItem(
                             modifier = Modifier
                                 .size(24.dp)
                                 .background(
-                                    MaterialTheme.colors.secondary, RoundedCornerShape(12.dp)
+                                    MaterialTheme.colors.secondary.copy(0.1f),
+                                    RoundedCornerShape(12.dp)
                                 )
                                 .padding(4.dp)
                         ) {
@@ -99,7 +111,7 @@ fun PotItem(
                                 Icon(
                                     imageVector = iconVector,
                                     contentDescription = "add account",
-                                    tint = MaterialTheme.colors.surface,
+                                    tint = MaterialTheme.colors.onBackground,
                                 )
                             }
                         }
@@ -118,14 +130,17 @@ fun PotItem(
                     }
                     Box(
                         modifier = Modifier.background(
-                            MaterialTheme.colors.primaryVariant, RoundedCornerShape(8.dp)
+                            MaterialTheme.colors.primaryVariant.copy(0.1f), RoundedCornerShape(8.dp)
                         )
                     ) {
                         Row {
-                            if (pot.capacity != null && filled != null) {
+                            if (totalAmount != null && actualCapacity != null) {
                                 Text(
-                                    text = "${(pot.capacity * filled!!).roundToInt()}/${pot.capacity.roundToInt()}",
-                                    color = MaterialTheme.colors.onPrimary,
+                                    text = "${totalAmount}/" + String.format(
+                                        "%.1f",
+                                        (actualCapacity)
+                                    ),
+                                    color = MaterialTheme.colors.onBackground,
                                     textAlign = TextAlign.Center,
                                     style = TextStyle(fontWeight = FontWeight.Normal),
                                     fontSize = 12.sp,
@@ -135,37 +150,41 @@ fun PotItem(
                                 )
                             }
                             if (filled != null) {
-                                Text(
-                                    text = " ${(filled!! * 100).roundToInt()}%",
-                                    color = MaterialTheme.colors.onSecondary,
-                                    textAlign = TextAlign.Center,
-                                    style = TextStyle(fontWeight = FontWeight.Bold),
-                                    fontSize = 12.sp,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
+                                Box(
                                     modifier = Modifier
-                                        .padding(4.dp)
+                                        .padding(8.dp, 4.dp)
                                         .background(
-                                            MaterialTheme.colors.secondary, RoundedCornerShape(4.dp)
+                                            MaterialTheme.colors.secondary.copy(0.1f),
+                                            RoundedCornerShape(4.dp)
                                         )
-                                )
+                                ) {
+                                    Text(
+                                        text = " "+String.format("%.2f", (filled!! * 100)) + "% ",
+                                        color = MaterialTheme.colors.onBackground,
+                                        textAlign = TextAlign.Center,
+                                        style = TextStyle(fontWeight = FontWeight.Bold),
+                                        fontSize = 12.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                    )
+                                }
                             }
                         }
 
                     }
                 }
                 Box(contentAlignment = Alignment.Center) {
-                    if (pot.is_template == true) {
-                        mData = mapOf(
-                            Pair("mo", kotlin.random.Random.nextFloat()),
-                            Pair("tu", kotlin.random.Random.nextFloat()),
-                            Pair("we", kotlin.random.Random.nextFloat()),
-                            Pair("th", kotlin.random.Random.nextFloat()),
-                            Pair("fr", kotlin.random.Random.nextFloat()),
-                            Pair("sa", kotlin.random.Random.nextFloat()),
-                            Pair("su", kotlin.random.Random.nextFloat()),
-                        )
-                    }
+//                    if (pot.is_template == true) {
+//                        mData = mapOf(
+//                            Pair("mo", kotlin.random.Random.nextFloat()),
+//                            Pair("tu", kotlin.random.Random.nextFloat()),
+//                            Pair("we", kotlin.random.Random.nextFloat()),
+//                            Pair("th", kotlin.random.Random.nextFloat()),
+//                            Pair("fr", kotlin.random.Random.nextFloat()),
+//                            Pair("sa", kotlin.random.Random.nextFloat()),
+//                            Pair("su", kotlin.random.Random.nextFloat()),
+//                        )
+//                    }
 
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -181,7 +200,7 @@ fun PotItem(
                             if (filled != null) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxHeight(filled.toFloat())
+                                        .fillMaxHeight(filled)
                                         .fillMaxWidth(0.6f)
                                         .background(
                                             MaterialTheme.colors.primary.copy(alpha = 0.9f),
@@ -209,9 +228,9 @@ fun PotItem(
                     Box(
                         modifier = Modifier
                             .background(
-                                color = if (pot.is_template == true && pot.weight == null) {
+                                color = if (pot.weight == null) {
                                     MaterialTheme.colors.surface.copy(alpha = 0.95f)
-                                } else if (pot.is_template == true && pot.weight != null) {
+                                } else if (transactions.isEmpty()) {
                                     MaterialTheme.colors.surface.copy(alpha = 0.90f)
                                 } else {
                                     MaterialTheme.colors.surface.copy(alpha = 0.0f)
@@ -219,7 +238,7 @@ fun PotItem(
                             )
                             .fillMaxSize(),
                     )
-                    if (pot.is_template == true && pot.weight == null) {
+                    if (pot.weight == null) {
                         Text(
                             text = "Set Weightage",
                             color = MaterialTheme.colors.onBackground,
@@ -230,7 +249,7 @@ fun PotItem(
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(4.dp, 0.dp)
                         )
-                    } else if (pot.is_template == true && pot.weight != null) {
+                    } else if (transactions.isEmpty()) {
                         Text(
                             text = "Not Initialized",
                             color = MaterialTheme.colors.onBackground,
