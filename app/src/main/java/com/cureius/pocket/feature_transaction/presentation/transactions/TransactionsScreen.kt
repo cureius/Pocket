@@ -127,7 +127,7 @@ fun TransactionsScreen(
                         TransactionItem(transaction = transaction, modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                navController?.navigate(Screen.AddTransactionScreen.route + "?transactionId=${transaction.id}&transactionColor=${transaction.color}")
+//                                navController?.navigate(Screen.AddTransactionScreen.route + "?transactionId=${transaction.id}&transactionColor=${transaction.color}")
                             }, onDeleteClick = {
                             viewModel.onEvent(TransactionsEvent.DeleteTransaction(transaction))
                             scope.launch {

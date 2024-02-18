@@ -57,12 +57,9 @@ fun TransactionItem(
             if (showDate) {
                 Text(
                     text = LocalDate.ofEpochDay(it)
-                        .format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy"))
-                        .toString(),
+                        .format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy")),
                     style = MaterialTheme.typography.body1,
                     color = Color.Gray,
-                    maxLines = 10,
-                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(8.dp))
             }
