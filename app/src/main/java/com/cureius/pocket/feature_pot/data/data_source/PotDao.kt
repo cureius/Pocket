@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import com.cureius.pocket.feature_pot.domain.model.Pot
 
@@ -24,5 +25,11 @@ interface PotDao {
 
     @Delete
     suspend fun deletePot(pot: Pot)
+
+    @Query("SELECT * FROM Pot WHERE validity = :validity")
+    fun getPotsWithValidity(validity: Long): Flow<List<Pot>>
+
+    @Update
+    suspend fun updatePot(pot: Pot)
 
 }

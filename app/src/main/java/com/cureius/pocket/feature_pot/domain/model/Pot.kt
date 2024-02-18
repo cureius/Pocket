@@ -5,11 +5,12 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(indices = [Index(value = ["title"], unique = true)])
+@Entity(indices = [Index(value = ["title"], unique = false)])
 data class Pot(
     @ColumnInfo(name = "title") val title: String?,
     @ColumnInfo(name = "weight") val weight: Float? = null,
     @ColumnInfo(name = "capacity") val capacity: Double? = null,
+    @ColumnInfo(name = "amount") val amount: Double? = 0.0,
     @ColumnInfo(name = "type") val type: String? = "liability",
     @ColumnInfo(name = "filled") val filled: Float? = null,
     @ColumnInfo(name = "is_template") val is_template: Boolean? = false,

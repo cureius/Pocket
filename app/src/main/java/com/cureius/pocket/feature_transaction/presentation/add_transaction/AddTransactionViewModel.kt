@@ -8,18 +8,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cureius.pocket.feature_account.domain.model.Account
 import com.cureius.pocket.feature_pot.domain.model.Pot
+import com.cureius.pocket.feature_pot.domain.use_case.PotUseCases
 import com.cureius.pocket.feature_transaction.domain.model.InvalidTransactionException
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 @HiltViewModel
 class AddTransactionViewModel @Inject constructor(
-    private val transactionUseCases: TransactionUseCases, savedStateHandle: SavedStateHandle
+    private val transactionUseCases: TransactionUseCases,
+    private val potUseCases: PotUseCases,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _dialogVisibility = mutableStateOf(false)
@@ -72,6 +78,9 @@ class AddTransactionViewModel @Inject constructor(
     private val _pot = mutableStateOf<Pot?>(null)
     val pot: State<Pot?> = _pot
 
+    private val _retrievedPot = mutableStateOf<Pot?>(null)
+    val retrievedPot: State<Pot?> = _retrievedPot
+
     private val _account = mutableStateOf<Account?>(null)
     val account: State<Account?> = _account
 
@@ -90,7 +99,6 @@ class AddTransactionViewModel @Inject constructor(
         data class ShowSnackBar(val message: String) : UiEvent()
         object SaveTransaction : UiEvent()
     }
-
 
     fun onEvent(event: AddTransactionEvent) {
         when (event) {
@@ -209,6 +217,51 @@ class AddTransactionViewModel @Inject constructor(
                                 id = currentTransactionId
                             )
                         )
+                        // Get the current date
+                        val currentDate = LocalDate.now()
+                        // Get the last day of the current month
+                        val lastDayOfMonth = currentDate.withDayOfMonth(currentDate.lengthOfMonth())
+                        // Get midnight of the last day of the current month
+                        val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
+                        // Convert the LocalDateTime to a Unix timestamp (in seconds)
+                        val validityTimestamp = midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC)
+                        // Now, you can call the DAO method to get the pots with the calculated validity timestamp
+                        val pots = potUseCases.getPotsWithValidity(validityTimestamp).firstOrNull()
+                        println("Pots: $pots")
+                        val filteredPot = pots?.firstOrNull { it.title == pot.value?.title }
+                        if (filteredPot == null) {
+                            potUseCases.addPot(
+                                Pot(
+                                    title = pot.value?.title ?: "Default",
+                                    weight = pot.value?.weight,
+                                    capacity = pot.value?.capacity,
+                                    amount = transactionAmount.value.toDouble(),
+                                    type = pot.value?.type,
+                                    filled = pot.value?.filled,
+                                    is_template = false,
+                                    is_monthly = true,
+                                    is_temporary = true,
+                                    is_default = pot.value?.is_default,
+                                    validity = validityTimestamp,
+                                    associated_account = pot.value?.associated_account,
+                                    icon = pot.value?.icon,
+                                    parent = pot.value?.parent,
+                                    timestamp = System.currentTimeMillis(),
+                                )
+                            )
+                        } else {
+
+                            potUseCases.updatePot(
+                                filteredPot.copy(
+                                    amount = filteredPot.amount?.plus(transactionAmount.value.toDouble()),
+                                    timestamp = System.currentTimeMillis()
+                                )
+                            )
+                        }
+
+//                        If a transaction is being created for the first time in the running month then create a new pot object and push it to db
+//                        IF there is already a pot by this name for this running month then just update the pot values
+
                         _eventFlow.emit(UiEvent.SaveTransaction)
                     } catch (e: InvalidTransactionException) {
                         _eventFlow.emit(

@@ -4,6 +4,8 @@ data class PotUseCases(
     val getPot: GetPot,
     val getPots: GetPots,
     val addPot: AddPot,
+    val updatePot: UpdatePot,
     val addPots: AddPots,
-    val deletePot: DeletePot
+    val deletePot: DeletePot,
+    val getPotsWithValidity: GetPotsWithValidity,
 )

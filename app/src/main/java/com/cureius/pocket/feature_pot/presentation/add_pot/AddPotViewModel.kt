@@ -37,8 +37,8 @@ class AddPotViewModel @Inject constructor(
     private val _isDefault = mutableStateOf(false)
     val isDefault: State<Boolean> = _isDefault
 
-    private val _potValidity = mutableStateOf(System.currentTimeMillis())
-    val potValidity: State<Long> = _potValidity
+    private val _potValidity = mutableStateOf(null as Long?)
+    val potValidity: State<Long?> = _potValidity
 
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()

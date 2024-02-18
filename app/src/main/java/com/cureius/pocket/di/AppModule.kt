@@ -16,7 +16,9 @@ import com.cureius.pocket.feature_pot.domain.use_case.AddPots
 import com.cureius.pocket.feature_pot.domain.use_case.DeletePot
 import com.cureius.pocket.feature_pot.domain.use_case.GetPot
 import com.cureius.pocket.feature_pot.domain.use_case.GetPots
+import com.cureius.pocket.feature_pot.domain.use_case.GetPotsWithValidity
 import com.cureius.pocket.feature_pot.domain.use_case.PotUseCases
+import com.cureius.pocket.feature_pot.domain.use_case.UpdatePot
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_transaction.data.data_source.TransactionDatabase
 import com.cureius.pocket.feature_transaction.data.repository.TransactionRepositoryImpl
@@ -118,8 +120,10 @@ object AppModule {
             getPot = GetPot(repository),
             deletePot = DeletePot(repository),
             addPot = AddPot(repository),
+            updatePot = UpdatePot(repository),
             addPots = AddPots(repository),
-            getPots = GetPots(repository)
+            getPots = GetPots(repository),
+            getPotsWithValidity = GetPotsWithValidity(repository)
         )
     }
 
