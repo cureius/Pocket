@@ -13,6 +13,10 @@ class PotRepositoryImpl(
         return dao.getPots()
     }
 
+    override fun getTemplatePots(): Flow<List<Pot>> {
+        return dao.getTemplatePots()
+    }
+
     override suspend fun getPotById(id: Int): Pot? {
         return dao.getPotById(id)
     }

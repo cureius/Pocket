@@ -14,6 +14,9 @@ interface PotDao {
     @Query("SELECT * FROM `pot`")
     fun getPots(): Flow<List<Pot>>
 
+    @Query("SELECT * FROM `pot` WHERE is_template = 1")
+    fun getTemplatePots(): Flow<List<Pot>>
+
     @Query("SELECT * FROM `pot` WHERE id = :id")
     suspend fun getPotById(id: Int): Pot?
 

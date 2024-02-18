@@ -1,5 +1,6 @@
 package com.cureius.pocket.feature_pot.presentation.pots
 
+import android.annotation.SuppressLint
 import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,22 +45,16 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialo
 import com.cureius.pocket.feature_pot.presentation.pots.components.AddPotCard
 import com.cureius.pocket.feature_pot.presentation.pots.components.PotItem
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun PotsScreen(
     navHostController: NavHostController,
     viewModel: PotsViewModel = hiltViewModel(),
     addPotViewModel: AddPotViewModel = hiltViewModel()
 ) {
-    val state = viewModel.state.value
-    val pots = mutableListOf<Pot>()
-    pots.clear()
-    state.filter { it.is_template == true }.forEach { template ->
-        if (state.any { it.parent == template.id }) {
-            pots.add(state.last { it.parent == template.id })
-        } else {
-            pots.add(template)
-        }
-    }
+    val monthlyPots = viewModel.validPots.value
+    val templatePots = viewModel.templatePots.value
+
     Scaffold {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -109,7 +104,12 @@ fun PotsScreen(
                 }
                 Spacer(modifier = Modifier.height(20.dp))
             }
-            items(pots) { pot ->
+            items(templatePots) { pot ->
+                if(pot.title !in monthlyPots.map { it.title }){
+                    PotItem(pot)
+                }
+            }
+            items(monthlyPots) { pot ->
                 PotItem(pot)
             }
             item {

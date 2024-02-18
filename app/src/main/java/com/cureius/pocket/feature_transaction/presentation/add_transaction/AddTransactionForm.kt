@@ -151,7 +151,7 @@ fun AddTransactionForm(
             icon = painterResource(id = R.drawable.sbi), name = "SBI"
         )
     )
-    val pots = potsViewModel.state.value
+    val pots = potsViewModel.templatePots.value
     val accounts = accountsViewModel.state.value
     val color1 = MaterialTheme.colors.background
     val color2 = MaterialTheme.colors.surface

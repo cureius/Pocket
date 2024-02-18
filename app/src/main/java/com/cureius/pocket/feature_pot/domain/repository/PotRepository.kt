@@ -4,7 +4,10 @@ import com.cureius.pocket.feature_pot.domain.model.Pot
 import kotlinx.coroutines.flow.Flow
 
 interface PotRepository {
+
     fun getPots(): Flow<List<Pot>>
+
+    fun getTemplatePots(): Flow<List<Pot>>
 
     suspend fun getPotById(id: Int): Pot?
 

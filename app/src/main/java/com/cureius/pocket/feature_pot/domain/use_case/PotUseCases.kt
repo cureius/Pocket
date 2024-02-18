@@ -3,6 +3,7 @@ package com.cureius.pocket.feature_pot.domain.use_case
 data class PotUseCases(
     val getPot: GetPot,
     val getPots: GetPots,
+    val getTemplatePots: GetTemplatePots,
     val addPot: AddPot,
     val updatePot: UpdatePot,
     val addPots: AddPots,

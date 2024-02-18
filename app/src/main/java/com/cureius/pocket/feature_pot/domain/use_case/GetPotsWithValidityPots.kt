@@ -4,10 +4,10 @@ import com.cureius.pocket.feature_pot.domain.repository.PotRepository
 import kotlinx.coroutines.flow.Flow
 import com.cureius.pocket.feature_pot.domain.model.Pot
 
-class GetTemplatePots(
+class GetPotsWithValidity(
     private val repository: PotRepository
 ) {
-    operator fun invoke(): Flow<List<Pot>> {
-        return repository.getTemplatePots()
+    operator fun invoke(validity: Long): Flow<List<Pot>> {
+        return repository.getPotsWithValidity(validity)
     }
 }
