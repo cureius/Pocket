@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -56,6 +55,7 @@ fun PotItem(
         .padding(8.dp)
         .fillMaxWidth()
         .height(168.dp)
+        .background(MaterialTheme.colors.surface.copy(0.4f), RoundedCornerShape(16.dp))
     val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonth.filter { it.pot == pot.title }
     val totalAmount = transactions.sumOf { it.amount!! }
     val totalCapacity =
@@ -71,15 +71,13 @@ fun PotItem(
     }
     val maxValue = (actualCapacity.let { data?.values?.maxOrNull()?.times(it) })?.roundToInt()
 
-    Card(
-        shape = RoundedCornerShape(20.dp),
-        elevation = 4.dp,
+    Box(
         modifier = paddingModifier,
-    ) {
+        ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
+                .background(Color.Transparent)
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
@@ -225,49 +223,50 @@ fun PotItem(
                             }
                         }
                     }
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                color = if (pot.weight == null) {
-                                    MaterialTheme.colors.surface.copy(alpha = 0.95f)
-                                } else if (transactions.isEmpty()) {
-                                    MaterialTheme.colors.surface.copy(alpha = 0.90f)
-                                } else {
-                                    MaterialTheme.colors.surface.copy(alpha = 0.0f)
-                                }, shape = RoundedCornerShape(24.dp)
-                            )
-                            .fillMaxSize(),
-                    )
-                    if (pot.weight == null) {
-                        Text(
-                            text = "Set Weightage",
-                            color = MaterialTheme.colors.onBackground,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 20.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(4.dp, 0.dp)
-                        )
-                    } else if (transactions.isEmpty()) {
-                        Text(
-                            text = "Not Initialized",
-                            color = MaterialTheme.colors.onBackground,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 20.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(4.dp, 0.dp)
-                                .fillMaxSize()
-                        )
-                    } else {
-
-                    }
                 }
+
             }
         }
+        Box(
+            modifier = Modifier
+                .background(
+                    color = if (pot.weight == null) {
+                        MaterialTheme.colors.background.copy(alpha = 0.90f)
+                    } else if (transactions.isEmpty()) {
+                        MaterialTheme.colors.background.copy(alpha = 0.80f)
+                    } else {
+                        MaterialTheme.colors.background.copy(alpha = 0.0f)
+                    }, shape = RoundedCornerShape(16.dp)
+                )
+                .fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ){
+            if (pot.weight == null) {
+                Text(
+                    text = "Set Weightage",
+                    color = MaterialTheme.colors.onBackground,
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(fontWeight = FontWeight.Bold),
+                    fontSize = 20.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(4.dp, 0.dp)
+                )
+            } else if (transactions.isEmpty()) {
+                Text(
+                    text = "Not Initialized",
+                    color = MaterialTheme.colors.onBackground,
+                    textAlign = TextAlign.Center,
+                    style = TextStyle(fontWeight = FontWeight.Bold),
+                    fontSize = 20.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            } else {
+
+            }
+        }
+
     }
 }
 

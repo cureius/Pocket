@@ -94,7 +94,7 @@ fun PotsScreen(
                             Icon(
                                 imageVector = config,
                                 contentDescription = "config",
-                                tint = MaterialTheme.colors.background,
+                                tint = MaterialTheme.colors.onBackground,
                             )
                         }
                     }

@@ -154,10 +154,10 @@ fun TransactionItem(
                     Column {
                         Text(
                             text = transaction.title.toString(),
-                            style = MaterialTheme.typography.body1,
-                            color = MaterialTheme.colors.onSurface,
+                            style = MaterialTheme.typography.h6,
+                            color = MaterialTheme.colors.onBackground,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                         Text(
                             text = if (transaction.type.equals("Income", true)) {
@@ -172,7 +172,7 @@ fun TransactionItem(
                                 MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
                             },
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
@@ -196,7 +196,8 @@ fun TransactionItem(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
-                        contentDescription = "Delete Transaction"
+                        contentDescription = "Delete Transaction",
+                        tint = MaterialTheme.colors.onSurface
                     )
                 }
             }
