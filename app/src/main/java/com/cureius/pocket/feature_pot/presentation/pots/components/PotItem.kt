@@ -47,7 +47,12 @@ fun PotItem(
         Pair("su", 0.0f),
     )
 ) {
-    var filled = pot.filled;
+    var filled = 0.0;
+    if (pot.capacity != null && pot.amount != null) {
+        filled = pot.amount / pot.capacity;
+    } else {
+        filled = pot.filled?.toDouble() ?: 0.0;
+    }
     var mData: Map<String, Float>? = data
     val icon = IconDictionary.allIcons[pot.icon]
     val maxValue = (pot.capacity?.let { data?.values?.maxOrNull()?.times(it) })?.roundToInt()
@@ -111,14 +116,13 @@ fun PotItem(
                             )
                         }
                     }
-
                     Box(
                         modifier = Modifier.background(
                             MaterialTheme.colors.primaryVariant, RoundedCornerShape(8.dp)
                         )
                     ) {
                         Row {
-                            if (pot.capacity != null) {
+                            if (pot.capacity != null && filled != null) {
                                 Text(
                                     text = "${(pot.capacity * filled!!).roundToInt()}/${pot.capacity.roundToInt()}",
                                     color = MaterialTheme.colors.onPrimary,
@@ -150,11 +154,8 @@ fun PotItem(
 
                     }
                 }
-
-
                 Box(contentAlignment = Alignment.Center) {
                     if (pot.is_template == true) {
-                        filled = kotlin.random.Random.nextFloat()
                         mData = mapOf(
                             Pair("mo", kotlin.random.Random.nextFloat()),
                             Pair("tu", kotlin.random.Random.nextFloat()),
@@ -180,7 +181,7 @@ fun PotItem(
                             if (filled != null) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxHeight(filled!!)
+                                        .fillMaxHeight(filled.toFloat())
                                         .fillMaxWidth(0.6f)
                                         .background(
                                             MaterialTheme.colors.primary.copy(alpha = 0.9f),
@@ -188,7 +189,6 @@ fun PotItem(
                                         )
                                 )
                             }
-
                             Jar(MaterialTheme.colors.onSurface)
                         }
 
