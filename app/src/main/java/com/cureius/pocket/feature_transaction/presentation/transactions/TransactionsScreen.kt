@@ -1,6 +1,7 @@
 package com.cureius.pocket.feature_transaction.presentation.transactions
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -8,10 +9,9 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -34,6 +34,7 @@ import com.cureius.pocket.feature_transaction.presentation.util.components.Phone
 import com.cureius.pocket.feature_transaction.presentation.util.components.RecordAudioPermissionTextProvider
 import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun TransactionsScreen(
     navController: NavController?,
@@ -122,7 +123,7 @@ fun TransactionsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 if (state != null) {
-                    items(state.transactions) { transaction ->
+                    itemsIndexed(state.transactions) { index, transaction ->
                         TransactionItem(transaction = transaction, modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
@@ -137,8 +138,10 @@ fun TransactionsScreen(
                                     viewModel.onEvent(TransactionsEvent.RestoreTransaction)
                                 }
                             }
-                        })
-                        Spacer(modifier = Modifier.height(16.dp))
+                        },
+                            showDate = if (index == 0) true else state.transactions[index - 1].date != transaction.date
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
                     }
                 }
             }
@@ -150,12 +153,15 @@ fun TransactionsScreen(
                     Manifest.permission.CAMERA -> {
                         CameraPermissionTextProvider()
                     }
+
                     Manifest.permission.RECORD_AUDIO -> {
                         RecordAudioPermissionTextProvider()
                     }
+
                     Manifest.permission.CALL_PHONE -> {
                         PhoneCallPermissionTextProvider()
                     }
+
                     else -> return@forEach
                 },
                 isPermanentlyDeclined = !shouldShowRequestPermissionRationale(

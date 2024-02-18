@@ -1,7 +1,20 @@
 package com.cureius.pocket.feature_transaction.presentation.transactions.components
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -11,107 +24,192 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
+import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
+import java.time.LocalDate
 
 @Composable
 fun TransactionItem(
     transaction: Transaction,
     modifier: Modifier = Modifier,
-    cornerRadius: Dp = 10.dp,
-    cutCornerSize: Dp = 30.dp,
-    onDeleteClick: () -> Unit
+    cornerRadius: Dp = 50.dp,
+    cutCornerSize: Dp = 0.dp,
+    showDate: Boolean = true,
+    onDeleteClick: () -> Unit,
 ) {
-    Box(modifier = modifier) {
-        Canvas(modifier = Modifier.matchParentSize()) {
-            val clipPath = Path().apply {
-                lineTo(size.width - cutCornerSize.toPx(), 0f)
-                lineTo(size.width, cutCornerSize.toPx())
-                lineTo(size.width, size.height)
-                lineTo(0f, size.height)
-                close()
-            }
-
-            clipPath(clipPath) {
-                transaction?.color?.let { Color(it) }?.let {
-                    drawRoundRect(
-                        color = it,
-                        size = size,
-                        cornerRadius = CornerRadius(cornerRadius.toPx())
-                    )
-                }
-                transaction.color?.let { ColorUtils.blendARGB(it, 0x000000, 0.2f) }?.let {
-                    Color(
-                        it
-                    )
-                }?.let {
-                    drawRoundRect(
-                        color = it,
-                        topLeft = Offset(size.width - cutCornerSize.toPx(), -100f),
-                        size = Size(cutCornerSize.toPx() + 100f, cutCornerSize.toPx() + 100f),
-                        cornerRadius = CornerRadius(cornerRadius.toPx())
-                    )
-                }
-            }
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-                .padding(end = 32.dp)
-        ) {
-            transaction.type?.uppercase()?.let {
+    Column {
+        transaction.date?.let {
+            if (showDate) {
                 Text(
-                    text = it,
-                    style = MaterialTheme.typography.h6,
-                    color = Color.Black,
-                    maxLines = 1,
+                    text = LocalDate.ofEpochDay(it)
+                        .format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy"))
+                        .toString(),
+                    style = MaterialTheme.typography.body1,
+                    color = Color.Gray,
+                    maxLines = 10,
                     overflow = TextOverflow.Ellipsis
                 )
+                Spacer(modifier = Modifier.height(8.dp))
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = transaction.amount.toString(),
-                style = MaterialTheme.typography.body1,
-                color = Color.Blue,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = transaction.body.toString(),
-                style = MaterialTheme.typography.body1,
-                color = Color.Gray,
-                maxLines = 10,
-                overflow = TextOverflow.Ellipsis
-            )
         }
-        IconButton(onClick = { onDeleteClick() },
-        modifier = Modifier.align(Alignment.BottomEnd)) {
-            Icon(imageVector = Icons.Default.Delete, contentDescription = "Delete Transaction")
-        }
+        Box(modifier = modifier) {
+            Canvas(modifier = Modifier.matchParentSize()) {
+                val clipPath = Path().apply {
+                    lineTo(size.width - cutCornerSize.toPx(), 0f)
+                    lineTo(size.width, cutCornerSize.toPx())
+                    lineTo(size.width, size.height)
+                    lineTo(0f, size.height)
+                    close()
+                }
 
+                clipPath(clipPath) {
+                    transaction?.color?.let { Color(it) }?.let {
+                        drawRoundRect(
+                            color = it,
+                            size = size,
+                            cornerRadius = CornerRadius(cornerRadius.toPx())
+                        )
+                    }
+                    transaction.color?.let { ColorUtils.blendARGB(it, 0x000000, 0.2f) }?.let {
+                        Color(
+                            it
+                        )
+                    }?.let {
+                        drawRoundRect(
+                            color = it,
+                            topLeft = Offset(size.width - cutCornerSize.toPx(), -100f),
+                            size = Size(cutCornerSize.toPx() + 100f, cutCornerSize.toPx() + 100f),
+                            cornerRadius = CornerRadius(cornerRadius.toPx())
+                        )
+                    }
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = MaterialTheme.colors.primary.copy(0.1f),
+                        shape = RoundedCornerShape(50.dp)
+                    )
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.Absolute.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+
+            ) {
+                Row(
+
+                    verticalAlignment = Alignment.CenterVertically
+
+                ) {
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(
+                        contentAlignment = Alignment.BottomCenter,
+                        modifier = Modifier
+                            .background(
+                                color = if (transaction.type.equals("Income", true)) {
+                                    Color.Green.copy(alpha = 0.7f)
+                                } else {
+                                    Color.Red.copy(alpha = 0.6f)
+                                },
+                                CircleShape
+                            )
+                            .padding(8.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = IconDictionary.allIcons["outGoingArrow"]!!),
+                            contentDescription = "outGoingArrow",
+                            modifier = Modifier
+                                .size(20.dp)
+                                .rotate(
+                                    degrees = if (transaction.type.equals("Income", true)) {
+                                        180f
+                                    } else {
+                                        0f
+                                    }
+                                ),
+                            colorFilter =
+                            ColorFilter.tint(
+                                MaterialTheme.colors.surface
+                            )
+
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Column {
+                        Text(
+                            text = transaction.title.toString(),
+                            style = MaterialTheme.typography.body1,
+                            color = Color.Blue,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = if (transaction.type.equals("Income", true)) {
+                                "+" + transaction.amount.toString()
+                            } else {
+                                "-" + transaction.amount.toString()
+                            },
+                            style = MaterialTheme.typography.body1,
+                            color = if (transaction.type.equals("Income", true)) {
+                                MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                            } else {
+                                MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                            },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                transaction.body.let {
+                    if (it != null) {
+                        if (it.isNotEmpty()) {
+                            Text(
+                                text = transaction.body.toString(),
+                                style = MaterialTheme.typography.body1,
+                                color = Color.Gray,
+                                maxLines = 10,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(
+                    onClick = { onDeleteClick() },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Transaction"
+                    )
+                }
+            }
+        }
     }
 }
 
 @Preview
 @Composable
-fun TransactionItemPreview(){
+fun IncomeTransactionItemPreview() {
     TransactionItem(
         transaction = Transaction(
-            title = "Transaction",
+            title = "Salary",
             type = "Income",
             amount = 100.0,
             body = "This is a transaction",
@@ -120,7 +218,26 @@ fun TransactionItemPreview(){
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.dp)
-            .padding(16.dp)
-    ){}
+            .padding(8.dp)
+    ) {}
+}
+
+
+@Preview
+@Composable
+fun SpendingTransactionItemPreview() {
+    TransactionItem(
+        transaction = Transaction(
+            title = "Food",
+            type = "Spending",
+            amount = 100.0,
+            body = null,
+            color = Color.White.toArgb(),
+            timestamp = System.currentTimeMillis(),
+            date = LocalDate.now().toEpochDay()
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {}
 }
