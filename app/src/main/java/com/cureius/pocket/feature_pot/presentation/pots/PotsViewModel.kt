@@ -36,13 +36,9 @@ class PotsViewModel @Inject constructor(
     private var getPotsWithValidityJob: Job? = null
 
     init {
-        val currentDate = LocalDate.now()
-        val lastDayOfMonth = currentDate.withDayOfMonth(currentDate.lengthOfMonth())
-        val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
-        val validityTimestamp = midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC)
         getPots()
         getTemplatePots()
-        getPotsWithValidity(validityTimestamp)
+        getPotsValidTillRunningMonth()
     }
 
     private fun getPots() {
@@ -67,5 +63,13 @@ class PotsViewModel @Inject constructor(
             println("PotsViewModel: getPotsWithValidity: pots: $pots")
             _validPots.value = pots
         }.launchIn(viewModelScope)
+    }
+
+    private fun getPotsValidTillRunningMonth() {
+        val currentDate = LocalDate.now()
+        val lastDayOfMonth = currentDate.withDayOfMonth(currentDate.lengthOfMonth())
+        val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
+        val validityTimestamp = midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC)
+        getPotsWithValidity(validityTimestamp)
     }
 }
