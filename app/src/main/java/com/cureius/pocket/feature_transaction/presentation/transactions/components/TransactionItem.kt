@@ -101,7 +101,7 @@ fun TransactionItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        color = MaterialTheme.colors.primary.copy(0.1f),
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
                         shape = RoundedCornerShape(50.dp)
                     )
                     .padding(8.dp),
@@ -152,7 +152,7 @@ fun TransactionItem(
                         Text(
                             text = transaction.title.toString(),
                             style = MaterialTheme.typography.body1,
-                            color = Color.Blue,
+                            color = MaterialTheme.colors.onSurface,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
