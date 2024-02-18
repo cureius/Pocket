@@ -15,6 +15,15 @@ interface TransactionDao {
     @Query("SELECT * FROM `transaction` WHERE id = :id")
     suspend fun getTransactionById(id: Long): Transaction?
 
+    @Query("SELECT * FROM `transaction` WHERE strftime('%Y-%m', timestamp / 1000, 'unixepoch') = strftime('%Y-%m', 'now')")
+    fun getTransactionsCreatedOnCurrentMonth(): Flow<List<Transaction>>
+
+    @Query("SELECT * FROM `transaction` WHERE strftime('%Y-%m', date / 1000 , 'unixepoch') = strftime('%Y-%m', 'now')")
+    fun getTransactionsCreatedForCurrentMonth(): Flow<List<Transaction>>
+
+    @Query("SELECT * FROM `transaction` WHERE date BETWEEN :startOfMonth AND :endOfMonth")
+    fun getTransactionsForDateRange(startOfMonth: Long, endOfMonth: Long): Flow<List<Transaction>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransaction(transaction: Transaction)
 

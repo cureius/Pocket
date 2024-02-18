@@ -63,6 +63,8 @@ object AppModule {
     fun provideTransactionUseCases(repository: TransactionRepository): TransactionUseCases {
         return TransactionUseCases(
             getTransaction = GetTransaction(repository),
+            getTransactionsCreatedOnCurrentMonth = GetTransactionsCreatedOnCurrentMonth(repository),
+            getTransactionsForDateRange = GetTransactionsForDateRange(repository),
             deleteTransaction = DeleteTransaction(repository),
             addTransaction = AddTransaction(repository),
             addTransactions = AddTransactions(repository),

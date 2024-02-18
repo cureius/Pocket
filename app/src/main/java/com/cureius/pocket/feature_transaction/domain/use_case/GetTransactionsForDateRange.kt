@@ -7,12 +7,15 @@ import com.cureius.pocket.feature_transaction.domain.util.TransactionOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class GetTransactions(
+class GetTransactionsForDateRange(
     private val repository: TransactionRepository
 ) {
-    operator fun invoke(transactionOrder: TransactionOrder = TransactionOrder.Date(OrderType.Descending)): Flow<List<Transaction>> {
-        return repository.
-        getTransactions().map { transactions ->
+    operator fun invoke(
+        transactionOrder: TransactionOrder = TransactionOrder.Date(OrderType.Descending),
+        start: Long,
+        end: Long
+    ): Flow<List<Transaction>> {
+        return repository.getTransactionsForDateRange(start, end).map { transactions ->
             when (transactionOrder.orderType) {
                 is OrderType.Ascending -> {
                     when (transactionOrder) {
@@ -21,6 +24,7 @@ class GetTransactions(
                         is TransactionOrder.Color -> transactions.sortedBy { it.color }
                     }
                 }
+
                 is OrderType.Descending -> {
                     when (transactionOrder) {
                         is TransactionOrder.Title -> transactions.sortedByDescending { it.type?.lowercase() }

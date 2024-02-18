@@ -14,6 +14,8 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 
@@ -27,6 +29,8 @@ class TransactionsViewModel @Inject constructor(
     val state: State<TransactionsState> = _state
     private var recentlyDeletedTransaction: Transaction? = null
     private var getTransactionsJob: Job? = null
+    private var getTransactionsForDateRangeJob: Job? = null
+    private var getTransactionsCreatedOnCurrentMonthJob: Job? = null
 
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
 
@@ -44,7 +48,23 @@ class TransactionsViewModel @Inject constructor(
     }
 
     init {
+        val currentDate = LocalDate.now() // Get the current date
+
+        // Get the start of the month
+        val startOfMonth = currentDate.withDayOfMonth(1)
+            .atStartOfDay(ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
+
+        // Get the end of the month
+        val endOfMonth = currentDate.withDayOfMonth(currentDate.lengthOfMonth())
+            .atStartOfDay(ZoneOffset.UTC)
+            .toInstant()
+            .toEpochMilli()
+
         getTransactions(TransactionOrder.Date(OrderType.Descending))
+        getTransactionsForDateRange(TransactionOrder.Date(OrderType.Descending), startOfMonth, endOfMonth)
+        getTransactionsCreatedOnCurrentMonth(TransactionOrder.Date(OrderType.Descending))
     }
 
     fun onEvent(event: TransactionsEvent) {
@@ -81,8 +101,29 @@ class TransactionsViewModel @Inject constructor(
     private fun getTransactions(transactionOrder: TransactionOrder) {
         getTransactionsJob?.cancel()
         getTransactionsJob = transactionUseCases.getTransactions(transactionOrder).onEach { transactions ->
+            println("TransactionsViewModel.getTransactions: transactions: $transactions")
             _state.value = state.value.copy(
                 transactions = transactions,
+                transactionOrder= transactionOrder
+            )
+        }.launchIn(viewModelScope)
+    }
+    private fun getTransactionsForDateRange(transactionOrder: TransactionOrder, start: Long, end: Long) {
+        getTransactionsForDateRangeJob?.cancel()
+        getTransactionsForDateRangeJob = transactionUseCases.getTransactionsForDateRange(transactionOrder, start, end).onEach { transactions ->
+            println("TransactionsViewModel.getTransactionsForDateRange: transactions: $transactions")
+            _state.value = state.value.copy(
+                transactionsForRange = transactions,
+                transactionOrder= transactionOrder
+            )
+        }.launchIn(viewModelScope)
+    }
+    private fun getTransactionsCreatedOnCurrentMonth(transactionOrder: TransactionOrder) {
+        getTransactionsCreatedOnCurrentMonthJob?.cancel()
+        getTransactionsCreatedOnCurrentMonthJob = transactionUseCases.getTransactionsCreatedOnCurrentMonth(transactionOrder).onEach { transactions ->
+            println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonth: transactions: $transactions")
+            _state.value = state.value.copy(
+                transactionsOnCurrentMonth = transactions,
                 transactionOrder= transactionOrder
             )
         }.launchIn(viewModelScope)

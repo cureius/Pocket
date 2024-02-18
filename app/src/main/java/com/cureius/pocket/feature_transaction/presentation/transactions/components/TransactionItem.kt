@@ -55,6 +55,9 @@ fun TransactionItem(
     Column {
         transaction.date?.let {
             if (showDate) {
+                println("Date Long: ${it}")
+                println("Date: ${LocalDate.ofEpochDay(it)}")
+
                 Text(
                     text = LocalDate.ofEpochDay(it)
                         .format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy")),

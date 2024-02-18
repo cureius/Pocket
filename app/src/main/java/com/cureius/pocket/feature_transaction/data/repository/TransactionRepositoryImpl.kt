@@ -12,8 +12,19 @@ class TransactionRepositoryImpl(
         return dao.getTransactions();
     }
 
+    override fun getTransactionsCreatedOnCurrentMonth(): Flow<List<Transaction>> {
+        return dao.getTransactionsCreatedOnCurrentMonth();
+    }
+
     override suspend fun getTransactionById(id: Long): Transaction? {
         return dao.getTransactionById(id)
+    }
+
+    override fun getTransactionsForDateRange(
+        start: Long,
+        end: Long
+    ): Flow<List<Transaction>> {
+        return dao.getTransactionsForDateRange(start, end)
     }
 
     override suspend fun insertTransaction(transaction: Transaction) {
