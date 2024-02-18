@@ -574,20 +574,22 @@ fun AddTransactionForm(
                                                     contentAlignment = Alignment.BottomCenter,
                                                     modifier = Modifier.padding(8.dp)
                                                 ) {
-                                                    Image(
-                                                        painter = painterResource(id = IconDictionary.allIcons[item.icon]!!),
-                                                        contentDescription = item.title!!,
-                                                        modifier = Modifier.size(40.dp),
-                                                        colorFilter = if (selectedPot == item) {
-                                                            ColorFilter.tint(MaterialTheme.colors.surface)
-                                                        } else {
-                                                            ColorFilter.tint(
-                                                                MaterialTheme.colors.primary.copy(
-                                                                    alpha = 0.5f
+                                                    if(IconDictionary.allIcons[item.icon] != null ){
+                                                        Image(
+                                                            painter = painterResource(id = IconDictionary.allIcons[item.icon]!!),
+                                                            contentDescription = item.title,
+                                                            modifier = Modifier.size(40.dp),
+                                                            colorFilter = if (selectedPot == item) {
+                                                                ColorFilter.tint(MaterialTheme.colors.surface)
+                                                            } else {
+                                                                ColorFilter.tint(
+                                                                    MaterialTheme.colors.primary.copy(
+                                                                        alpha = 0.5f
+                                                                    )
                                                                 )
-                                                            )
-                                                        }
-                                                    )
+                                                            }
+                                                        )
+                                                    }
                                                 }
                                                 Text(
                                                     text = item.title!!,
