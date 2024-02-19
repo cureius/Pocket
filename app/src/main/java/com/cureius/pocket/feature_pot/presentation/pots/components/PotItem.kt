@@ -32,24 +32,22 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsViewModel
-import kotlin.math.roundToInt
 
 @Composable
 fun PotItem(
     pot: Pot,
     transactionsViewModel: TransactionsViewModel = hiltViewModel(),
-    data: Map<String, Float>? = mapOf(
-        Pair("mo", 0.0f),
-        Pair("tu", 0.0f),
-        Pair("we", 0.0f),
-        Pair("th", 0.0f),
-        Pair("fr", 0.0f),
-        Pair("sa", 0.0f),
-        Pair("su", 0.0f),
+    data: MutableMap<String, Float>? = mutableMapOf(
+        Pair("MONDAY", 0.0f),
+        Pair("TUESDAY", 0.0f),
+        Pair("WEDNESDAY", 0.0f),
+        Pair("THURSDAY", 0.0f),
+        Pair("FRIDAY", 0.0f),
+        Pair("SATURDAY", 0.0f),
+        Pair("SUNDAY", 0.0f),
     )
 ) {
 
-    var mData: Map<String, Float>? = data
     val icon = IconDictionary.allIcons[pot.icon]
     val paddingModifier = Modifier
         .padding(8.dp)
@@ -69,11 +67,25 @@ fun PotItem(
             filled = totalAmount.toFloat() / actualCapacity.toFloat();
         }
     }
-    val maxValue = (actualCapacity.let { data?.values?.maxOrNull()?.times(it) })?.roundToInt()
+    transactions.forEach {
+        if (it.amount != null) {
+            // Or, you can directly access the key and update its value
+            data?.get(it.day)?.let { currentValue ->
+                it.day?.let { it1 ->
+                    data.put(
+                        it1, currentValue + (it.amount.toFloat())
+                    )
+                }
+            }
+        }
+    }
+    var mData: Map<String, Float>? = data
+    val maxValue = data?.values?.maxOrNull() ?: actualCapacity.toFloat()
+    val updatedData = mData?.mapValues { (_, value) -> value / maxValue }
 
     Box(
         modifier = paddingModifier,
-        ) {
+    ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -172,18 +184,6 @@ fun PotItem(
                     }
                 }
                 Box(contentAlignment = Alignment.Center) {
-//                    if (pot.is_template == true) {
-//                        mData = mapOf(
-//                            Pair("mo", kotlin.random.Random.nextFloat()),
-//                            Pair("tu", kotlin.random.Random.nextFloat()),
-//                            Pair("we", kotlin.random.Random.nextFloat()),
-//                            Pair("th", kotlin.random.Random.nextFloat()),
-//                            Pair("fr", kotlin.random.Random.nextFloat()),
-//                            Pair("sa", kotlin.random.Random.nextFloat()),
-//                            Pair("su", kotlin.random.Random.nextFloat()),
-//                        )
-//                    }
-
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -198,13 +198,18 @@ fun PotItem(
                             if (filled != null) {
                                 Box(
                                     modifier = Modifier
-                                        .fillMaxHeight(filled)
-                                        .fillMaxWidth(0.6f)
-                                        .background(
-                                            MaterialTheme.colors.primary.copy(alpha = 0.9f),
-                                            RoundedCornerShape(8.dp)
-                                        )
-                                )
+                                        .padding(0.dp, 20.dp, 0.dp, 0.dp)
+                                ){
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxHeight(filled * 1f)
+                                            .fillMaxWidth(0.6f)
+                                            .background(
+                                                MaterialTheme.colors.primary.copy(alpha = 0.9f),
+                                                RoundedCornerShape(8.dp)
+                                            )
+                                    )
+                                }
                             }
                             Jar(MaterialTheme.colors.onSurface)
                         }
@@ -212,10 +217,10 @@ fun PotItem(
                         Box(
                             modifier = Modifier.background(Color.Yellow.copy(alpha = 0.0f))
                         ) {
-                            if (mData != null) {
+                            if (updatedData != null && maxValue != 0.0f) {
                                 Chart(
-                                    data = mData!!,
-                                    maxValue = maxValue?.toDouble(),
+                                    data = updatedData!!,
+                                    maxValue = maxValue.toDouble(),
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .offset(y = (8).dp)

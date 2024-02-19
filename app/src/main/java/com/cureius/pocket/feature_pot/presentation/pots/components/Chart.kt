@@ -66,7 +66,7 @@ fun Chart(
                     })
                 Text(
                     color = MaterialTheme.colors.onSurface,
-                    text = it.key.uppercase(),
+                    text = it.key.substring(0, 2).uppercase(),
                     textAlign = TextAlign.Center,
                     style = TextStyle(fontWeight = FontWeight.Bold),
                     fontSize = 8.sp,
