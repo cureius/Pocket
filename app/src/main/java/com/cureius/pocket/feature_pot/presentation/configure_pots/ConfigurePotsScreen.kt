@@ -1,5 +1,6 @@
 package com.cureius.pocket.feature_pot.presentation.configure_pots
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -35,6 +36,7 @@ import com.cureius.pocket.feature_pot.presentation.configure_pots.components.Con
 import com.cureius.pocket.feature_pot.presentation.configure_pots.components.CutCornerButton
 import kotlin.math.roundToInt
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @RequiresApi(Build.VERSION_CODES.N)
 @Preview
 @Composable

@@ -1,5 +1,6 @@
 package com.cureius.pocket.feature_account.presentation.account
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,6 +29,7 @@ import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEve
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountFormDialog
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountViewModel
 
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Preview
 @Composable
 fun AccountsScreen(
