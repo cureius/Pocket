@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
@@ -59,6 +60,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -180,7 +182,12 @@ fun AddTransactionForm(
                 }
 
                 is AddTransactionViewModel.UiEvent.SaveTransaction -> {
-                    onDismiss()
+                    viewModel.onEvent(AddTransactionEvent.EnteredTitle(""))
+                    viewModel.onEvent(AddTransactionEvent.EnteredAmount(""))
+                    viewModel.onEvent(AddTransactionEvent.EnteredDate(LocalDate.now()))
+                    viewModel.onEvent(AddTransactionEvent.EnteredTime(LocalTime.now()))
+                    viewModel.onEvent(AddTransactionEvent.SelectedPot(null))
+                    viewModel.onEvent(AddTransactionEvent.SelectedAccount(null))
                 }
             }
         }
@@ -280,10 +287,20 @@ fun AddTransactionForm(
                                 TextField(
                                     value = transactionAmount,
                                     onValueChange = { amount ->
-                                        viewModel.onEvent(AddTransactionEvent.EnteredAmount(amount))
+                                        // Ensure that the input is numeric
+                                        if (amount.all { it.isDigit() }) {
+                                            viewModel.onEvent(
+                                                AddTransactionEvent.EnteredAmount(
+                                                    amount
+                                                )
+                                            )
+                                        }
                                     },
                                     label = { Text(text = "How much?") },
                                     placeholder = { Text(text = "Enter Transaction Amount") },
+                                    keyboardOptions = KeyboardOptions.Default.copy(
+                                        keyboardType = KeyboardType.Number
+                                    )
                                 )
                             }
                         } // Transaction Amount Text Field
@@ -635,6 +652,12 @@ fun AddTransactionForm(
                                         viewModel.onEvent(
                                             AddTransactionEvent.SaveTransaction
                                         )
+                                        viewModel.onEvent(AddTransactionEvent.EnteredTitle(""))
+                                        viewModel.onEvent(AddTransactionEvent.EnteredAmount(""))
+                                        viewModel.onEvent(AddTransactionEvent.EnteredDate(LocalDate.now()))
+                                        viewModel.onEvent(AddTransactionEvent.EnteredTime(LocalTime.now()))
+                                        viewModel.onEvent(AddTransactionEvent.SelectedPot(null))
+                                        viewModel.onEvent(AddTransactionEvent.SelectedAccount(null))
                                         onSubmit()
                                     },
                                     modifier = Modifier.padding(8.dp),
@@ -658,11 +681,11 @@ fun AddTransactionForm(
         }
     ) {
         datepicker(
-            initialDate = LocalDate.now(),
+            initialDate = transactionDate,
             title = "Pick a date",
         ) {
             pickedDate = it
-            viewModel.onEvent(AddTransactionEvent.EnteredDate(it.toEpochDay()))
+            viewModel.onEvent(AddTransactionEvent.EnteredDate(it))
         }
     }
 
@@ -674,11 +697,11 @@ fun AddTransactionForm(
         }
     ) {
         timepicker(
-            initialTime = LocalTime.now(),
+            initialTime = transactionTime,
             title = "Pick a time",
         ) {
             pickedTime = it
-            viewModel.onEvent(AddTransactionEvent.EnteredTime(it.toNanoOfDay()))
+            viewModel.onEvent(AddTransactionEvent.EnteredTime(it))
         }
     }
 }

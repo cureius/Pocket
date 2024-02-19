@@ -16,10 +16,9 @@ import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.ZoneOffset
+import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -48,14 +47,14 @@ class AddTransactionViewModel @Inject constructor(
     val transactionType: State<String> = _transactionType
 
     private val _transactionAccount = mutableStateOf(
-        ""
+        null as String?
     )
-    val transactionAccount: State<String> = _transactionAccount
+    val transactionAccount: State<String?> = _transactionAccount
 
     private val _transactionPot = mutableStateOf(
-        ""
+        null as String?
     )
-    val transactionPot: State<String> = _transactionAccount
+    val transactionPot: State<String?> = _transactionPot
 
     private val _transactionAmount = mutableStateOf(
         ""
@@ -63,14 +62,14 @@ class AddTransactionViewModel @Inject constructor(
     val transactionAmount: State<String> = _transactionAmount
 
     private val _transactionDate = mutableStateOf(
-        ""
+        LocalDate.now()
     )
-    val transactionDate: State<String> = _transactionDate
+    val transactionDate: State<LocalDate> = _transactionDate
 
     private val _transactionTime = mutableStateOf(
-        ""
+        LocalTime.now()
     )
-    val transactionTime: State<String> = _transactionTime
+    val transactionTime: State<LocalTime> = _transactionTime
 
     private val _transactionBalance = mutableStateOf(
         ""
@@ -143,22 +142,12 @@ class AddTransactionViewModel @Inject constructor(
             }
 
             is AddTransactionEvent.EnteredDate -> {
-                _transactionDate.value = event.value.toString()
-
-            }
-
-            is AddTransactionEvent.ChangeDateFocus -> {
-                _transactionDate.value = (!event.focusState.isFocused).toString()
+                _transactionDate.value = event.value
 
             }
 
             is AddTransactionEvent.EnteredTime -> {
-                _transactionTime.value = event.value.toString()
-
-            }
-
-            is AddTransactionEvent.ChangeTimeFocus -> {
-                _transactionTime.value = (!event.focusState.isFocused).toString()
+                _transactionTime.value = event.value
 
             }
 
@@ -214,8 +203,8 @@ class AddTransactionViewModel @Inject constructor(
                                 type = transactionType.value,
                                 amount = transactionAmount.value.ifBlank { "0" }.toDouble(),
 //                                balance = transactionBalance.value.toDouble(),
-                                date = transactionDate.value.ifEmpty { "0" }.toLong(),
-                                date_time = transactionDate.value + " | " + transactionTime.value,
+//                                date = transactionDate.value.atTime(transactionTime.value).toEpochSecond(ZoneOffset.UTC),
+                                date = transactionDate.value.toEpochDay(),
                                 timestamp = System.currentTimeMillis(),
 //                                color = transactionColor.value,
                                 account = account.value?.account_number,

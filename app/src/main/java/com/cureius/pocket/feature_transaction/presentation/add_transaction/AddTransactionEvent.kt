@@ -4,6 +4,8 @@ import androidx.compose.ui.focus.FocusState
 import com.cureius.pocket.feature_account.domain.model.Account
 import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
+import java.time.LocalDate
+import java.time.LocalTime
 
 sealed class AddTransactionEvent {
     data class EnteredTitle(val value: String) : AddTransactionEvent()
@@ -13,15 +15,15 @@ sealed class AddTransactionEvent {
     data class EnteredAccount(val value: String) : AddTransactionEvent()
     data class ChangeAccountFocus(val focusState: FocusState) : AddTransactionEvent()
 
-    data class SelectedPot(val value: Pot) : AddTransactionEvent()
-    data class SelectedAccount(val value: Account) : AddTransactionEvent()
+    data class SelectedPot(val value: Pot?) : AddTransactionEvent()
+    data class SelectedAccount(val value: Account?) : AddTransactionEvent()
     data class EnteredAmount(val value: String) : AddTransactionEvent()
     data class ChangeAmountFocus(val focusState: FocusState) : AddTransactionEvent()
 
-    data class EnteredDate(val value: Long) : AddTransactionEvent()
+    data class EnteredDate(val value: LocalDate) : AddTransactionEvent()
     data class ChangeDateFocus(val focusState: FocusState) : AddTransactionEvent()
 
-    data class EnteredTime(val value: Long) : AddTransactionEvent()
+    data class EnteredTime(val value: LocalTime) : AddTransactionEvent()
     data class ChangeTimeFocus(val focusState: FocusState) : AddTransactionEvent()
 
     data class EnteredBalance(val value: Double) : AddTransactionEvent()

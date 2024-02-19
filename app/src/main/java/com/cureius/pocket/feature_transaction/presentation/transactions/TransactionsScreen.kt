@@ -143,7 +143,11 @@ fun TransactionsScreen(
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                     }
+                    item {
+                        Spacer(modifier = Modifier.height(160.dp))
+                    }
                 }
+
             }
         }
 
