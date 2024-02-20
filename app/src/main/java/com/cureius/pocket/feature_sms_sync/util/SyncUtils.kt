@@ -3,10 +3,13 @@ package com.cureius.pocket.feature_sms_sync.util
 import androidx.compose.ui.graphics.toArgb
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 object SyncUtils {
 
-    private fun dateToTimeStamp(date: String?, time: String?): Long? {
+    private fun dateToTimeStamp(date: String?, time: String?): LocalDate? {
 
         if (date == null) {
             return null
@@ -28,7 +31,17 @@ object SyncUtils {
         }
         val dateFormat = SimpleDateFormat("dd-MM-yy HH:mm")
         val dateConv = dateFormat.parse(dateTimeString)
-        return dateConv?.time
+
+        val formatter = DateTimeFormatter.ofPattern("dd-MM-yy HH:mm")
+
+        // Parse the date and time string into a LocalDateTime object
+        val localDateTime = LocalDateTime.parse(dateTimeString, formatter)
+
+        // Extract LocalDate part from LocalDateTime
+        val localDate = localDateTime.toLocalDate()
+
+        println(localDate) // Output: 2020-02-24
+        return localDate
     }
 
     private fun extractBankNames(address: String, text: String): String? {
@@ -53,13 +66,8 @@ object SyncUtils {
             }
         }
         val regexBody = Regex("(?i)\\b((?:hdfc|pnb|kotak)\\b)")
-        return if (regexBody.findAll(text.lowercase())
-                .map { it.value }
-                .toList().isNotEmpty()
-        ) {
-            regexBody.findAll(text.lowercase())
-                .map { it.value }
-                .toList()[0]
+        return if (regexBody.findAll(text.lowercase()).map { it.value }.toList().isNotEmpty()) {
+            regexBody.findAll(text.lowercase()).map { it.value }.toList()[0]
         } else {
             null
         }
@@ -67,25 +75,20 @@ object SyncUtils {
     }
 
     fun extractTransactionalDetails(
-        date: Long,
-        address: String,
-        messageBody: String
+        date: Long, address: String, messageBody: String
     ): Transaction {
         // Define the regular expressions for parsing the message body
         val amountRegex =
             Regex("(?i)(amount|txn amount|debited|credited|INR|debited INR|credited by Rs |credited for INR|Rs.|credited for Rs )[\\s:]*[rs.]*(([\\d,]+\\.?\\d*)|([\\d,\\\\.]+))")
         val balanceRegex =
             Regex("(?i)(balance|available balance|Bal INR|Available Bal INR|New balance: Rs\\. |Available Bal Rs |Avl bal:INR )[\\s:]*[rs.]*(([\\d,]+\\.\\d{2})|([\\d,\\\\.]+))")
-        val transactionUpiIdRegex =
-            Regex("(?i)(UPI:|UPI Ref no |UPI Ref ID )[\\s:]*([0-9]+)")
+        val transactionUpiIdRegex = Regex("(?i)(UPI:|UPI Ref no |UPI Ref ID )[\\s:]*([0-9]+)")
         val transactionImpsIdRegex =
             Regex("(?i)(transaction id|txn id|reference id|ref|IMPS Ref no|IMPS Ref No\\. )[\\s:]*([0-9]+)")
         val transactionDateRegex =
             Regex("(?i)(transaction date|txn date|date|on |Dt )[\\s:]*((\\d{2}-\\d{2}-\\d{2})|(\\d{2}/\\d{2}/\\d{4}))")
-        val transactionTimeRegex =
-            Regex("(?i)( )[\\s:]*(\\d{2}:\\d{2})")
-        val accountRegex =
-            Regex("(?i)(a/c no XXXXXXXXXX|a/c XXXXXXXX)*([0-9]+)")
+        val transactionTimeRegex = Regex("(?i)( )[\\s:]*(\\d{2}:\\d{2})")
+        val accountRegex = Regex("(?i)(a/c no XXXXXXXXXX|a/c XXXXXXXX)*([0-9]+)")
         // Parse the message body using regular expressions
         val amountMatch = amountRegex.find(messageBody)
         val balanceMatch = balanceRegex.find(messageBody)
@@ -97,12 +100,10 @@ object SyncUtils {
         val bankName = extractBankNames(address, messageBody) ?: "NAN"
 
         // Extract the transactional details from the regular expression matches
-        val type = if (messageBody.contains("debited")) {
-            "debited"
-        } else if (messageBody.contains("credited")) {
+        val type = if (messageBody.contains("credited") || messageBody.contains("received")) {
             "credited"
         } else {
-            "NAN"
+            "debited"
         }
 
         val amount = if (amountMatch?.groupValues?.get(2)?.contains(",") == true) {
@@ -123,22 +124,26 @@ object SyncUtils {
         val transactionDate = transactionDateMatch?.groupValues?.get(2)
         val transactionTime = transactionTimeMatch?.groupValues?.get(2)
         val transactionAccount = transactionAccountMatch?.groupValues?.get(2)
+        // Define input and output formatters
+        val inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yy")
+        val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
+        // Parse the input date string and format it to the desired output format
+        val inputDate = LocalDate.parse(transactionDate, inputFormatter)
+        val outputDateStr = inputDate.format(outputFormatter)
         // Create a TransactionalDetails object with the extracted transactional details
         return Transaction(
-            id = date,
             type = type,
             account = transactionAccount ?: "NAN",
             amount = amount ?: -1.0,
-            date = dateToTimeStamp(transactionDate, transactionTime) ?: -1,
+            date = dateToTimeStamp(transactionDate, transactionTime)?.toEpochDay(),
+            date_time = outputDateStr ?: "NAN",
             balance = balance ?: -1.0,
             UPI_ref = transactionUpiId,
             IMPS_ref = transactionImpsId,
-            color = Transaction.transactionColors.random().toArgb(),
             timestamp = System.currentTimeMillis(),
             bank = bankName,
             body = messageBody.lowercase(),
-            day = "$transactionDate|${transactionTime ?: "00:00"}"
         )
     }
 

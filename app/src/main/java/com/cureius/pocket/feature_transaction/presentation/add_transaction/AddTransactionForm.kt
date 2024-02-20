@@ -240,7 +240,7 @@ fun AddTransactionForm(
                                     .fillMaxWidth()
                                     .height(40.dp)
                             ) {
-                                viewModel.onEvent(AddTransactionEvent.EnteredType(if (mode.value) "Spending" else "Income"))
+                                viewModel.onEvent(AddTransactionEvent.EnteredType(if (mode.value) "debited" else "credited"))
                                 TransactionTypeSwitcher(size = 80.dp,
                                     padding = 2.dp,
                                     height = 40.dp,
@@ -250,7 +250,7 @@ fun AddTransactionForm(
                                     toggleShape = RoundedCornerShape(50),
                                     onClick = {
                                         mode.value = !mode.value
-                                        viewModel.onEvent(AddTransactionEvent.EnteredType(if (mode.value) "Spending" else "Income"))
+                                        viewModel.onEvent(AddTransactionEvent.EnteredType(if (mode.value) "debited" else "credited"))
                                     })
                             }
                         } // Spending Income Toggle

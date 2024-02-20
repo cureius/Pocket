@@ -9,7 +9,6 @@ import android.telephony.SmsMessage
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
-import com.cureius.pocket.feature_sms_sync.presentation.PopUpService
 import com.cureius.pocket.feature_sms_sync.util.SyncUtils
 import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,7 +32,7 @@ class SmsReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val tag = "SMS Receiver"
         // Use the ViewModel instance here
-
+        println(tag)
         // initialize the addTransactionViewModel property
         if (intent.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
             val bundle = intent.extras
@@ -48,29 +47,39 @@ class SmsReceiver : BroadcastReceiver() {
                     val body = message.messageBody
                     val date = message.timestampMillis
                     if ((body.lowercase().contains("a/c") || body.lowercase()
-                            .contains("card")) && (body.contains("credited") || body.contains("debited"))
+                            .contains(" ac ") || body.lowercase()
+                            .contains("card"))
                     ) {
+                        if (
+                            (body.lowercase().contains("credited") || body.lowercase()
+                                .contains("debited") || body.lowercase()
+                                .contains("spent") || body.lowercase()
+                                .contains("sent") || body.lowercase().contains("received"))
+                        ) {
 
-                        if (address != null) {
-                            SyncUtils.extractTransactionalDetails(
-                                date, address, body
-                            ).let {
-                                Log.d(tag, "onReceive: triggering")
-                                val serviceIntent = Intent(context, PopUpService::class.java)
-                                serviceIntent.putExtra("detected-transaction-date", date)
-                                serviceIntent.putExtra("detected-transaction-address", address)
-                                serviceIntent.putExtra("detected-transaction-body", body)
+                            if (address != null) {
+                                SyncUtils.extractTransactionalDetails(
+                                    date, address, body
+                                ).let {
+                                    Log.d(tag, "onReceive: triggering")
+                                    val serviceIntent = Intent(context, PopUpService::class.java)
+                                    serviceIntent.putExtra("detected-transaction-date", date)
+                                    serviceIntent.putExtra("detected-transaction-address", address)
+                                    serviceIntent.putExtra("detected-transaction-body", body)
 
-                                context.startService(serviceIntent)
-                                Log.d(tag, "onReceive: $it")
-                                scope.launch {
-                                    transactionUseCases.addTransaction(it)
+                                    context.startService(serviceIntent)
+                                    Log.d(tag, "onReceive: $it")
+                                    scope.launch {
+                                        transactionUseCases.addTransaction(it)
+                                    }
                                 }
                             }
+                            // Prevent other apps from receiving the broadcast
+                            abortBroadcast()
                         }
-                        // Prevent other apps from receiving the broadcast
-                        abortBroadcast()
                     }
+
+
                     Log.d(tag, "onReceive: $address -- $body")
                     // Do something with the message and sender
                 }

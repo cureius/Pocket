@@ -77,7 +77,7 @@ fun AddPotDialog(
         ), PotKind(
             icon = painterResource(id = R.drawable.coins), name = "emi"
         ), PotKind(
-            icon = painterResource(id = R.drawable.shop), name = "investment"
+            icon = painterResource(id = R.drawable.shop), name = "invest"
         )
     )
     val color1 = MaterialTheme.colors.background

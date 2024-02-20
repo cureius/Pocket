@@ -57,7 +57,7 @@ fun PotItem(
     val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonth.filter { it.pot == pot.title }
     val totalAmount = transactions.sumOf { it.amount!! }
     val totalCapacity =
-        transactionsViewModel.state.value.transactionsOnCurrentMonth.filter { it.type == "Income" }
+        transactionsViewModel.state.value.transactionsOnCurrentMonth.filter { it.type == "credited" }
             .sumOf { it.amount!! }
     var actualCapacity = 0.0;
     var filled = 0.0f;

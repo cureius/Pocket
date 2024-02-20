@@ -457,6 +457,7 @@ fun MultiplePermissionExample(
             }
         }
         if (checkAllPermission) {
+            println("Permission Granted")
             viewModel.onEvent(DashBoardEvent.ReadAllSMS)
         }
     }

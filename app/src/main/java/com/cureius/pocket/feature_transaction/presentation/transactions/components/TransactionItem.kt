@@ -56,14 +56,14 @@ fun TransactionItem(
         transaction.date?.let {
             if (showDate) {
                 println("Date Long: ${it}")
-                println("Date: ${LocalDate.ofEpochDay(it)}")
+//                println("Date: ${LocalDate.ofEpochDay(it)}")
 
-                Text(
-                    text = LocalDate.ofEpochDay(it)
-                        .format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy")),
-                    style = MaterialTheme.typography.body1,
-                    color = Color.Gray,
-                )
+//                Text(
+//                    text = LocalDate.ofEpochDay(it)
+//                        .format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy")),
+//                    style = MaterialTheme.typography.body1,
+//                    color = Color.Gray,
+//                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
@@ -78,25 +78,30 @@ fun TransactionItem(
                 }
 
                 clipPath(clipPath) {
-                    transaction?.color?.let { Color(it) }?.let {
-                        drawRoundRect(
-                            color = it,
-                            size = size,
-                            cornerRadius = CornerRadius(cornerRadius.toPx())
-                        )
-                    }
-                    transaction.color?.let { ColorUtils.blendARGB(it, 0x000000, 0.2f) }?.let {
-                        Color(
-                            it
-                        )
-                    }?.let {
-                        drawRoundRect(
-                            color = it,
-                            topLeft = Offset(size.width - cutCornerSize.toPx(), -100f),
-                            size = Size(cutCornerSize.toPx() + 100f, cutCornerSize.toPx() + 100f),
-                            cornerRadius = CornerRadius(cornerRadius.toPx())
-                        )
-                    }
+//                    transaction?.color?.let { Color(it) }?.let {
+//                        drawRoundRect(
+//                            color = it,
+//                            size = size,
+//                            cornerRadius = CornerRadius(cornerRadius.toPx())
+//                        )
+//                    }
+//                    transaction.color?.let { ColorUtils.blendARGB(it, 0x000000, 0.2f) }?.let {
+//                        Color(
+//                            it
+//                        )
+//                    }?.let {
+//                        drawRoundRect(
+//                            color = it,
+//                            topLeft = Offset(size.width - cutCornerSize.toPx(), -100f),
+//                            size = Size(cutCornerSize.toPx() + 100f, cutCornerSize.toPx() + 100f),
+//                            cornerRadius = CornerRadius(cornerRadius.toPx())
+//                        )
+//                    }
+                    drawRoundRect(
+                        color = Color.Transparent,
+                        size = size,
+                        cornerRadius = CornerRadius(cornerRadius.toPx())
+                    )
                 }
             }
 
@@ -122,7 +127,7 @@ fun TransactionItem(
                         contentAlignment = Alignment.BottomCenter,
                         modifier = Modifier
                             .background(
-                                color = if (transaction.type.equals("Income", true)) {
+                                color = if (transaction.type?.lowercase().equals("credited", true)) {
                                     Color.Green.copy(alpha = 0.7f)
                                 } else {
                                     Color.Red.copy(alpha = 0.6f)
@@ -137,7 +142,7 @@ fun TransactionItem(
                             modifier = Modifier
                                 .size(20.dp)
                                 .rotate(
-                                    degrees = if (transaction.type.equals("Income", true)) {
+                                    degrees = if (transaction.type?.lowercase().equals("credited", true)) {
                                         180f
                                     } else {
                                         0f
@@ -160,13 +165,13 @@ fun TransactionItem(
                             overflow = TextOverflow.Ellipsis,
                         )
                         Text(
-                            text = if (transaction.type.equals("Income", true)) {
+                            text = if (transaction.type?.lowercase().equals("credited", true)) {
                                 "+" + transaction.amount.toString()
                             } else {
                                 "-" + transaction.amount.toString()
                             },
                             style = MaterialTheme.typography.body1,
-                            color = if (transaction.type.equals("Income", true)) {
+                            color = if (transaction.type?.lowercase().equals("credited", true)) {
                                 MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
                             } else {
                                 MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
@@ -182,10 +187,11 @@ fun TransactionItem(
                         if (it.isNotEmpty()) {
                             Text(
                                 text = transaction.body.toString(),
-                                style = MaterialTheme.typography.body1,
-                                color = Color.Gray,
-                                maxLines = 10,
-                                overflow = TextOverflow.Ellipsis
+                                style = MaterialTheme.typography.body2,
+                                color = Color.LightGray,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.fillMaxWidth(0.75f)
                             )
                         }
                     }
@@ -211,7 +217,7 @@ fun IncomeTransactionItemPreview() {
     TransactionItem(
         transaction = Transaction(
             title = "Salary",
-            type = "Income",
+            type = "credited",
             amount = 100.0,
             body = "This is a transaction",
             color = Color.White.toArgb(),
@@ -230,7 +236,7 @@ fun SpendingTransactionItemPreview() {
     TransactionItem(
         transaction = Transaction(
             title = "Food",
-            type = "Spending",
+            type = "debited",
             amount = 100.0,
             body = null,
             color = Color.White.toArgb(),
