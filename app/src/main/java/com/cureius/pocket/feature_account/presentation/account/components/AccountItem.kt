@@ -1,8 +1,6 @@
 package com.cureius.pocket.feature_account.presentation.account.components
 
 import android.graphics.RuntimeShader
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -32,6 +30,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_account.domain.model.Bank
 import org.intellij.lang.annotations.Language
 
 
@@ -49,11 +48,21 @@ val CUSTOM_SHADER = """
     }
 """.trimIndent()
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun AccountItem(
     bankName: String, cardNumber: String, accountNumber: String, holderName: String
 ) {
+    val banks = listOf(
+        Bank(
+            icon = painterResource(id = R.drawable.pnb), name = "PNB"
+        ), Bank(
+            icon = painterResource(id = R.drawable.hdfc), name = "HDFC"
+        ), Bank(
+            icon = painterResource(id = R.drawable.kotak), name = "Kotak"
+        ), Bank(
+            icon = painterResource(id = R.drawable.sbi), name = "SBI"
+        )
+    )
     val aspectRatio = 1.58f // Set the aspect ratio as desired
 
     val paddingModifier = Modifier
@@ -105,8 +114,16 @@ fun AccountItem(
                 ) {
                     Row {
                         val borderWidth = 2.dp
+                        println(bankName.lowercase())
+                        var bankIcon = banks.first {
+                            println(it.name!!.lowercase())
+                            bankName.lowercase().contains(
+                                it.name!!.lowercase()
+                            )
+                        }.icon
+                        println(bankIcon)
                         Image(
-                            painter = painterResource(id = R.drawable.accounts),
+                            painter = bankIcon ?: painterResource(id = R.drawable.accounts),
                             contentDescription = "Bank Logo",
                             contentScale = ContentScale.Inside,
                             modifier = Modifier
@@ -117,7 +134,6 @@ fun AccountItem(
                                 )
                                 .padding(borderWidth)
                                 .clip(CircleShape),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Column() {
@@ -214,11 +230,10 @@ fun BoxWithRoundedCorners(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Preview
 @Composable
 fun AccountItemPreview() {
     AccountItem(
-        bankName = "HDFC Bank", cardNumber = "1234", accountNumber = "890", holderName = "John Doe"
+        bankName = "HDFC", cardNumber = "1234", accountNumber = "890", holderName = "John Doe"
     )
 }
