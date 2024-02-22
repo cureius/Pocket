@@ -130,20 +130,28 @@ class DashBoardViewModel @Inject constructor(
                             val type = cursor.getInt(cursor.getColumnIndexOrThrow("type"))
 
                             if (type == 1
-                                && (body.lowercase().contains("a/c") || body.lowercase()
-                                    .contains("card"))
-                                && (body.contains("credited") || body.contains("debited"))
                             ) {
-                                Log.d(
-                                    tag, "format:  $address, ${
+                                if ((body.lowercase().contains("a/c") || body.lowercase()
+                                        .contains(" ac ") || body.lowercase().contains("card"))
+                                ) {
+                                    if ((body.lowercase().contains("credited") || body.lowercase()
+                                            .contains("debited") || body.lowercase()
+                                            .contains("spent") || body.lowercase()
+                                            .contains("sent") || body.lowercase()
+                                            .contains("received"))
+                                    ) {
+                                        Log.d(
+                                            tag, "format:  $address, ${
+                                                SyncUtils.extractTransactionalDetails(
+                                                    date, address, body
+                                                )
+                                            }"
+                                        )
                                         SyncUtils.extractTransactionalDetails(
                                             date, address, body
-                                        )
-                                    }"
-                                )
-                                SyncUtils.extractTransactionalDetails(
-                                    date, address, body
-                                ).let { transactionList.add(it) }
+                                        ).let { transactionList.add(it) }
+                                    }
+                                }
                             }
                         } while (cursor.moveToNext())
                     }
