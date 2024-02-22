@@ -19,21 +19,25 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.cureius.pocket.R
 
-@Preview
 @Composable
-fun SyncSMS(position: Int = 0, onClick : () -> Unit){
-
-    val download = ImageVector.vectorResource(id = R.drawable.download)
+fun ActionElement(
+    position: Int = 0,
+    title: String,
+    subTitle: String,
+    borderColor: Color,
+    backgroundColor: Color,
+    icon: ImageVector,
+    condition: Boolean,
+    onClick: () -> Unit
+) {
 
     val buttonShape = RoundedCornerShape(
         topStart = 12.dp,
@@ -64,7 +68,7 @@ fun SyncSMS(position: Int = 0, onClick : () -> Unit){
             .fillMaxWidth()
             .height(60.dp)
             .background(
-                MaterialTheme.colors.secondary.copy(alpha = 0.2f),
+                backgroundColor,
                 when (position) {
                     -1 -> topWrapperShape
                     0 -> midWrapperShape
@@ -74,7 +78,7 @@ fun SyncSMS(position: Int = 0, onClick : () -> Unit){
             )
             .border(
                 2.dp,
-                MaterialTheme.colors.secondary.copy(alpha = 0.4f),
+                borderColor,
                 when (position) {
                     -1 -> topWrapperShape
                     0 -> midWrapperShape
@@ -91,19 +95,23 @@ fun SyncSMS(position: Int = 0, onClick : () -> Unit){
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            Column(modifier = Modifier.fillMaxWidth(0.75f).padding(start = 8.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth(0.75f)
+                    .padding(start = 8.dp)
+            ) {
                 Text(
-                    text = "Start SMS Sync",
+                    text = title,
                     color = MaterialTheme.colors.onBackground,
                     textAlign = TextAlign.Center,
                     style = TextStyle(fontWeight = FontWeight.Bold),
                     fontSize = 20.sp
                 )
                 Text(
-                    text = "Press To Track Expenses Live On-The-Go",
+                    text = subTitle,
                     color = MaterialTheme.colors.onBackground,
                     textAlign = TextAlign.Center,
-                    style = TextStyle(fontWeight = FontWeight.Bold),
+                    style = TextStyle(fontWeight = FontWeight.Normal),
                     fontSize = 12.sp
                 )
             }
@@ -117,8 +125,8 @@ fun SyncSMS(position: Int = 0, onClick : () -> Unit){
                     onClick()
                 }) {
                     Icon(
-                        imageVector = download,
-                        contentDescription = "Add Pots",
+                        imageVector = icon,
+                        contentDescription = "Action Icon",
                         tint = MaterialTheme.colors.secondary
                     )
                 }

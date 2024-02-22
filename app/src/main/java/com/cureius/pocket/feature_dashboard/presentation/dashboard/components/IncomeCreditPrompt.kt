@@ -84,5 +84,5 @@ fun IncomeCreditPrompt(position: Int = 0){
         }
 
     }
-    Spacer(modifier = Modifier.height(16.dp))
+    Spacer(modifier = Modifier.height(8.dp))
 }

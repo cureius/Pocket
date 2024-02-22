@@ -44,7 +44,6 @@ import com.cureius.pocket.feature_transaction.presentation.transactions.Transact
 fun PotsScreen(
     navHostController: NavHostController,
     viewModel: PotsViewModel = hiltViewModel(),
-    transactionViewModel: TransactionsViewModel = hiltViewModel(),
     addPotViewModel: AddPotViewModel = hiltViewModel()
 ) {
     val monthlyPots = viewModel.validPots.value

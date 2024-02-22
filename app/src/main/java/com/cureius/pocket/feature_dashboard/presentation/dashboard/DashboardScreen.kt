@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalPermissionsApi::class)
+
 package com.cureius.pocket.feature_dashboard.presentation.dashboard
 
 import android.content.Context
@@ -21,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -48,8 +51,8 @@ import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountFormDialog
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountViewModel
-import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.AddAccountRequest
-import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.AddPotRequest
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.ActionElement
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.ActionItem
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.CurveBottomMask
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.DashBoardHeader
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.IncomeCreditPrompt
@@ -57,7 +60,6 @@ import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.In
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.ItemRow
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.PotItem
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.RoundIconButton
-import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.SyncSMS
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotEvent
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
@@ -101,6 +103,9 @@ fun DashboardScreen(
     val health = ImageVector.vectorResource(id = R.drawable.health)
     val shopping = ImageVector.vectorResource(id = R.drawable.shopping)
     val grocery = ImageVector.vectorResource(id = R.drawable.shop)
+    val account = ImageVector.vectorResource(id = R.drawable.accounts)
+    val pot = ImageVector.vectorResource(id = R.drawable.pot)
+    val download = ImageVector.vectorResource(id = R.drawable.download)
 
     val gridItems = listOf(
         CategoryItem(
@@ -159,6 +164,91 @@ fun DashboardScreen(
     val startPadding = ((screenWeight - (rowCap * 80)) / 2)
     val intent = Intent(context, SmsService::class.java)
     val popUpIntent = Intent(context, PopUpService::class.java)
+    val actionElementList = mutableListOf<ActionItem>()
+    val permissionState = rememberMultiplePermissionsState(
+        permissions = listOf(
+            android.Manifest.permission.READ_SMS,
+            android.Manifest.permission.RECEIVE_SMS,
+            android.Manifest.permission.SEND_SMS
+        )
+    )
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(key1 = lifecycleOwner) {
+        val observer = LifecycleEventObserver { source, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> {
+                    permissionState.launchMultiplePermissionRequest()
+                }
+
+                else -> {
+
+                }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+            viewModel.onEvent(DashBoardEvent.ToggleAskPermission)
+        }
+    }
+
+
+    if (accountsViewModel.state.value.isEmpty()) {
+        actionElementList.add(ActionItem(
+            icon = account,
+            title = "Add Account",
+            subTitle = "Press To Add Account, Necessary To Track",
+            borderColor = MaterialTheme.colors.primary.copy(alpha = 0.4f),
+            backgroundColor = MaterialTheme.colors.primary.copy(alpha = 0.15f),
+            position = -1,
+            condition = accountsViewModel.state.value.isEmpty()
+        ) {
+            addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
+        })
+    }
+
+    if (potsViewModel.state.value.isEmpty()) {
+        actionElementList.add(ActionItem(
+            icon = pot,
+            title = "Add Pots",
+            subTitle = "Press To Add Pots, Necessary To Track",
+            borderColor = MaterialTheme.colors.primary.copy(alpha = 0.4f),
+            backgroundColor = MaterialTheme.colors.primary.copy(alpha = 0.15f),
+            position = 0,
+            condition = potsViewModel.state.value.isEmpty()
+        ) {
+            addPotViewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
+        })
+    }
+
+    if (viewModel.startSyncPromptVisibility.value) {
+        actionElementList.add(ActionItem(
+            icon = download,
+            title = "Start SMS Sync",
+            subTitle = "Press To Track Expenses Live On-The-Go",
+            borderColor = MaterialTheme.colors.secondary.copy(alpha = 0.4f),
+            backgroundColor = MaterialTheme.colors.secondary.copy(alpha = 0.15f),
+            position = 1,
+            condition = viewModel.startSyncPromptVisibility.value
+        ) {
+            viewModel.onEvent(DashBoardEvent.ToggleAskPermission)
+            context.startService(intent)
+
+            var checkAllPermission = true;
+            permissionState.permissions.forEach {
+                if (!it.status.isGranted) {
+                    checkAllPermission = false
+                }
+            }
+            if (checkAllPermission) {
+                println("Permission Granted")
+                viewModel.onEvent(DashBoardEvent.ReadAllSMS)
+            }
+
+        })
+    }
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -180,29 +270,23 @@ fun DashboardScreen(
                     .offset(y = (0).dp),
                 contentPadding = PaddingValues(vertical = 12.dp, horizontal = 16.dp)
             ) {
-                item {
-                    if (accountsViewModel.state.value.isEmpty()) {
-                        AddAccountRequest(position = -1) {
-                            addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
-                        }
-                    }
-                }
-                item {
-                    if (potsViewModel.state.value.isEmpty()) {
-                        AddPotRequest(position = 0) {
-                            addPotViewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
-                        }
-                    }
-                }
-                item {
-                    if (viewModel.startSyncPromptVisibility.value) {
-                        SyncSMS(position = 0) {
-                            viewModel.onEvent(DashBoardEvent.ToggleAskPermission)
-                            context.startService(intent)
-                        }
-                    }
-                    if (viewModel.permissionPrompt.value) {
-                        MultiplePermissionExample(viewModel, addTransactionViewModel)
+                itemsIndexed(actionElementList) { index, item ->
+                    ActionElement(
+                        icon = item.icon!!,
+                        title = item.title!!,
+                        subTitle = item.subTitle!!,
+                        borderColor = item.borderColor!!,
+                        backgroundColor = item.backgroundColor!!,
+                        position = if (index == 0) {
+                            -1
+                        } else if (index == actionElementList.size - 1) {
+                            1
+                        } else {
+                            0
+                        },
+                        condition = item.condition!!
+                    ) {
+                        item.onClick()
                     }
                 }
                 item {
@@ -210,6 +294,12 @@ fun DashboardScreen(
                         IncomeCreditPrompt(position = 1)
                     }
                 }
+                item {
+//                    if (viewModel.permissionPrompt.value && viewModel.startSyncPromptVisibility.value) {
+//                        MultiplePermissionExample(viewModel, addTransactionViewModel)
+//                    }
+                }
+                item { Spacer(modifier = Modifier.height(16.dp)) }
                 item {
                     Text(
                         text = "Your Pots",
@@ -245,7 +335,7 @@ fun DashboardScreen(
                                         .width(44.dp),
                                     iconColor = MaterialTheme.colors.background,
                                     onClick = {
-
+                                        addPotViewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
                                     })
                                 Text(
                                     text = "Create new",

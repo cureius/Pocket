@@ -126,7 +126,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
                             color = Color.DarkGray.copy(alpha = 0.5f),
                             start = Offset(x = 0f, y = size.height / 2),
                             end = Offset(x = size.width * 0.95f, y = size.height / 2),
-                            strokeWidth = 8f,
+                            strokeWidth = 6f,
                             pathEffect = PathEffect.dashPathEffect(
                                 intervals = floatArrayOf(20f, 10f), phase = 0f
                             )
@@ -182,7 +182,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
                                         color = com.cureius.pocket.ui.theme.Green,
                                         textAlign = TextAlign.Center,
                                         style = TextStyle(fontWeight = FontWeight.Normal),
-                                        fontSize = 14.sp,
+                                        fontSize = 16.sp,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.padding(0.dp, 0.dp)
@@ -217,7 +217,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
                                         color = com.cureius.pocket.ui.theme.TomatoRed,
                                         textAlign = TextAlign.Center,
                                         style = TextStyle(fontWeight = FontWeight.Normal),
-                                        fontSize = 14.sp,
+                                        fontSize = 16.sp,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.padding(0.dp, 0.dp)
