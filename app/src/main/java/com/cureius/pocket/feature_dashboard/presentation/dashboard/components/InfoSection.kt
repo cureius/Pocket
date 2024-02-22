@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashBoardViewModel
+import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsViewModel
 
 
 fun Modifier.vertical() = layout { measurable, constraints ->
@@ -56,7 +57,7 @@ fun Modifier.vertical() = layout { measurable, constraints ->
 
 @Preview
 @Composable
-fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel()) {
+fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsViewModel: TransactionsViewModel = hiltViewModel()) {
     val rupee = painterResource(id = R.drawable.rupee)
     val shape = RoundedCornerShape(
         topStart = 24.dp, topEnd = 24.dp, bottomStart = 24.dp, bottomEnd = 24.dp
@@ -64,6 +65,10 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel()) {
     val mtdShape = RoundedCornerShape(
         topStart = 0.dp, topEnd = 0.dp, bottomStart = 24.dp, bottomEnd = 0.dp
     )
+    val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonth
+    val totalIncomeAmount = transactions.filter { it.type == "credited" }.sumOf { it.amount!! }
+    val totalSpentAmount = transactions.filter { it.type == "debited" }.sumOf { it.amount!! }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -176,7 +181,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel()) {
                                         alignment = Alignment.Center
                                     )
                                     Text(
-                                        text = " ${viewModel.incomeMtd.value}",
+                                        text = " $totalIncomeAmount",
                                         color = MaterialTheme.colors.primaryVariant,
                                         textAlign = TextAlign.Center,
                                         style = TextStyle(fontWeight = FontWeight.Bold),
@@ -211,7 +216,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel()) {
                                         alignment = Alignment.Center
                                     )
                                     Text(
-                                        text = " ${viewModel.spentMtd.value}",
+                                        text = " $totalSpentAmount",
                                         color = MaterialTheme.colors.primaryVariant,
                                         textAlign = TextAlign.Center,
                                         style = TextStyle(fontWeight = FontWeight.Bold),
@@ -267,4 +272,10 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel()) {
             }
         }
     }
+}
+
+@Composable
+@Preview
+fun InfoSectionPreview() {
+    InfoSection()
 }

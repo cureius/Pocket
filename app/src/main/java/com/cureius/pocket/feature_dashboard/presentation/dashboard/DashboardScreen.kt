@@ -66,6 +66,7 @@ import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
 import com.cureius.pocket.feature_sms_sync.presentation.PopUpService
 import com.cureius.pocket.feature_sms_sync.presentation.SmsService
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
+import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsViewModel
 import com.cureius.pocket.util.ScreenDimensions
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -82,6 +83,7 @@ fun DashboardScreen(
     addAccountViewModel: AddAccountViewModel = hiltViewModel(),
     potsViewModel: PotsViewModel = hiltViewModel(),
     addPotViewModel: AddPotViewModel = hiltViewModel(),
+    transactionsViewModel: TransactionsViewModel = hiltViewModel(),
     addTransactionViewModel: AddTransactionViewModel = hiltViewModel()
 ) {
 
@@ -167,7 +169,7 @@ fun DashboardScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             DashBoardHeader(navHostController)
-            if (viewModel.infoSectionVisibility.value) {
+            if (transactionsViewModel.state.value.transactionsOnCurrentMonth.isNotEmpty() && accountsViewModel.state.value.isNotEmpty()) {
                 InfoSection(viewModel)
             }
         }
@@ -303,7 +305,6 @@ fun DashboardScreen(
                     Button(onClick = {
                         requestOverlayPermission(context)
                         context.startService(popUpIntent)
-                        viewModel.onEvent(DashBoardEvent.ToggleInfoSectionVisibility)
                     }) {
                         Text(text = "Start Service")
                     }
@@ -311,7 +312,6 @@ fun DashboardScreen(
                 item {
                     Button(onClick = {
                         context.stopService(popUpIntent)
-                        viewModel.onEvent(DashBoardEvent.ToggleInfoSectionVisibility)
                     }) {
                         Text(text = "Stop Service")
                     }
