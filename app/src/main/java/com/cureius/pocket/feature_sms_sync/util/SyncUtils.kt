@@ -1,6 +1,5 @@
 package com.cureius.pocket.feature_sms_sync.util
 
-import androidx.compose.ui.graphics.toArgb
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -38,10 +37,7 @@ object SyncUtils {
         val localDateTime = LocalDateTime.parse(dateTimeString, formatter)
 
         // Extract LocalDate part from LocalDateTime
-        val localDate = localDateTime.toLocalDate()
-
-        println(localDate) // Output: 2020-02-24
-        return localDate
+        return localDateTime.toLocalDate()
     }
 
     private fun extractBankNames(address: String, text: String): String? {

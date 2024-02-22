@@ -1,6 +1,7 @@
 package com.cureius.pocket.feature_transaction.domain.model
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.cureius.pocket.ui.theme.BabyBlue
 import com.cureius.pocket.ui.theme.LightGreen
@@ -8,7 +9,12 @@ import com.cureius.pocket.ui.theme.RedOrange
 import com.cureius.pocket.ui.theme.RedPink
 import com.cureius.pocket.ui.theme.Violet
 
-@Entity
+@Entity(
+    indices = [Index(
+        value = ["title", "type", "account", "amount", "date", "date_time", "balance", "day", "amount_string", "UPI_ref", "IMPS_ref", "card_number", "place", "bank", "body"],
+        unique = true
+    ), Index(value = ["body"], unique = true)]
+)
 data class Transaction(
     /*-------------From-SMS---------------*/
     val title: String? = null,

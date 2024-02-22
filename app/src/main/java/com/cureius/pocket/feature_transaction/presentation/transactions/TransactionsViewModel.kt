@@ -101,7 +101,7 @@ class TransactionsViewModel @Inject constructor(
     private fun getTransactions(transactionOrder: TransactionOrder) {
         getTransactionsJob?.cancel()
         getTransactionsJob = transactionUseCases.getTransactions(transactionOrder).onEach { transactions ->
-            println("TransactionsViewModel.getTransactions: transactions: $transactions")
+            println("TransactionsViewModel.getTransactions: transactions: ${transactions.size}")
             _state.value = state.value.copy(
                 transactions = transactions,
                 transactionOrder= transactionOrder
@@ -111,7 +111,7 @@ class TransactionsViewModel @Inject constructor(
     private fun getTransactionsForDateRange(transactionOrder: TransactionOrder, start: Long, end: Long) {
         getTransactionsForDateRangeJob?.cancel()
         getTransactionsForDateRangeJob = transactionUseCases.getTransactionsForDateRange(transactionOrder, start, end).onEach { transactions ->
-            println("TransactionsViewModel.getTransactionsForDateRange: transactions: $transactions")
+            println("TransactionsViewModel.getTransactionsForDateRange: transactions:  ${transactions.size}")
             _state.value = state.value.copy(
                 transactionsForRange = transactions,
                 transactionOrder= transactionOrder
@@ -121,7 +121,7 @@ class TransactionsViewModel @Inject constructor(
     private fun getTransactionsCreatedOnCurrentMonth(transactionOrder: TransactionOrder) {
         getTransactionsCreatedOnCurrentMonthJob?.cancel()
         getTransactionsCreatedOnCurrentMonthJob = transactionUseCases.getTransactionsCreatedOnCurrentMonth(transactionOrder).onEach { transactions ->
-            println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonth: transactions: $transactions")
+            println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonth: transactions:  ${transactions.size}")
             _state.value = state.value.copy(
                 transactionsOnCurrentMonth = transactions,
                 transactionOrder= transactionOrder

@@ -65,11 +65,15 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_pot.presentation.pots.components.CategoryItem
-import com.cureius.pocket.feature_sms_sync.presentation.SmsService
 import com.cureius.pocket.feature_sms_sync.presentation.PopUpService
+import com.cureius.pocket.feature_sms_sync.presentation.SmsService
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
 import com.cureius.pocket.util.ScreenDimensions
-import com.google.accompanist.permissions.*
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.accompanist.permissions.rememberPermissionState
+import com.google.accompanist.permissions.shouldShowRationale
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -283,13 +287,13 @@ fun DashboardScreen(
 
                             Spacer(modifier = Modifier.width(16.dp))
                         }
-                        Log.d("Pots", "DashboardScreen: $potItems")
                         items(potItems) { item ->
-                            item.filled?.let {
-                                item.type?.let { it1 ->
-                                    item.title?.let { it2 ->
+                            Log.d("Pot", "DashboardScreen: $item")
+                            item.filled?.let { filled ->
+                                item.type?.let { potType ->
+                                    item.title?.let { potTitle ->
                                         PotItem(
-                                            item.icon, it, it2, it1
+                                            item.icon, filled, potTitle, potType
                                         )
                                     }
                                 }
