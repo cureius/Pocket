@@ -48,7 +48,6 @@ import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountFormDialog
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountViewModel
-import com.cureius.pocket.feature_dashboard.domain.PotType
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.AddAccountRequest
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.AddPotRequest
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.CurveBottomMask
@@ -59,7 +58,6 @@ import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.It
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.PotItem
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.RoundIconButton
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.SyncSMS
-import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotEvent
 import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
@@ -147,33 +145,7 @@ fun DashboardScreen(
             adder = true
         ),
     )
-    val potItems = listOf(
-        Pot(
-            icon = "save",
-            title = "Savings",
-            capacity = 100.0,
-            filled = 0.8f,
-            type = PotType.Asset.type
-        ), Pot(
-            icon = "wallet",
-            title = "Wallet",
-            capacity = 100.0,
-            filled = 0.5f,
-            type = PotType.Liability.type
-        ), Pot(
-            icon = "emi",
-            title = "EMI",
-            capacity = 100.0,
-            filled = 0.6f,
-            type = PotType.Liability.type
-        ), Pot(
-            icon = "invest",
-            title = "Investment",
-            capacity = 100.0,
-            filled = 0.7f,
-            type = PotType.Asset.type
-        )
-    )
+    val potItems = potsViewModel.templatePots.value
     val size = ScreenDimensions()
     val screenWeight = size.width()
     val rowCap = (screenWeight / 80)
@@ -289,15 +261,10 @@ fun DashboardScreen(
                         }
                         items(potItems) { item ->
                             Log.d("Pot", "DashboardScreen: $item")
-                            item.filled?.let { filled ->
-                                item.type?.let { potType ->
-                                    item.title?.let { potTitle ->
-                                        PotItem(
-                                            item.icon, filled, potTitle, potType
-                                        )
-                                    }
-                                }
-                            }
+                            PotItem(
+                                item, item.icon, 0.8f, item.title, item.type
+                            )
+
                         }
                     }
                 }
@@ -417,8 +384,7 @@ fun PermissionExample() {
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MultiplePermissionExample(
-    viewModel: DashBoardViewModel,
-    addTransactionViewModel: AddTransactionViewModel
+    viewModel: DashBoardViewModel, addTransactionViewModel: AddTransactionViewModel
 ) {
 
     val permissionState = rememberMultiplePermissionsState(
