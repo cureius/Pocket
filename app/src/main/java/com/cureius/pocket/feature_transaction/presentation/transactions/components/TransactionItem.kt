@@ -53,14 +53,12 @@ fun TransactionItem(
         transaction.date?.let {
             if (showDate) {
                 println("Date Long: ${it}")
-//                println("Date: ${LocalDate.ofEpochDay(it)}")
-
-//                Text(
-//                    text = LocalDate.ofEpochDay(it)
-//                        .format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy")),
-//                    style = MaterialTheme.typography.body1,
-//                    color = Color.Gray,
-//                )
+                Text(
+                    text = LocalDate.ofEpochDay(it)
+                        .format(java.time.format.DateTimeFormatter.ofPattern("dd MMM yyyy")),
+                    style = MaterialTheme.typography.body1,
+                    color = Color.Gray,
+                )
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
