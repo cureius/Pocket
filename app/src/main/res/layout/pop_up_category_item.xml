@@ -28,7 +28,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_gravity="center_vertical"
-                android:layout_margin="4dp"
+                android:layout_margin="8dp"
                 android:src="@drawable/health"
                 android:tint="#0040FF"
                 tools:ignore="UseAppTint" />

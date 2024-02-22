@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -31,23 +31,22 @@ fun AddPotCard(viewModel: AddPotViewModel = hiltViewModel()) {
         .padding(10.dp)
         .fillMaxWidth()
         .height(160.dp)
-    Card(
-        shape = RoundedCornerShape(20.dp),
-        elevation = 4.dp,
+        .background(MaterialTheme.colors.surface)
+        .clip(RoundedCornerShape(20.dp))
+    Box(
         modifier = paddingModifier,
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .background(MaterialTheme.colors.surface)
-                .fillMaxSize()
         ) {
             IconButton(onClick = {
                 viewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
             }, modifier = Modifier.fillMaxSize()) {
                 Icon(
                     imageVector = add,
-                    contentDescription = "add account",
+                    contentDescription = "add pot",
                     tint = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
                     modifier = Modifier.fillMaxSize(0.7f)
                 )

@@ -26,8 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.Path
@@ -38,7 +36,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.ColorUtils
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import java.time.LocalDate
@@ -118,16 +115,17 @@ fun TransactionItem(
 
             ) {
                 Row(
-
                     verticalAlignment = Alignment.CenterVertically
-
                 ) {
                     Spacer(modifier = Modifier.width(8.dp))
                     Box(
                         contentAlignment = Alignment.BottomCenter,
                         modifier = Modifier
                             .background(
-                                color = if (transaction.type?.lowercase().equals("credited", true)) {
+                                color = if (transaction.type
+                                        ?.lowercase()
+                                        .equals("credited", true)
+                                ) {
                                     Color.Green.copy(alpha = 0.7f)
                                 } else {
                                     Color.Red.copy(alpha = 0.6f)
@@ -142,7 +140,10 @@ fun TransactionItem(
                             modifier = Modifier
                                 .size(20.dp)
                                 .rotate(
-                                    degrees = if (transaction.type?.lowercase().equals("credited", true)) {
+                                    degrees = if (transaction.type
+                                            ?.lowercase()
+                                            .equals("credited", true)
+                                    ) {
                                         180f
                                     } else {
                                         0f
@@ -157,13 +158,14 @@ fun TransactionItem(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Column {
-                        Text(
-                            text = transaction.title.toString(),
-                            style = MaterialTheme.typography.h6,
-                            color = MaterialTheme.colors.onBackground,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                        if (transaction.title != null)
+                            Text(
+                                text = transaction.title.toString(),
+                                style = MaterialTheme.typography.h6,
+                                color = MaterialTheme.colors.onBackground,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
                         Text(
                             text = if (transaction.type?.lowercase().equals("credited", true)) {
                                 "+" + transaction.amount.toString()
@@ -172,9 +174,9 @@ fun TransactionItem(
                             },
                             style = MaterialTheme.typography.body1,
                             color = if (transaction.type?.lowercase().equals("credited", true)) {
-                                MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                                MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
                             } else {
-                                MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                                MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
                             },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -186,9 +188,10 @@ fun TransactionItem(
                     if (it != null) {
                         if (it.isNotEmpty()) {
                             Text(
-                                text = transaction.body.toString(),
+                                text = transaction.body.toString().split(" ")
+                                    .joinToString(" ") { it.capitalize() },
                                 style = MaterialTheme.typography.body2,
-                                color = Color.LightGray,
+                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
                                 modifier = Modifier.fillMaxWidth(0.75f)

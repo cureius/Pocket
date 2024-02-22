@@ -1,6 +1,5 @@
 package com.cureius.pocket.feature_pot.presentation.configure_pots.components
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -31,6 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
@@ -52,13 +54,13 @@ fun ConfigurablePotItem(
         .height(144.dp)
     Card(
         shape = RoundedCornerShape(20.dp),
-        elevation = 4.dp,
+        elevation = 0.dp,
         modifier = paddingModifier,
     ) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
-                .background(MaterialTheme.colors.surface)
+                .background(Color.Transparent)
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
@@ -81,7 +83,8 @@ fun ConfigurablePotItem(
                             modifier = Modifier
                                 .size(24.dp)
                                 .background(
-                                    MaterialTheme.colors.secondary, RoundedCornerShape(12.dp)
+                                    MaterialTheme.colors.secondary.copy(0.1f),
+                                    RoundedCornerShape(12.dp)
                                 )
                                 .padding(4.dp)
                         ) {
@@ -91,7 +94,7 @@ fun ConfigurablePotItem(
                                 Icon(
                                     imageVector = icon,
                                     contentDescription = "add account",
-                                    tint = MaterialTheme.colors.surface,
+                                    tint = MaterialTheme.colors.onBackground,
                                 )
                             }
                         }
@@ -104,17 +107,20 @@ fun ConfigurablePotItem(
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(4.dp, 0.dp)
+                            .widthIn(max = 130.dp, min = 0.dp), // Adjust the minimum width as per your requirement
+
                         )
                     }
 
                     Box(
                         modifier = Modifier.background(
-                            MaterialTheme.colors.primaryVariant, RoundedCornerShape(8.dp)
+                            MaterialTheme.colors.primaryVariant.copy(0.1f), RoundedCornerShape(8.dp)
                         )
                     ) {
                         Row(
-                            horizontalArrangement = Arrangement.End, modifier = Modifier.background(
-                                Color.Transparent
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.background(
+                                Color.Transparent,
                             )
                         ) {
                             Box(
@@ -123,7 +129,7 @@ fun ConfigurablePotItem(
                             ) {
                                 BasicTextField(
                                     value = if (totalCapacity.isEmpty()) {
-                                        "Percent Spent"
+                                        "Allocated"
                                     } else {
                                         "${
                                             (totalCapacity.toDouble() * weight.toFloat()).roundToInt()
@@ -132,7 +138,10 @@ fun ConfigurablePotItem(
                                     },
                                     onValueChange = { weight = it },
                                     readOnly = true,
-                                    textStyle = TextStyle(fontWeight = FontWeight.Bold).copy(
+                                    textStyle = TextStyle(
+                                        fontWeight = FontWeight.Normal,
+                                        color = MaterialTheme.colors.onBackground
+                                    ).copy(
                                         fontSize = 12.sp
                                     ),
                                     modifier = Modifier
@@ -144,42 +153,67 @@ fun ConfigurablePotItem(
 
                             Box(
                                 modifier = Modifier
-                                    .padding(4.dp)
+                                    .padding(4.dp, 4.dp, 0.dp, 4.dp)
                                     .background(
-                                        MaterialTheme.colors.secondary, RoundedCornerShape(4.dp)
+                                        MaterialTheme.colors.secondary.copy(0.1f),
+                                        RoundedCornerShape(4.dp)
                                     )
-                                    .width(36.dp), contentAlignment = Alignment.Center
                             ) {
                                 BasicTextField(
-                                    value = (weight.toFloat() * 100).roundToInt().toString() + "%",
+                                    value = (weight.toFloat() * 100).roundToInt().toString(),
                                     onValueChange = { weight = it },
                                     readOnly = true,
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-                                    textStyle = TextStyle(fontWeight = FontWeight.Bold).copy(
+                                    textStyle = TextStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colors.onBackground
+                                    ).copy(
                                         fontSize = 12.sp
                                     ),
                                     modifier = Modifier
                                         .padding(2.dp)
+                                        .width(25.dp)
                                         .align(Alignment.Center),
                                     singleLine = true,
                                     maxLines = 1
                                 )
                             }
-
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .padding(0.dp, 4.dp, 8.dp, 4.dp)
+                            ) {
+                                Text(
+                                    text = "%",
+                                    style = TextStyle(
+                                        fontWeight = FontWeight.Normal,
+                                        color = MaterialTheme.colors.onBackground
+                                    ).copy(
+                                        fontSize = 12.sp
+                                    ),
+                                    modifier = Modifier
+                                        .padding(2.dp)
+                                        .align(Alignment.Center)
+                                )
+                            }
                         }
                     }
                 }
 
                 Box(
-                    modifier = Modifier.fillMaxSize().padding(bottom = 20.dp , top = 4.dp), contentAlignment = Alignment.BottomCenter
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 20.dp, top = 4.dp),
+                    contentAlignment = Alignment.BottomCenter
                 ) {
-                    RangeSlider(modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .fillMaxWidth(),
-                        rangeColor = MaterialTheme.colors.primary,
+                    RangeSlider(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
+                            .fillMaxWidth(),
+                        rangeColor = MaterialTheme.colors.primary.copy(alpha = 0.8f),
                         backColor = MaterialTheme.colors.primary.copy(alpha = 0.1f),
-                        startKnob = MaterialTheme.colors.secondary,
-                        endKnob = MaterialTheme.colors.primary,
+                        startKnob = MaterialTheme.colors.secondary.copy(alpha = 1f),
+                        endKnob = MaterialTheme.colors.primary.copy(alpha = 1f),
                         barHeight = 8.dp,
                         circleRadius = 10.dp,
                         progress1InitialValue = initialStart,
@@ -198,4 +232,16 @@ fun ConfigurablePotItem(
             }
         }
     }
+}
+
+@Composable
+@Preview
+fun ConfigurablePotItemPreview() {
+    ConfigurablePotItem(
+        label = "Emergency Fund",
+        icon = "invest",
+        totalCapacity = "",
+        onStartChange = {},
+        onEndChange = {}
+    )
 }

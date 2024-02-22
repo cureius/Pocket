@@ -7,8 +7,8 @@
 
     <androidx.cardview.widget.CardView
         android:id="@+id/pot_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="80dp"
+        android:layout_height="100dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="0dp"
@@ -33,7 +33,7 @@
             <ImageView
                 android:id="@+id/pot_icon"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="40dp"
                 android:src="@drawable/coins"
                 android:tint="#2196F3"
                 tools:ignore="UseAppTint" />
@@ -46,8 +46,9 @@
                 android:fontFamily="sans-serif-black"
                 android:padding="8dp"
                 android:text="Pot Name"
+                android:gravity="center"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-                android:textSize="16sp" />
+                android:textSize="12sp" />
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>

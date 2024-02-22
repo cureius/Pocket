@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -33,7 +35,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.feature_pot.presentation.configure_pots.components.ConfigurablePotItem
-import com.cureius.pocket.feature_pot.presentation.configure_pots.components.CutCornerButton
 import kotlin.math.roundToInt
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
@@ -48,18 +49,21 @@ fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
     Log.d("Nodes", "ConfigurePotsScreen: $nonMutableNodeList")
     Scaffold(bottomBar = {
         Column {
-            CutCornerButton(
+            Button(
                 onClick = {
                     viewModel.onEvent(
                         ConfigurePotsEvent.SaveConfiguration
                     )
                 },
-                label = "Set Configuration",
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp)
-                    .padding(horizontal = 20.dp)
-            )
+                    .padding(horizontal = 10.dp)
+                    .background(MaterialTheme.colors.primary, shape = RoundedCornerShape(20.dp)),
+                shape = RoundedCornerShape(20.dp)
+            ) {
+                Text(text = "Set Configuration", style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp))
+            }
             Spacer(modifier = Modifier.height(12.dp))
         }
     }) {
@@ -105,6 +109,9 @@ fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
                     .fillMaxWidth()
                     .fillMaxHeight()
             ) {
+                item {
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
                 itemsIndexed(potTemplateList) { ix, pot ->
                     nodeList[ix]?.let { it1 ->
                         nodeList[ix + 1]?.let { it2 ->
