@@ -72,25 +72,6 @@ fun TransactionItem(
                 }
 
                 clipPath(clipPath) {
-//                    transaction?.color?.let { Color(it) }?.let {
-//                        drawRoundRect(
-//                            color = it,
-//                            size = size,
-//                            cornerRadius = CornerRadius(cornerRadius.toPx())
-//                        )
-//                    }
-//                    transaction.color?.let { ColorUtils.blendARGB(it, 0x000000, 0.2f) }?.let {
-//                        Color(
-//                            it
-//                        )
-//                    }?.let {
-//                        drawRoundRect(
-//                            color = it,
-//                            topLeft = Offset(size.width - cutCornerSize.toPx(), -100f),
-//                            size = Size(cutCornerSize.toPx() + 100f, cutCornerSize.toPx() + 100f),
-//                            cornerRadius = CornerRadius(cornerRadius.toPx())
-//                        )
-//                    }
                     drawRoundRect(
                         color = Color.Transparent,
                         size = size,
@@ -203,7 +184,7 @@ fun TransactionItem(
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Delete Transaction",
-                        tint = MaterialTheme.colors.onSurface
+                        tint = MaterialTheme.colors.onSurface.copy(alpha = 0.1f)
                     )
                 }
             }
