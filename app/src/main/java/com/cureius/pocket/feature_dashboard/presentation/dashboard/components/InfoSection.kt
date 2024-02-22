@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -28,10 +27,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -68,7 +65,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
     val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonth
     val totalIncomeAmount = transactions.filter { it.type == "credited" }.sumOf { it.amount!! }
     val totalSpentAmount = transactions.filter { it.type == "debited" }.sumOf { it.amount!! }
-
+    val totalMTDBalance = totalIncomeAmount - totalSpentAmount
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -76,7 +73,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
     ) {
         Box(
             modifier = Modifier
-                .background(MaterialTheme.colors.primary.copy(alpha = 0.2f), shape)
+                .background(MaterialTheme.colors.primary.copy(alpha = 0.1f), shape)
                 .fillMaxWidth()
                 .padding(8.dp, 8.dp, 8.dp, 0.dp)
                 .height(108.dp)
@@ -107,12 +104,12 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
                                 painter = rupee,
                                 contentDescription = "rupee",
                                 modifier = Modifier.size(16.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
                                 alignment = Alignment.Center
                             )
                             Text(
-                                text = " ${viewModel.totalBalance.value}",
-                                color = MaterialTheme.colors.secondary,
+                                text = " $totalMTDBalance",
+                                color = MaterialTheme.colors.primary,
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(fontWeight = FontWeight.Bold),
                                 fontSize = 20.sp,
@@ -177,14 +174,14 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
                                         painter = rupee,
                                         contentDescription = "rupee",
                                         modifier = Modifier.size(12.dp),
-                                        colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
+                                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
                                         alignment = Alignment.Center
                                     )
                                     Text(
                                         text = " $totalIncomeAmount",
-                                        color = MaterialTheme.colors.primaryVariant,
+                                        color = com.cureius.pocket.ui.theme.Green,
                                         textAlign = TextAlign.Center,
-                                        style = TextStyle(fontWeight = FontWeight.Bold),
+                                        style = TextStyle(fontWeight = FontWeight.Normal),
                                         fontSize = 14.sp,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
@@ -196,7 +193,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
                                     text = "INCOME",
                                     color = MaterialTheme.colors.onSurface,
                                     textAlign = TextAlign.Center,
-                                    style = TextStyle(fontWeight = FontWeight.Bold),
+                                    style = TextStyle(fontWeight = FontWeight.Normal),
                                     fontSize = 14.sp,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
@@ -212,14 +209,14 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
                                         painter = rupee,
                                         contentDescription = "rupee",
                                         modifier = Modifier.size(12.dp),
-                                        colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
+                                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
                                         alignment = Alignment.Center
                                     )
                                     Text(
                                         text = " $totalSpentAmount",
-                                        color = MaterialTheme.colors.primaryVariant,
+                                        color = com.cureius.pocket.ui.theme.TomatoRed,
                                         textAlign = TextAlign.Center,
-                                        style = TextStyle(fontWeight = FontWeight.Bold),
+                                        style = TextStyle(fontWeight = FontWeight.Normal),
                                         fontSize = 14.sp,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
@@ -231,7 +228,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
                                     text = "SPENT",
                                     color = MaterialTheme.colors.onSurface,
                                     textAlign = TextAlign.Center,
-                                    style = TextStyle(fontWeight = FontWeight.Bold),
+                                    style = TextStyle(fontWeight = FontWeight.Normal),
                                     fontSize = 14.sp,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
@@ -257,7 +254,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
                             painter = pngImage,
                             contentDescription = "Scan & Pay",
                             modifier = Modifier.size(90.dp),
-                            colorFilter = ColorFilter.tint(MaterialTheme.colors.secondary)
+                            colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface.copy(alpha = 0.8f))
                         )
                         Text(
                             text = "Scan & Pay",
