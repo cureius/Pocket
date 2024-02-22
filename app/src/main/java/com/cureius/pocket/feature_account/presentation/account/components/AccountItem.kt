@@ -1,5 +1,8 @@
 package com.cureius.pocket.feature_account.presentation.account.components
 
+import android.graphics.RuntimeShader
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,15 +10,16 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -23,126 +27,198 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.cureius.pocket.R
-import com.cureius.pocket.feature_transaction.domain.model.Transaction
+import org.intellij.lang.annotations.Language
 
+
+@Language("AGSL")
+val CUSTOM_SHADER = """
+    uniform float2 resolution;
+    layout(color) uniform half4 color;
+    layout(color) uniform half4 color2;
+
+    half4 main(in float2 fragCoord) {
+        float2 uv = fragCoord/resolution.xy;
+
+        float mixValue = distance(uv, vec2(0, 1));
+        return mix(color, color2, mixValue);
+    }
+""".trimIndent()
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun AccountItem(
-    bankName: String,
-    cardNumber: String,
-    accountNumber: String,
-    holderName: String
+    bankName: String, cardNumber: String, accountNumber: String, holderName: String
 ) {
+    val aspectRatio = 1.58f // Set the aspect ratio as desired
+
     val paddingModifier = Modifier
-        .padding(10.dp)
-        .fillMaxWidth()
-        .height(160.dp)
-    Card(
-        shape = RoundedCornerShape(20.dp),
-        elevation = 4.dp,
-        modifier = paddingModifier,
+
+    val Coral = Color(0xFFA897F3)
+    val LightYellow = Color(0xFFF8EE94)
+
+    BoxWithRoundedCorners(
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth()
+            .aspectRatio(aspectRatio),
     ) {
         Box(
             modifier = Modifier
-                .background(MaterialTheme.colors.primary.copy(alpha = 0.1f))
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Column() {
-                Row {
-                    val borderWidth = 2.dp
-                    Image(
-                        painter = painterResource(id = R.drawable.accounts),
-                        contentDescription = "Bank Logo",
-                        contentScale = ContentScale.Inside,
-                        modifier = Modifier
-                            .size(36.dp)
-                            .border(
-                                BorderStroke(borderWidth, MaterialTheme.colors.primary),
-                                CircleShape
+                .drawWithCache {
+                    val shader = RuntimeShader(CUSTOM_SHADER)
+                    val shaderBrush = ShaderBrush(shader)
+                    shader.setFloatUniform("resolution", size.width, size.height)
+                    onDrawBehind {
+                        shader.setColorUniform(
+                            "color", android.graphics.Color.valueOf(
+                                LightYellow.red,
+                                LightYellow.green,
+                                LightYellow.blue,
+                                LightYellow.alpha
                             )
-                            .padding(borderWidth)
-                            .clip(CircleShape),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Column() {
-                        Text(
-                            text = bankName,
-                            color = Color.Black,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 16.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(4.dp, 0.dp)
                         )
-                        Text(
-                            text = "Bank Account",
-                            color = Color.Black,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 8.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(4.dp, 0.dp)
+                        shader.setColorUniform(
+                            "color2", android.graphics.Color.valueOf(
+                                Coral.red, Coral.green, Coral.blue, Coral.alpha
+                            )
                         )
+                        drawRect(shaderBrush)
                     }
+                }
 
-                }
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+
+        ) {
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colors.background.copy(alpha = 0.1f))
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    val pngImage: Painter = painterResource(id = R.drawable.chip)
-                    Image(
-                        painter = pngImage,
-                        contentDescription = "smart chip",
-                        modifier = Modifier
-                            .size(72.dp),
-                    )
-                    Column {
-                        Text(
-                            text = "XXXX XXXX XXXX ${
-                                if (cardNumber != "") {
-                                    cardNumber
-                                } else {
-                                    "XXXX"
-                                }
-                            }",
-                            color = Color.Black,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 16.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(4.dp, 0.dp)
+                    Row {
+                        val borderWidth = 2.dp
+                        Image(
+                            painter = painterResource(id = R.drawable.accounts),
+                            contentDescription = "Bank Logo",
+                            contentScale = ContentScale.Inside,
+                            modifier = Modifier
+                                .size(36.dp)
+                                .border(
+                                    BorderStroke(borderWidth, MaterialTheme.colors.primary),
+                                    CircleShape
+                                )
+                                .padding(borderWidth)
+                                .clip(CircleShape),
+                            colorFilter = ColorFilter.tint(MaterialTheme.colors.primary)
                         )
-                        Text(
-                            text = "**********$accountNumber",
-                            color = Color.Black,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(4.dp, 0.dp)
-                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Column() {
+                            Text(
+                                text = bankName,
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(fontWeight = FontWeight.Bold),
+                                fontSize = 16.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(4.dp, 0.dp)
+                            )
+                            Text(
+                                text = "Bank Account",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(fontWeight = FontWeight.Bold),
+                                fontSize = 8.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(4.dp, 0.dp)
+                            )
+                        }
+
                     }
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val pngImage: Painter = painterResource(id = R.drawable.chip)
+                        Image(
+                            painter = pngImage,
+                            contentDescription = "smart chip",
+                            modifier = Modifier.size(110.dp),
+                        )
+                        Column {
+                            Text(
+                                text = "XXXX XXXX XXXX ${
+                                    if (cardNumber != "") {
+                                        cardNumber
+                                    } else {
+                                        "XXXX"
+                                    }
+                                }",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(fontWeight = FontWeight.Bold),
+                                fontSize = 18.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(4.dp, 0.dp)
+                            )
+                            Text(
+                                text = "**********$accountNumber",
+                                color = Color.Black,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(
+                                    fontWeight = FontWeight.Normal, letterSpacing = 3.5.sp
+                                ),
+                                fontSize = 16.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(4.dp, 0.dp)
+                            )
+                        }
+                    }
+                    Text(
+                        text = holderName.uppercase(),
+                        color = Color.Black,
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(fontWeight = FontWeight.Bold),
+                        fontSize = 26.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(4.dp, 0.dp)
+                    )
                 }
-                Text(
-                    text = holderName.uppercase(),
-                    color = Color.Black,
-                    textAlign = TextAlign.Center,
-                    style = TextStyle(fontWeight = FontWeight.Bold),
-                    fontSize = 16.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(4.dp, 0.dp)
-                )
             }
         }
     }
+}
+
+@Composable
+fun BoxWithRoundedCorners(
+    modifier: Modifier = Modifier,
+    cornerRadius: Dp = 16.dp,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = modifier.clip(RoundedCornerShape(cornerRadius)),
+    ) {
+        content()
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+@Preview
+@Composable
+fun AccountItemPreview() {
+    AccountItem(
+        bankName = "HDFC Bank", cardNumber = "1234", accountNumber = "890", holderName = "John Doe"
+    )
 }

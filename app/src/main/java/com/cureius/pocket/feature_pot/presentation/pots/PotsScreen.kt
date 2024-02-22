@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
@@ -63,9 +62,10 @@ fun PotsScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(0.dp, 0.dp)
+                        .height(60.dp)
                 ) {
                     Text(
-                        text = "Your Pots",
+                        text = "Pots",
                         color = MaterialTheme.colors.onBackground,
                         textAlign = TextAlign.Center,
                         style = TextStyle(fontWeight = FontWeight.Bold),
@@ -74,15 +74,12 @@ fun PotsScreen(
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(4.dp, 0.dp)
                     )
-                    Card(
-                        elevation = 4.dp, shape = RoundedCornerShape(12.dp)
-                    ) {
                         Box(
                             modifier = Modifier
                                 .background(
                                     color = MaterialTheme.colors.primary.copy(
                                         alpha = 0.4f
-                                    )
+                                    ), RoundedCornerShape(12.dp)
                                 )
                                 .padding(8.dp)
                                 .clickable {
@@ -96,7 +93,7 @@ fun PotsScreen(
                                 tint = MaterialTheme.colors.onBackground,
                             )
                         }
-                    }
+
                 }
                 Spacer(modifier = Modifier.height(20.dp))
             }

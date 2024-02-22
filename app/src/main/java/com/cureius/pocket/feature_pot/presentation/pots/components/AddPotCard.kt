@@ -13,7 +13,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,29 +27,23 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 fun AddPotCard(viewModel: AddPotViewModel = hiltViewModel()) {
     val add = ImageVector.vectorResource(id = R.drawable.add)
     val paddingModifier = Modifier
-        .padding(10.dp)
+        .padding(8.dp)
         .fillMaxWidth()
-        .height(160.dp)
-        .background(MaterialTheme.colors.surface)
-        .clip(RoundedCornerShape(20.dp))
+        .height(168.dp)
+        .background(MaterialTheme.colors.surface.copy(0.4f), RoundedCornerShape(16.dp))
     Box(
         modifier = paddingModifier,
+        contentAlignment = Alignment.Center,
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .background(MaterialTheme.colors.surface)
-        ) {
-            IconButton(onClick = {
-                viewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
-            }, modifier = Modifier.fillMaxSize()) {
-                Icon(
-                    imageVector = add,
-                    contentDescription = "add pot",
-                    tint = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
-                    modifier = Modifier.fillMaxSize(0.7f)
-                )
-            }
+        IconButton(onClick = {
+            viewModel.onEvent(AddPotEvent.ToggleAddAccountDialog)
+        }, modifier = Modifier.fillMaxSize()) {
+            Icon(
+                imageVector = add,
+                contentDescription = "add pot",
+                tint = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+                modifier = Modifier.fillMaxSize(0.7f)
+            )
         }
     }
 }

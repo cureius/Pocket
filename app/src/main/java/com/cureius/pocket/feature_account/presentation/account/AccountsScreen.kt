@@ -1,9 +1,13 @@
 package com.cureius.pocket.feature_account.presentation.account
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +18,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -46,16 +51,25 @@ fun AccountsScreen(
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
         ) {
             item {
-                Text(
-                    text = "Your Accounts:",
-                    color = MaterialTheme.colors.onBackground,
-                    textAlign = TextAlign.Center,
-                    style = TextStyle(fontWeight = FontWeight.Bold),
-                    fontSize = 24.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(4.dp, 0.dp)
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .padding(0.dp, 0.dp)
+                ) {
+                    Text(
+                        text = "Accounts",
+                        color = MaterialTheme.colors.onBackground,
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(fontWeight = FontWeight.Bold),
+                        fontSize = 24.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(4.dp, 0.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.height(20.dp))
             }
             items(state) { account ->
@@ -66,11 +80,14 @@ fun AccountsScreen(
                     holderName = account.holder_name!!
                 )
             }
-            item {
-                AddAccountCard(onClick = {
-                    addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
-                })
+            if (state.isEmpty()) {
+                item {
+                    AddAccountCard(onClick = {
+                        addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
+                    })
+                }
             }
+
             item {
                 Spacer(modifier = Modifier.height(140.dp))
             }
