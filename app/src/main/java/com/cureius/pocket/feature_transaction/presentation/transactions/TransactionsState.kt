@@ -8,6 +8,7 @@ data class TransactionsState(
     val transactions: List<Transaction> = emptyList(),
     val transactionsForRange: List<Transaction> = emptyList(),
     val transactionsOnCurrentMonth: List<Transaction> = emptyList(),
+    val transactionsOnCurrentMonthForAccounts: List<Transaction> = emptyList(),
     val transactionOrder: TransactionOrder = TransactionOrder.Date(OrderType.Descending),
     val isOrderSelectionVisible: Boolean = false
 )

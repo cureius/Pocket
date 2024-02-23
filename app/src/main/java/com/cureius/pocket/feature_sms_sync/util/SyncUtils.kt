@@ -71,20 +71,26 @@ object SyncUtils {
     }
 
     fun extractTransactionalDetails(
-        date: Long, address: String, messageBody: String
+        date: Long, address: String, rawMessageBody: String
     ): Transaction {
+        val messageBody = rawMessageBody.lowercase()
+        println("Extracting transactional details from message body: $date $messageBody")
         // Define the regular expressions for parsing the message body
         val amountRegex =
-            Regex("(?i)(amount|txn amount|debited|credited|INR|debited INR|credited by Rs |credited for INR|Rs.|credited for Rs )[\\s:]*[rs.]*(([\\d,]+\\.?\\d*)|([\\d,\\\\.]+))")
+            Regex("(?i)(amount|txn amount|debited|credited|INR|inr|debited INR|debited inr|credited by Rs |credited by rs |credited for INR|credited for inr|Rs.|rs.|credited for Rs |credited for rs )[\\s:]*[rs.]*(([\\d,]+\\.?\\d*)|([\\d,\\\\.]+))")
         val balanceRegex =
-            Regex("(?i)(balance|available balance|Bal INR|Available Bal INR|New balance: Rs\\. |Available Bal Rs |Avl bal:INR )[\\s:]*[rs.]*(([\\d,]+\\.\\d{2})|([\\d,\\\\.]+))")
-        val transactionUpiIdRegex = Regex("(?i)(UPI:|UPI Ref no |UPI Ref ID )[\\s:]*([0-9]+)")
+            Regex("(?i)(balance|available balance|Bal INR|bal inr|Available Bal INR|available bal inr|New balance: Rs|new balance: rs\\. |Available Bal Rs |available bal rs |Avl bal:INR |avl bal:inr )[\\s:]*[rs.]*(([\\d,]+\\.\\d{2})|([\\d,\\\\.]+))")
+        val transactionUpiIdRegex = Regex("(?i)(UPI:|UPI Ref no |UPI Ref ID|upi:|upi ref no |upi ref id )[\\s:]*([0-9]+)")
         val transactionImpsIdRegex =
-            Regex("(?i)(transaction id|txn id|reference id|ref|IMPS Ref no|IMPS Ref No\\. )[\\s:]*([0-9]+)")
+            Regex("(?i)(transaction id|txn id|reference id|ref|IMPS Ref-|IMPS Ref no|IMPS Ref No\\. |imps ref-|imps ref no|imps ref no\\. )[\\s:]*([0-9]+)")
         val transactionDateRegex =
-            Regex("(?i)(transaction date|txn date|date|on |Dt )[\\s:]*((\\d{2}-\\d{2}-\\d{2})|(\\d{2}/\\d{2}/\\d{4}))")
+            Regex("(?i)(transaction date|txn date|date|on |Dt |dt )[\\s:]*((\\d{2}-\\d{2}-\\d{2})|(\\d{2}/\\d{2}/\\d{4}))")
         val transactionTimeRegex = Regex("(?i)( )[\\s:]*(\\d{2}:\\d{2})")
-        val accountRegex = Regex("(?i)(a/c no XXXXXXXXXX|a/c XXXXXXXX)*([0-9]+)")
+        val accountRegex =
+            Regex("(?i)(HDFC Bank A/c XX|a/c no XXXXXXXXXX|a/c XXXXXXXX |A/c XX|ac x|a/c xxxxxxxxxxx|AC X)*([0-9]+)")
+        val accountRegex0 =
+            Regex("(?i)( AC X|A/c XX|A/c xxxxxxxxxxx| ac x|a/c xx|HDFC Bank A/c XX|a/c no XXXXXXXXXX|a/c XXXXXXXX |ac x|a/c xxxxxxxxxxx|AC X|a/c xxxxxxxxxxx\\. )[\\s:]*([0-9]+)")
+
         // Parse the message body using regular expressions
         val amountMatch = amountRegex.find(messageBody)
         val balanceMatch = balanceRegex.find(messageBody)
@@ -92,8 +98,9 @@ object SyncUtils {
         val transactionImpsIdMatch = transactionImpsIdRegex.find(messageBody)
         val transactionDateMatch = transactionDateRegex.find(messageBody)
         val transactionTimeMatch = transactionTimeRegex.find(messageBody)
-        val transactionAccountMatch = accountRegex.find(messageBody)
+        val transactionAccountMatch = accountRegex0.find(messageBody)
         val bankName = extractBankNames(address, messageBody) ?: "NAN"
+
 
         // Extract the transactional details from the regular expression matches
         val type = if (messageBody.contains("credited") || messageBody.contains("received")) {
@@ -128,6 +135,8 @@ object SyncUtils {
         val inputDate = LocalDate.parse(transactionDate, inputFormatter)
         val outputDateStr = inputDate.format(outputFormatter)
         // Create a TransactionalDetails object with the extracted transactional details
+
+        println("Transaction: $type, $transactionAccount, $amount, $date, $outputDateStr, $balance, $transactionUpiId, $transactionImpsId, $bankName, $messageBody")
         return Transaction(
             type = type,
             account = transactionAccount ?: "NAN",

@@ -49,10 +49,10 @@ fun PotItem(
     val fillShape = RoundedCornerShape(
         topStart = 12.dp, topEnd = 12.dp, bottomStart = 12.dp, bottomEnd = 12.dp
     )
-    val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonth.filter { it.pot == pot.title }
+    val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonthForAccounts.filter { it.pot == pot.title }
     val totalAmount = transactions.sumOf { it.amount!! }
     val totalCapacity =
-        transactionsViewModel.state.value.transactionsOnCurrentMonth.filter { it.type == "credited" }
+        transactionsViewModel.state.value.transactionsOnCurrentMonthForAccounts.filter { it.type == "credited" }
             .sumOf { it.amount!! }
     var actualCapacity = 0.0;
     var filled = 0.0f;

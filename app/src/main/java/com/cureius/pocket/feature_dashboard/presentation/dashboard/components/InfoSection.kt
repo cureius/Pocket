@@ -62,7 +62,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
     val mtdShape = RoundedCornerShape(
         topStart = 0.dp, topEnd = 0.dp, bottomStart = 24.dp, bottomEnd = 0.dp
     )
-    val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonth
+    val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonthForAccounts
     val totalIncomeAmount = transactions.filter { it.type == "credited" }.sumOf { it.amount!! }
     val totalSpentAmount = transactions.filter { it.type == "debited" }.sumOf { it.amount!! }
     val totalMTDBalance = totalIncomeAmount - totalSpentAmount

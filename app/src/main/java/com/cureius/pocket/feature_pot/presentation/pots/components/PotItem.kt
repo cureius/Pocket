@@ -54,10 +54,10 @@ fun PotItem(
         .fillMaxWidth()
         .height(168.dp)
         .background(MaterialTheme.colors.surface.copy(0.4f), RoundedCornerShape(16.dp))
-    val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonth.filter { it.pot == pot.title }
+    val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonthForAccounts.filter { it.pot == pot.title }
     val totalAmount = transactions.sumOf { it.amount!! }
     val totalCapacity =
-        transactionsViewModel.state.value.transactionsOnCurrentMonth.filter { it.type == "credited" }
+        transactionsViewModel.state.value.transactionsOnCurrentMonthForAccounts.filter { it.type == "credited" }
             .sumOf { it.amount!! }
     var actualCapacity = 0.0;
     var filled = 0.0f;

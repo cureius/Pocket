@@ -5,6 +5,8 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.cureius.pocket.feature_account.domain.model.Account
+import com.cureius.pocket.feature_account.domain.use_case.AccountUseCases
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
 import com.cureius.pocket.feature_transaction.domain.util.OrderType
@@ -21,16 +23,25 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TransactionsViewModel @Inject constructor(
-    private val transactionUseCases: TransactionUseCases
+    private val transactionUseCases: TransactionUseCases,
+    private val accountUseCases: AccountUseCases
 ) : ViewModel() {
 
 
     private val _state = mutableStateOf(TransactionsState())
     val state: State<TransactionsState> = _state
+
+    private val _accountsState = mutableStateOf(listOf<Account>())
+    val accountsState: State<List<Account>> = _accountsState
+
+
     private var recentlyDeletedTransaction: Transaction? = null
     private var getTransactionsJob: Job? = null
     private var getTransactionsForDateRangeJob: Job? = null
     private var getTransactionsCreatedOnCurrentMonthJob: Job? = null
+    private var getTransactionsCreatedOnCurrentMonthForAccountsJob: Job? = null
+    private var getAccountsJob: Job? = null
+
 
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
 
@@ -62,9 +73,11 @@ class TransactionsViewModel @Inject constructor(
             .toInstant()
             .toEpochMilli()
 
+        getAccounts()
         getTransactions(TransactionOrder.Date(OrderType.Descending))
         getTransactionsForDateRange(TransactionOrder.Date(OrderType.Descending), startOfMonth, endOfMonth)
         getTransactionsCreatedOnCurrentMonth(TransactionOrder.Date(OrderType.Descending))
+        getTransactionsCreatedOnCurrentMonthForAccounts(TransactionOrder.Date(OrderType.Descending))
     }
 
     fun onEvent(event: TransactionsEvent) {
@@ -118,14 +131,38 @@ class TransactionsViewModel @Inject constructor(
             )
         }.launchIn(viewModelScope)
     }
+
     private fun getTransactionsCreatedOnCurrentMonth(transactionOrder: TransactionOrder) {
         getTransactionsCreatedOnCurrentMonthJob?.cancel()
-        getTransactionsCreatedOnCurrentMonthJob = transactionUseCases.getTransactionsCreatedOnCurrentMonth(transactionOrder).onEach { transactions ->
-            println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonth: transactions:  ${transactions.size}")
-            _state.value = state.value.copy(
-                transactionsOnCurrentMonth = transactions,
-                transactionOrder= transactionOrder
-            )
+        getTransactionsCreatedOnCurrentMonthJob =
+            transactionUseCases.getTransactionsCreatedOnCurrentMonth(transactionOrder)
+                .onEach { transactions ->
+                    println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonth: transactions:  ${transactions.size}")
+                    _state.value = state.value.copy(
+                        transactionsOnCurrentMonth = transactions,
+                        transactionOrder = transactionOrder
+                    )
+                }.launchIn(viewModelScope)
+    }
+
+    private fun getTransactionsCreatedOnCurrentMonthForAccounts(transactionOrder: TransactionOrder) {
+        getTransactionsCreatedOnCurrentMonthForAccountsJob?.cancel()
+        getTransactionsCreatedOnCurrentMonthForAccountsJob =
+            transactionUseCases.getTransactionsCreatedOnCurrentMonth(transactionOrder)
+                .onEach { transactions ->
+                    _state.value = state.value.copy(
+                        transactionsOnCurrentMonthForAccounts = transactions.filter { it.account in accountsState.value.map { account: Account -> account.account_number } },
+                        transactionOrder = transactionOrder
+                    )
+                    println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonthForAccounts: transactions 2:  ${transactions.filter { it.account in accountsState.value.map { account: Account -> account.account_number } }.size}")
+                }.launchIn(viewModelScope)
+    }
+
+
+    private fun getAccounts() {
+        getAccountsJob?.cancel()
+        getAccountsJob = accountUseCases.getAccounts().onEach { accounts ->
+            _accountsState.value = accounts
         }.launchIn(viewModelScope)
     }
 }
