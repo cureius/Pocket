@@ -151,7 +151,10 @@ class TransactionsViewModel @Inject constructor(
             transactionUseCases.getTransactionsCreatedOnCurrentMonth(transactionOrder)
                 .onEach { transactions ->
                     _state.value = state.value.copy(
-                        transactionsOnCurrentMonthForAccounts = transactions.filter { it.account in accountsState.value.map { account: Account -> account.account_number } },
+                        transactionsOnCurrentMonthForAccounts = transactions.filter {
+                            ((it.account)?.toInt()
+                                ?.rem(1000)).toString() in accountsState.value.map { account: Account -> account.account_number }
+                        },
                         transactionOrder = transactionOrder
                     )
                     println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonthForAccounts: transactions 2:  ${transactions.filter { it.account in accountsState.value.map { account: Account -> account.account_number } }.size}")

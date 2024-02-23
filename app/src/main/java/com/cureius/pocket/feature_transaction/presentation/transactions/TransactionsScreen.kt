@@ -27,7 +27,6 @@ import androidx.navigation.compose.rememberNavController
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.OrderSection
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.TransactionItem
-import com.cureius.pocket.feature_transaction.presentation.util.Screen
 import com.cureius.pocket.feature_transaction.presentation.util.components.CameraPermissionTextProvider
 import com.cureius.pocket.feature_transaction.presentation.util.components.PermissionDialog
 import com.cureius.pocket.feature_transaction.presentation.util.components.PhoneCallPermissionTextProvider
@@ -74,16 +73,7 @@ fun TransactionsScreen(
     )
 
     Scaffold(
-        floatingActionButton = {
-//            FloatingActionButton(
-//                onClick = {
-//                    navController?.navigate(Screen.AddTransactionScreen.route)
-//                },
-//                backgroundColor = MaterialTheme.colors.primary,
-//            ) {
-//                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Transaction")
-//            }
-        },
+        floatingActionButton = {},
         scaffoldState = scaffoldState,
     ) {
         Column(
@@ -122,7 +112,6 @@ fun TransactionsScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                println(state?.transactionsOnCurrentMonthForAccounts?.size)
                 if (state != null) {
                     itemsIndexed(state.transactionsOnCurrentMonthForAccounts) { index, transaction ->
                         TransactionItem(transaction = transaction, modifier = Modifier
@@ -140,7 +129,7 @@ fun TransactionsScreen(
                                 }
                             }
                         },
-                            showDate = if (index == 0) true else state.transactions[index - 1].date != transaction.date
+                            showDate = if (index == 0) true else state.transactionsOnCurrentMonthForAccounts[index - 1].date != transaction.date
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                     }
