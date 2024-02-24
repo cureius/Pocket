@@ -99,7 +99,13 @@ fun TransactionItem(
                 )
                 .border(
                     width = 1.dp,
-                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+                    color = if (transaction.type.equals(
+                            "debited",
+                            ignoreCase = true
+                        ) && transaction.pot.isNullOrBlank() && pots.isNotEmpty()
+                    ) MaterialTheme.colors.onSurface.copy(alpha = 0.2f) else {
+                        Color.Transparent
+                    },
                     shape = RoundedCornerShape(30.dp)
                 )
         ) {
@@ -344,7 +350,11 @@ fun TransactionItem(
                                                                 shape = CircleShape
                                                             )
                                                             .clickable {
-                                                                updateTransactionViewModel.onEvent(UpdateTransactionEvent.PickTransaction(transaction))
+                                                                updateTransactionViewModel.onEvent(
+                                                                    UpdateTransactionEvent.PickTransaction(
+                                                                        transaction
+                                                                    )
+                                                                )
                                                                 updateTransactionViewModel.onEvent(
                                                                     UpdateTransactionEvent.SelectedPot(
                                                                         item
