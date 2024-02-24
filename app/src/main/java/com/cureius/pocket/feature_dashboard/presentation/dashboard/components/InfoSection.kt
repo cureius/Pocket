@@ -214,7 +214,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
                                     )
                                     Text(
                                         text = " $totalSpentAmount",
-                                        color = com.cureius.pocket.ui.theme.TomatoRed,
+                                        color = MaterialTheme.colors.error,
                                         textAlign = TextAlign.Center,
                                         style = TextStyle(fontWeight = FontWeight.Normal),
                                         fontSize = 16.sp,

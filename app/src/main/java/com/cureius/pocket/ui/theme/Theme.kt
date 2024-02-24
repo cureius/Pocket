@@ -5,7 +5,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Red
 
 private val LightColorPalette = darkColors(
     primary = Indigo500,
@@ -19,6 +19,7 @@ private val LightColorPalette = darkColors(
     onSecondary = Gray800,
     onBackground = Black,
     onSurface = Gray900,
+    error = Red
 )
 
 private val DarkColorPalette = lightColors(
@@ -33,6 +34,7 @@ private val DarkColorPalette = lightColors(
     onSecondary = Gray900,
     onBackground = Gray300,
     onSurface = Gray500,
+    error = Red
 )
 
 @Composable

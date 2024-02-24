@@ -104,9 +104,9 @@ fun TransactionItem(
                                         ?.lowercase()
                                         .equals("credited", true)
                                 ) {
-                                    Color.Green.copy(alpha = 0.7f)
+                                    MaterialTheme.colors.secondary
                                 } else {
-                                    Color.Red.copy(alpha = 0.6f)
+                                    MaterialTheme.colors.error
                                 },
                                 CircleShape
                             )
@@ -152,9 +152,9 @@ fun TransactionItem(
                             },
                             style = MaterialTheme.typography.body1,
                             color = if (transaction.type?.lowercase().equals("credited", true)) {
-                                MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
+                                MaterialTheme.colors.onSurface.copy(alpha = 0.8f)
                             } else {
-                                MaterialTheme.colors.onSurface.copy(alpha = 0.7f)
+                                MaterialTheme.colors.onSurface.copy(alpha = 0.8f)
                             },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
