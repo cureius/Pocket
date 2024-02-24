@@ -50,19 +50,7 @@ class AccountsViewModel @Inject constructor(
             Log.d(TAG, "getAccounts: $accounts")
             _state.value = accounts
             _accountNumberList.value = accounts.map { it -> it.account_number }.toTypedArray()
-            transactionUseCases.getTransactionsOfAccount(
-                TransactionOrder.Date(
-                    OrderType.Descending
-                ), _accountNumberList.value
-            ).onEach { transactions ->
-                println("Accounts " + _accountNumberList.value.size)
-                Log.d("Account View model", "getAllAccountsBalance: $transactions")
-                println("getAllAccountsBalance: $transactions")
-                _totalIncome.value =
-                    transactions.filter { it.type.equals("credited", true) }.sumOf { it.amount!! }
-                _totalSpending.value =
-                    transactions.filter { it.type.equals("debited", true) }.sumOf { it.amount!! }
-            }.launchIn(viewModelScope)
+            getAllAccountsBalance()
         }.launchIn(viewModelScope)
     }
 
@@ -73,12 +61,7 @@ class AccountsViewModel @Inject constructor(
                 OrderType.Descending
             ), _accountNumberList.value
         ).onEach { transactions ->
-            val accountNumbersArray: Array<String> =
-                _state.value.map { it -> it.account_number }.toTypedArray()
-            println("Accounts " + _accountNumberList.value.size)
-
             Log.d("Account View model", "getAllAccountsBalance: $transactions")
-            println("getAllAccountsBalance: $transactions")
             _totalIncome.value =
                 transactions.filter { it.type.equals("credited", true) }.sumOf { it.amount!! }
             _totalSpending.value =

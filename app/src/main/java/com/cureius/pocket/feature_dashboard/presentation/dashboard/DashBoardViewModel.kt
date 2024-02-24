@@ -90,6 +90,7 @@ class DashBoardViewModel @Inject constructor(
                     }
 
                     override fun onError(throwable: Throwable) {
+                        Log.e(tag, "onError: $throwable", )
                         Log.d(tag, "Sync Failed")
                     }
                 }
