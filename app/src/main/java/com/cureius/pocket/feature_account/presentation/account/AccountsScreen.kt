@@ -1,6 +1,7 @@
 package com.cureius.pocket.feature_account.presentation.account
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -43,6 +44,8 @@ fun AccountsScreen(
 ) {
 
     val state = viewModel.state.value
+    val balance = viewModel.totalBalance.value
+    Log.d("Accounts ", "AccountsScreen: $balance")
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
     Scaffold {

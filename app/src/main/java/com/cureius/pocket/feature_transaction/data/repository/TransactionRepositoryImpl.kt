@@ -15,8 +15,13 @@ class TransactionRepositoryImpl(
     override fun getTransactionsCreatedOnCurrentMonth(): Flow<List<Transaction>> {
         return dao.getTransactionsCreatedOnCurrentMonth();
     }
-override fun getTransactionsOfAccountNumber(accountNumbers: Array<String>): Flow<List<Transaction>> {
+
+    override fun getTransactionsOfAccountNumber(accountNumbers: Array<String>): Flow<List<Transaction>> {
         return dao.getTransactionsOfAccountNumber(accountNumbers);
+    }
+
+    override fun getLatestTransactionWithBalanceForAccountNumber(accountNumber: String): Flow<Transaction>? {
+        return dao.getLatestTransactionWithBalanceForAccountNumber(accountNumber);
     }
 
     override suspend fun getTransactionById(id: Long): Transaction? {

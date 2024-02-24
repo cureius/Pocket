@@ -1,5 +1,6 @@
 package com.cureius.pocket.feature_dashboard.presentation.dashboard.components
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -57,8 +58,8 @@ fun Modifier.vertical() = layout { measurable, constraints ->
 @Composable
 fun InfoSection(
     viewModel: DashBoardViewModel = hiltViewModel(),
-//    transactionsViewModel: TransactionsViewModel = hiltViewModel(),
-    accountsViewModel: AccountsViewModel = hiltViewModel()
+    transactionsViewModel: TransactionsViewModel = hiltViewModel(),
+    accountsViewModel: AccountsViewModel = hiltViewModel(),
 ) {
     val rupee = painterResource(id = R.drawable.rupee)
     val shape = RoundedCornerShape(
@@ -67,11 +68,26 @@ fun InfoSection(
     val mtdShape = RoundedCornerShape(
         topStart = 0.dp, topEnd = 0.dp, bottomStart = 24.dp, bottomEnd = 0.dp
     )
-//    val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonthForAccounts
-    val totalIncomeAmount = accountsViewModel.totalIncome.value
-    val totalSpentAmount = accountsViewModel.totalSpending.value
-    val totalMTDBalance =
-        accountsViewModel.totalIncome.value - accountsViewModel.totalSpending.value
+    val transactions = transactionsViewModel.state.value.transactionsOnCurrentMonthForAccounts
+    val totalIncomeAmount = transactions.filter { it.type == "credited" }.sumOf { it.amount!! }
+    val totalSpentAmount = transactions.filter { it.type == "debited" }.sumOf { it.amount!! }
+    val totalTDBalance = accountsViewModel.totalIncome.value - accountsViewModel.totalSpending.value
+//    val totalMTDBalance =
+//        accountsViewModel.totalBalance.value
+//    val totalMTDBalance = totalIncomeAmount - totalSpentAmount
+
+    var totalBalance = 0.0;
+    for (account in accountsViewModel.state.value) {
+        Log.d("TAG", "InfoSection: Account: $account")
+        val transaction = transactionsViewModel.state.value.transactionsForAccounts.filter {
+            it.account?.contains(account.account_number, true) == true && it.balance != null
+        }.sortedByDescending { it.date }.firstOrNull()
+
+        Log.d("TAG", "InfoSection: Transaction: $transaction")
+        totalBalance += (transaction?.balance ?: 0.0)
+    }
+    Log.d("TAG", "InfoSection: Total Balance: $totalBalance")
+    // filter transaction for account
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -114,7 +130,7 @@ fun InfoSection(
                                 alignment = Alignment.Center
                             )
                             Text(
-                                text = " $totalMTDBalance",
+                                text = " ${totalBalance + totalTDBalance}",
                                 color = MaterialTheme.colors.secondary,
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(fontWeight = FontWeight.Bold),

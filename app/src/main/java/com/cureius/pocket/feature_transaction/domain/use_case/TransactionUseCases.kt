@@ -4,6 +4,7 @@ data class TransactionUseCases(
     val getTransaction: GetTransaction,
     val getTransactionsCreatedOnCurrentMonth: GetTransactionsCreatedOnCurrentMonth,
     val getTransactionsOfAccount: GetTransactionsOfAccount,
+    val getLatestTransactionWithBalanceForAccount: GetLatestTransactionWithBalanceForAccount,
     val getTransactionsForDateRange: GetTransactionsForDateRange,
     val getTransactions: GetTransactions,
     val addTransaction: AddTransaction,

@@ -10,6 +10,8 @@ interface TransactionRepository {
 
     fun getTransactionsOfAccountNumber(accountNumbers: Array<String>): Flow<List<Transaction>>
 
+    fun getLatestTransactionWithBalanceForAccountNumber(accountNumber: String): Flow<Transaction>?
+
     fun getTransactionsForDateRange(start: Long, end: Long): Flow<List<Transaction>>
 
     suspend fun getTransactionById(id: Long): Transaction?

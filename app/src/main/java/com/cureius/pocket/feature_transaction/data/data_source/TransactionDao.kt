@@ -28,6 +28,9 @@ interface TransactionDao {
     @Query("SELECT * FROM `transaction` WHERE substr(account, -3) IN (:lastThreeDigits)")
     fun getTransactionsOfAccountNumber(lastThreeDigits: Array<String>): Flow<List<Transaction>>
 
+    @Query("SELECT * FROM `transaction` WHERE account = :accountNumber AND balance IS NOT NULL  ORDER BY timestamp DESC LIMIT 1")
+    fun getLatestTransactionWithBalanceForAccountNumber(accountNumber: String): Flow<Transaction>?
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertTransaction(transaction: Transaction)
 

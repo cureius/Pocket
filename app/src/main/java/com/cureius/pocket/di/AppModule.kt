@@ -65,6 +65,7 @@ object AppModule {
             getTransaction = GetTransaction(repository),
             getTransactionsCreatedOnCurrentMonth = GetTransactionsCreatedOnCurrentMonth(repository),
             getTransactionsOfAccount = GetTransactionsOfAccount(repository),
+            getLatestTransactionWithBalanceForAccount = GetLatestTransactionWithBalanceForAccount(repository),
             getTransactionsForDateRange = GetTransactionsForDateRange(repository),
             deleteTransaction = DeleteTransaction(repository),
             addTransaction = AddTransaction(repository),

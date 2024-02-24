@@ -13,9 +13,12 @@ import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCase
 import com.cureius.pocket.feature_transaction.domain.util.OrderType
 import com.cureius.pocket.feature_transaction.domain.util.TransactionOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -37,11 +40,16 @@ class AccountsViewModel @Inject constructor(
     private val _totalSpending = mutableStateOf(0.0)
     val totalSpending: State<Double> = _totalSpending
 
+    private val _totalBalance = mutableStateOf(0.0)
+    val totalBalance: State<Double> = _totalBalance
+
     private var getAccountsJob: Job? = null
     private var getAccountsBalanceJob: Job? = null
+    private var getAllAccountsIncomeSpendingBalanceJob: Job? = null
 
     init {
         getAccounts()
+//        getAllAccountsBalance()
     }
 
     private fun getAccounts() {
@@ -50,13 +58,14 @@ class AccountsViewModel @Inject constructor(
             Log.d(TAG, "getAccounts: $accounts")
             _state.value = accounts
             _accountNumberList.value = accounts.map { it -> it.account_number }.toTypedArray()
-            getAllAccountsBalance()
+            getAllAccountsIncomeSpendingBalance()
+
         }.launchIn(viewModelScope)
     }
 
-    private fun getAllAccountsBalance() {
-        getAccountsBalanceJob?.cancel()
-        getAccountsBalanceJob = transactionUseCases.getTransactionsOfAccount(
+    private fun getAllAccountsIncomeSpendingBalance() {
+        getAllAccountsIncomeSpendingBalanceJob?.cancel()
+        getAllAccountsIncomeSpendingBalanceJob = transactionUseCases.getTransactionsOfAccount(
             TransactionOrder.Date(
                 OrderType.Descending
             ), _accountNumberList.value
@@ -67,5 +76,15 @@ class AccountsViewModel @Inject constructor(
             _totalSpending.value =
                 transactions.filter { it.type.equals("debited", true) }.sumOf { it.amount!! }
         }.launchIn(viewModelScope)
+    }
+
+    private fun getAllAccountsBalance(accountNumberListLocal: Array<String>? = _accountNumberList.value) {
+        getAccountsBalanceJob?.cancel()
+        getAccountsBalanceJob = transactionUseCases.getLatestTransactionWithBalanceForAccount(
+             "797"
+        )?.onEach { transactions ->
+            Log.d("Account View model", "getAllAccountsBalance: $transactions")
+            if(transactions?.balance != null) _totalBalance.value = transactions.balance
+        }?.launchIn(viewModelScope)
     }
 }
