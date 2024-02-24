@@ -31,6 +31,10 @@ class TransactionRepositoryImpl(
         return dao.insertTransaction(transaction)
     }
 
+    override suspend fun updateTransaction(transaction: Transaction) {
+        return dao.updateTransaction(transaction)
+    }
+
     override suspend fun insertTransactions(transactions: List<Transaction>) {
         return dao.insertTransactions(transactions)
     }

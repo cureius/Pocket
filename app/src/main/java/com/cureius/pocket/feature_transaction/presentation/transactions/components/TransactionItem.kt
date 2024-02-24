@@ -54,6 +54,8 @@ import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
+import com.cureius.pocket.feature_transaction.presentation.add_transaction.UpdateTransactionEvent
+import com.cureius.pocket.feature_transaction.presentation.add_transaction.UpdateTransactionViewModel
 import java.time.LocalDate
 
 @Composable
@@ -64,6 +66,7 @@ fun TransactionItem(
     cutCornerSize: Dp = 0.dp,
     showDate: Boolean = true,
     potsViewModel: PotsViewModel = hiltViewModel(),
+    updateTransactionViewModel: UpdateTransactionViewModel = hiltViewModel(),
     onDeleteClick: () -> Unit,
 ) {
     val potShape = RoundedCornerShape(
@@ -258,15 +261,21 @@ fun TransactionItem(
                                 Box(
                                     modifier = Modifier
                                         .clickable(onClick = {
-//                                            viewModel.onEvent(
-//                                                AddTransactionEvent.SelectedPot(
-//                                                    item
-//                                                )
-//                                            )
+
                                             if (selectedPot.value == item) {
                                                 selectedPot.value = null
+                                                updateTransactionViewModel.onEvent(
+                                                    UpdateTransactionEvent.SelectedPot(
+                                                        null
+                                                    )
+                                                )
                                             } else {
                                                 selectedPot.value = item
+                                                updateTransactionViewModel.onEvent(
+                                                    UpdateTransactionEvent.SelectedPot(
+                                                        item
+                                                    )
+                                                )
                                             }
                                         })
                                         .widthIn(60.dp, Dp.Infinity)
@@ -334,7 +343,17 @@ fun TransactionItem(
                                                                 ),
                                                                 shape = CircleShape
                                                             )
-                                                            .clickable { selectedPot.value = null }
+                                                            .clickable {
+                                                                updateTransactionViewModel.onEvent(UpdateTransactionEvent.PickTransaction(transaction))
+                                                                updateTransactionViewModel.onEvent(
+                                                                    UpdateTransactionEvent.SelectedPot(
+                                                                        item
+                                                                    )
+                                                                )
+                                                                updateTransactionViewModel.onEvent(
+                                                                    UpdateTransactionEvent.UpdateTransaction
+                                                                )
+                                                            }
                                                     ) {
                                                         Image(
                                                             painter = painterResource(R.drawable.add),
