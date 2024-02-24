@@ -22,6 +22,7 @@ data class Transaction(
     val account: String? = null,
     val amount: Double? = null,
     val date: Long? = null,
+    val event_timestamp: Long? = null,
     val date_time: String? = date?.let { java.time.LocalDate.ofEpochDay(it).toString() },
     val balance: Double? = null,
     val day: String? = date?.let { java.time.LocalDate.ofEpochDay(it).dayOfWeek.toString() },

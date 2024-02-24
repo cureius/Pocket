@@ -142,6 +142,7 @@ object SyncUtils {
             account = transactionAccount ?: "NAN",
             amount = amount ?: -1.0,
             date = dateToTimeStamp(transactionDate, transactionTime)?.toEpochDay(),
+            event_timestamp = date,
             date_time = outputDateStr ?: "NAN",
             balance = balance ?: -1.0,
             UPI_ref = transactionUpiId,

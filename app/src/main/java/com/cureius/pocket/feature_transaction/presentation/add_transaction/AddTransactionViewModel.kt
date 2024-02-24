@@ -18,7 +18,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 @HiltViewModel
@@ -205,6 +207,10 @@ class AddTransactionViewModel @Inject constructor(
 //                                balance = transactionBalance.value.toDouble(),
 //                                date = transactionDate.value.atTime(transactionTime.value).toEpochSecond(ZoneOffset.UTC),
                                 date = transactionDate.value.toEpochDay(),
+                                event_timestamp = LocalDateTime.of(
+                                    transactionDate.value,
+                                    transactionTime.value
+                                ).toEpochSecond(ZoneOffset.UTC) * 1000,
                                 timestamp = System.currentTimeMillis(),
 //                                color = transactionColor.value,
                                 account = account.value?.account_number,
