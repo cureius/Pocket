@@ -126,11 +126,11 @@ fun PotItem(
                         PotType.Asset.type -> MaterialTheme.colors.secondary
                         PotType.Asset.type -> MaterialTheme.colors.error
                         else -> {
-                            MaterialTheme.colors.secondary
+                            MaterialTheme.colors.onSurface
                         }
                     },
                     textAlign = TextAlign.Center,
-                    style = TextStyle(fontWeight = FontWeight.Bold),
+                    style = TextStyle(fontWeight = FontWeight.Normal),
                     fontSize = 12.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

@@ -109,7 +109,7 @@ fun InfoSection(viewModel: DashBoardViewModel = hiltViewModel(), transactionsVie
                             )
                             Text(
                                 text = " $totalMTDBalance",
-                                color = MaterialTheme.colors.primary,
+                                color = MaterialTheme.colors.secondary,
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(fontWeight = FontWeight.Bold),
                                 fontSize = 20.sp,
