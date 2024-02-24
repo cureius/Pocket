@@ -64,6 +64,7 @@ object AppModule {
         return TransactionUseCases(
             getTransaction = GetTransaction(repository),
             getTransactionsCreatedOnCurrentMonth = GetTransactionsCreatedOnCurrentMonth(repository),
+            getTransactionsOfAccount = GetTransactionsOfAccount(repository),
             getTransactionsForDateRange = GetTransactionsForDateRange(repository),
             deleteTransaction = DeleteTransaction(repository),
             addTransaction = AddTransaction(repository),

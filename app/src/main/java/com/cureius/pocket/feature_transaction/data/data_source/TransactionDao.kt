@@ -25,6 +25,9 @@ interface TransactionDao {
     @Query("SELECT * FROM `transaction` WHERE date BETWEEN :startOfMonth AND :endOfMonth")
     fun getTransactionsForDateRange(startOfMonth: Long, endOfMonth: Long): Flow<List<Transaction>>
 
+    @Query("SELECT * FROM `transaction` WHERE substr(account, -3) IN (:lastThreeDigits)")
+    fun getTransactionsOfAccountNumber(lastThreeDigits: Array<String>): Flow<List<Transaction>>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insertTransaction(transaction: Transaction)
 

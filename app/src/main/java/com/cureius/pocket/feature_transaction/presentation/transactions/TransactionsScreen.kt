@@ -113,7 +113,7 @@ fun TransactionsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 if (state != null) {
-                    itemsIndexed(state.transactionsOnCurrentMonthForAccounts) { index, transaction ->
+                    itemsIndexed(state.transactionsForAccounts) { index, transaction ->
                         TransactionItem(transaction = transaction, modifier = Modifier
                             .fillMaxWidth()
                             .clickable {

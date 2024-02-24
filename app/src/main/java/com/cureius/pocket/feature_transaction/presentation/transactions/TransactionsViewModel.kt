@@ -39,6 +39,7 @@ class TransactionsViewModel @Inject constructor(
     private var getTransactionsJob: Job? = null
     private var getTransactionsForDateRangeJob: Job? = null
     private var getTransactionsCreatedOnCurrentMonthJob: Job? = null
+    private var getTransactionsForAccountsJob: Job? = null
     private var getTransactionsCreatedOnCurrentMonthForAccountsJob: Job? = null
     private var getAccountsJob: Job? = null
 
@@ -78,6 +79,7 @@ class TransactionsViewModel @Inject constructor(
         getTransactionsForDateRange(TransactionOrder.Date(OrderType.Descending), startOfMonth, endOfMonth)
         getTransactionsCreatedOnCurrentMonth(TransactionOrder.Date(OrderType.Descending))
         getTransactionsCreatedOnCurrentMonthForAccounts(TransactionOrder.Date(OrderType.Descending))
+        getTransactionsForAccounts(TransactionOrder.Date(OrderType.Descending))
     }
 
     fun onEvent(event: TransactionsEvent) {
@@ -157,7 +159,23 @@ class TransactionsViewModel @Inject constructor(
                         },
                         transactionOrder = transactionOrder
                     )
-                    println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonthForAccounts: transactions 2:  ${transactions.filter { it.account in accountsState.value.map { account: Account -> account.account_number } }.size}")
+                    println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonthForAccounts: transactions:  ${transactions.filter { it.account in accountsState.value.map { account: Account -> account.account_number } }.size}")
+                }.launchIn(viewModelScope)
+    }
+
+    private fun getTransactionsForAccounts(transactionOrder: TransactionOrder) {
+        getTransactionsForAccountsJob?.cancel()
+        getTransactionsForAccountsJob =
+            transactionUseCases.getTransactions(transactionOrder)
+                .onEach { transactions ->
+                    _state.value = state.value.copy(
+                        transactionsForAccounts = transactions.filter {
+                            ((it.account)?.toInt()
+                                ?.rem(1000)).toString() in accountsState.value.map { account: Account -> account.account_number }
+                        },
+                        transactionOrder = transactionOrder
+                    )
+                    println("TransactionsViewModel.getTransactionsForAccounts: transactions:  ${transactions.filter { it.account in accountsState.value.map { account: Account -> account.account_number } }.size}")
                 }.launchIn(viewModelScope)
     }
 
