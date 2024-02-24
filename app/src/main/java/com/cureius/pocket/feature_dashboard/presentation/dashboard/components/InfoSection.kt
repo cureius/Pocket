@@ -83,12 +83,12 @@ fun InfoSection(
                 account.account_number,
                 true
             ) == true && it.balance != null && it.balance != -1.0
-        }.maxByOrNull { it.timestamp } ?: continue
+        }.maxByOrNull { it.event_timestamp!! } ?: continue
         Log.d("TAG", "InfoSection: Account: $account")
         val transactions = transactionsViewModel.state.value.transactionsForAccounts.filter {
             it.account?.contains(
                 account.account_number, true
-            ) == true && it.date != null && it.timestamp > transaction.timestamp
+            ) == true && it.date != null && it.event_timestamp!! > transaction.event_timestamp!!
         }.sortedByDescending { it.date }
         val incomeAfterBalance = transactions.filter { it.type == "credited" }.sumOf { it.amount!! }
         val spendingAfterBalance =
@@ -99,7 +99,7 @@ fun InfoSection(
                     account.account_number,
                     true
                 ) == true && it.balance != null && it.balance != -1.0
-            }.maxByOrNull { it.timestamp }
+            }.maxByOrNull { it.event_timestamp!! }
         }")
         Log.d("TAG", "InfoSection: Transaction: ${transaction.balance}")
         Log.d("TAG", "InfoSection: Transaction: $incomeAfterBalance")

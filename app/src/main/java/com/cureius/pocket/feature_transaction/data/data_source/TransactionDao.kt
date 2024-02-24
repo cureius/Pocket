@@ -16,7 +16,7 @@ interface TransactionDao {
     @Query("SELECT * FROM `transaction` WHERE id = :id")
     suspend fun getTransactionById(id: Long): Transaction?
 
-    @Query("SELECT * FROM `transaction` WHERE strftime('%Y-%m', timestamp / 1000, 'unixepoch') = strftime('%Y-%m', 'now')")
+    @Query("SELECT * FROM `transaction` WHERE strftime('%Y-%m', event_timestamp / 1000, 'unixepoch') = strftime('%Y-%m', 'now')")
     fun getTransactionsCreatedOnCurrentMonth(): Flow<List<Transaction>>
 
     @Query("SELECT * FROM `transaction` WHERE strftime('%Y-%m', date / 1000 , 'unixepoch') = strftime('%Y-%m', 'now')")
@@ -28,7 +28,7 @@ interface TransactionDao {
     @Query("SELECT * FROM `transaction` WHERE substr(account, -3) IN (:lastThreeDigits)")
     fun getTransactionsOfAccountNumber(lastThreeDigits: Array<String>): Flow<List<Transaction>>
 
-    @Query("SELECT * FROM `transaction` WHERE account = :accountNumber AND balance IS NOT NULL  ORDER BY timestamp DESC LIMIT 1")
+    @Query("SELECT * FROM `transaction` WHERE account = :accountNumber AND balance IS NOT NULL  ORDER BY event_timestamp DESC LIMIT 1")
     fun getLatestTransactionWithBalanceForAccountNumber(accountNumber: String): Flow<Transaction>?
 
     @Insert(onConflict = OnConflictStrategy.ABORT)

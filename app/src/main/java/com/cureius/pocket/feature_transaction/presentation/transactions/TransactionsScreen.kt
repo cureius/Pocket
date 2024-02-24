@@ -129,7 +129,7 @@ fun TransactionsScreen(
                                 }
                             }
                         },
-                            showDate = if (index == 0) true else state.transactionsOnCurrentMonthForAccounts[index - 1].date != transaction.date
+                            showDate = if (index == 0) true else state.transactionsForAccounts[index - 1].date != transaction.date
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                     }
