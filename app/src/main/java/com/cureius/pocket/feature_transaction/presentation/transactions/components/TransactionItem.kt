@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -48,6 +49,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.cureius.pocket.R
+import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
@@ -67,11 +70,8 @@ fun TransactionItem(
         topStart = 12.dp, topEnd = 12.dp, bottomStart = 12.dp, bottomEnd = 12.dp
     )
     val selectedPot = remember {
-        mutableStateOf(
-            com.cureius.pocket.feature_pot.domain.model.Pot(
-                title = "General",
-                icon = "general",
-            )
+        mutableStateOf<Pot?>(
+            null
         )
     }
 
@@ -263,43 +263,92 @@ fun TransactionItem(
 //                                                    item
 //                                                )
 //                                            )
+                                            if (selectedPot.value == item) {
+                                                selectedPot.value = null
+                                            } else {
+                                                selectedPot.value = item
+                                            }
                                         })
-                                        .width(60.dp)
+                                        .widthIn(60.dp, Dp.Infinity)
                                         .height(90.dp)
                                         .background(
+                                            color =
+                                            MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
+                                            potShape
+                                        )
+                                        .border(
+                                            1.dp,
                                             color = if (selectedPot.value == item) {
                                                 MaterialTheme.colors.primary.copy(alpha = 0.5f)
                                             } else {
-                                                MaterialTheme.colors.onSurface.copy(alpha = 0.1f)
+                                                MaterialTheme.colors.onSurface.copy(alpha = 0.0f)
                                             }, potShape
-
                                         ),
                                 ) {
                                     Column(
-                                        modifier = Modifier.fillMaxHeight(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Bottom
+                                        modifier = Modifier
+                                            .fillMaxHeight()
+                                            .width(if (selectedPot.value == item) 120.dp else 60.dp)
                                     ) {
-                                        Box(
-                                            contentAlignment = Alignment.BottomCenter,
-                                            modifier = Modifier.padding(8.dp)
-                                        ) {
-                                            if (IconDictionary.allIcons[item.icon] != null) {
-                                                Image(
-                                                    painter = painterResource(id = IconDictionary.allIcons[item.icon]!!),
-                                                    contentDescription = item.title,
-                                                    modifier = Modifier.size(40.dp),
-                                                    colorFilter = if (selectedPot.value == item) {
-                                                        ColorFilter.tint(MaterialTheme.colors.surface)
-                                                    } else {
-                                                        ColorFilter.tint(
-                                                            MaterialTheme.colors.primary.copy(
-                                                                alpha = 0.5f
+                                        Row {
+                                            Column(
+                                                modifier = Modifier
+                                                    .width(60.dp),
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                verticalArrangement = Arrangement.Bottom
+                                            ) {
+                                                Box(
+                                                    contentAlignment = Alignment.BottomCenter,
+                                                    modifier = Modifier.padding(8.dp)
+                                                ) {
+                                                    if (IconDictionary.allIcons[item.icon] != null) {
+                                                        Image(
+                                                            painter = painterResource(id = IconDictionary.allIcons[item.icon]!!),
+                                                            contentDescription = item.title,
+                                                            modifier = Modifier.size(40.dp),
+                                                            colorFilter =
+                                                            ColorFilter.tint(
+                                                                MaterialTheme.colors.primary.copy(
+                                                                    alpha = 0.5f
+                                                                )
                                                             )
+
                                                         )
                                                     }
-                                                )
+                                                }
                                             }
+                                            if (selectedPot.value == item) {
+                                                Column(
+                                                    modifier = Modifier
+                                                        .width(60.dp),
+                                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                                    verticalArrangement = Arrangement.Bottom
+                                                ) {
+                                                    Box(
+                                                        contentAlignment = Alignment.BottomCenter,
+                                                        modifier = Modifier
+                                                            .padding(8.dp)
+                                                            .background(
+                                                                color = MaterialTheme.colors.primary.copy(
+                                                                    alpha = 0.5f
+                                                                ),
+                                                                shape = CircleShape
+                                                            )
+                                                            .clickable { selectedPot.value = null }
+                                                    ) {
+                                                        Image(
+                                                            painter = painterResource(R.drawable.add),
+                                                            contentDescription = item.title,
+                                                            modifier = Modifier.size(40.dp),
+                                                            colorFilter =
+                                                            ColorFilter.tint(MaterialTheme.colors.onBackground)
+
+                                                        )
+
+                                                    }
+                                                }
+                                            }
+
                                         }
                                         Text(
                                             text = item.title!!,
@@ -313,6 +362,7 @@ fun TransactionItem(
                                                 .fillMaxWidth()
                                                 .padding(4.dp, 8.dp)
                                         )
+
                                     }
                                 }
                                 Spacer(modifier = Modifier.width(6.dp))
