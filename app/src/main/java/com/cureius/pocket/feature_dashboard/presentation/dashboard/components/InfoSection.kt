@@ -78,14 +78,35 @@ fun InfoSection(
 
     var totalBalance = 0.0;
     for (account in accountsViewModel.state.value) {
-        Log.d("TAG", "InfoSection: Account: $account")
         val transaction = transactionsViewModel.state.value.transactionsForAccounts.filter {
-            it.account?.contains(account.account_number, true) == true && it.balance != null
-        }.sortedByDescending { it.date }.firstOrNull()
-
-        Log.d("TAG", "InfoSection: Transaction: $transaction")
-        totalBalance += (transaction?.balance ?: 0.0)
+            it.account?.contains(
+                account.account_number,
+                true
+            ) == true && it.balance != null && it.balance != -1.0
+        }.maxByOrNull { it.timestamp } ?: continue
+        Log.d("TAG", "InfoSection: Account: $account")
+        val transactions = transactionsViewModel.state.value.transactionsForAccounts.filter {
+            it.account?.contains(
+                account.account_number, true
+            ) == true && it.date != null && it.timestamp > transaction.timestamp
+        }.sortedByDescending { it.date }
+        val incomeAfterBalance = transactions.filter { it.type == "credited" }.sumOf { it.amount!! }
+        val spendingAfterBalance =
+            transactions.filter { it.type == "debited" }.sumOf { it.amount!! }
+        Log.d("TAG", "InfoSection: Transaction: ${
+            transactionsViewModel.state.value.transactionsForAccounts.filter {
+                it.account?.contains(
+                    account.account_number,
+                    true
+                ) == true && it.balance != null && it.balance != -1.0
+            }.maxByOrNull { it.timestamp }
+        }")
+        Log.d("TAG", "InfoSection: Transaction: ${transaction.balance}")
+        Log.d("TAG", "InfoSection: Transaction: $incomeAfterBalance")
+        Log.d("TAG", "InfoSection: Transaction: $spendingAfterBalance")
+        totalBalance += (transaction?.balance ?: 0.0) + incomeAfterBalance - spendingAfterBalance
     }
+
     Log.d("TAG", "InfoSection: Total Balance: $totalBalance")
     // filter transaction for account
     Box(
@@ -130,7 +151,7 @@ fun InfoSection(
                                 alignment = Alignment.Center
                             )
                             Text(
-                                text = " ${totalBalance + totalTDBalance}",
+                                text = " ${totalBalance}",
                                 color = MaterialTheme.colors.secondary,
                                 textAlign = TextAlign.Center,
                                 style = TextStyle(fontWeight = FontWeight.Bold),
