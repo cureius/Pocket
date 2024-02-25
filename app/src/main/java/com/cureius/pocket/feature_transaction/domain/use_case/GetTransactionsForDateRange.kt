@@ -21,9 +21,16 @@ class GetTransactionsForDateRange(
             when (transactionOrder.orderType) {
                 is OrderType.Ascending -> {
                     when (transactionOrder) {
-                        is TransactionOrder.Title -> transactions.sortedBy { it.type?.lowercase() }
+                        is TransactionOrder.Type -> transactions.sortedBy { it.type?.lowercase() }
                         is TransactionOrder.Date -> transactions.sortedBy { it.event_timestamp }
-                        is TransactionOrder.Color -> transactions.sortedBy { it.color }
+                        is TransactionOrder.Amount -> transactions.sortedBy { it.amount }
+                    }
+                }
+                is OrderType.Descending -> {
+                    when (transactionOrder) {
+                        is TransactionOrder.Type -> transactions.sortedByDescending { it.type?.lowercase() }
+                        is TransactionOrder.Date -> transactions.sortedByDescending { it.event_timestamp }
+                        is TransactionOrder.Amount -> transactions.sortedByDescending { it.amount }
                     }
                 }
                 else -> transactions.sortedBy { it.event_timestamp }
