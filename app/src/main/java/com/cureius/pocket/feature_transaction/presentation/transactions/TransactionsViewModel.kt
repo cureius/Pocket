@@ -122,19 +122,21 @@ class TransactionsViewModel @Inject constructor(
             }
 
             is TransactionsEvent.MonthSelected -> {
-                val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
-                val date = LocalDate.parse("1/${event.value}", formatter)
-                val lastDayOfMonth = date.withDayOfMonth(date.lengthOfMonth())
-                val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
-                val validityTimestamp = midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC) * 1000
-                val firstDayOfMonth = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000
-                println("TransactionsViewModel: onEvent: MonthSelected: event: $firstDayOfMonth $validityTimestamp ")
-                getTransactionsCreatedOnMonthForAccounts(
-                    TransactionOrder.Date(OrderType.Descending),
-                    firstDayOfMonth,
-                    validityTimestamp
-                )
                 _monthPicked.value = event.value
+                if (event.value != null){
+                    val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+                    val date = LocalDate.parse("1/${event.value}", formatter)
+                    val lastDayOfMonth = date.withDayOfMonth(date.lengthOfMonth())
+                    val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
+                    val validityTimestamp = midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC) * 1000
+                    val firstDayOfMonth = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000
+                    println("TransactionsViewModel: onEvent: MonthSelected: event: $firstDayOfMonth $validityTimestamp ")
+                    getTransactionsCreatedOnMonthForAccounts(
+                        TransactionOrder.Date(OrderType.Descending),
+                        firstDayOfMonth,
+                        validityTimestamp
+                    )
+                }
                 _monthPickerDialogVisibility.value = false
             }
 

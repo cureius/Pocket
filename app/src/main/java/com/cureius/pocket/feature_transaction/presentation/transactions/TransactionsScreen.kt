@@ -26,8 +26,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -51,10 +54,10 @@ fun TransactionsScreen(
     viewModel: TransactionsViewModel = hiltViewModel(),
     addViewModel: AddTransactionViewModel = hiltViewModel()
 ) {
-    val state = viewModel?.state?.value
+    val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
-    val dialogQueue = viewModel?.visiblePermissionDialogQueue
+    val dialogQueue = viewModel.visiblePermissionDialogQueue
 
     val permissionsToRequest = arrayOf(
         Manifest.permission.RECORD_AUDIO,
@@ -93,19 +96,25 @@ fun TransactionsScreen(
                 .padding(16.dp)
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Transactions", style = MaterialTheme.typography.h4
+                    text = "Transactions",
+                    style = TextStyle(fontWeight = FontWeight.Bold),
+                    fontSize = 24.sp,
                 )
                 Row {
                     Box(
                         modifier = Modifier
                             .background(
-                                color = MaterialTheme.colors.primary.copy(
-                                    alpha = 0.1f
+                                color = if (viewModel.monthPicked.value != null) MaterialTheme.colors.primary.copy(
+                                    alpha = 0.2f
+                                ) else MaterialTheme.colors.primary.copy(
+                                    alpha = 0.0f
                                 ), RoundedCornerShape(12.dp)
                             )
                             .padding(8.dp)
@@ -218,19 +227,29 @@ fun TransactionsScreen(
                 mutableStateOf("")
             }
 
-            val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
-            val year = Calendar.getInstance().get(Calendar.YEAR)
-
+            val currentMonth =
+                viewModel.monthPicked.value?.split("/")?.get(0)?.toInt() ?: (Calendar.getInstance()
+                    .get(Calendar.MONTH) + 1)
+            println("currentMonth: $currentMonth")
+            val year =
+                viewModel.monthPicked.value?.split("/")?.get(1)?.toInt() ?: Calendar.getInstance()
+                    .get(Calendar.YEAR)
+            println("year: $year")
             // A surface container using the 'background' color from the theme
-            MonthPicker(visible = visible,
+            MonthPicker(
+                visible = visible,
                 currentMonth = currentMonth,
                 currentYear = year,
+                showReset = viewModel.monthPicked.value != null,
                 confirmButtonCLicked = { month_, year_ ->
                     date = "$month_/$year_"
                     viewModel.onEvent(TransactionsEvent.MonthSelected(date))
                 },
                 cancelClicked = {
                     viewModel.onEvent(TransactionsEvent.ToggleMonthPickerDialog)
+                },
+                resetClicked = {
+                    viewModel.onEvent(TransactionsEvent.MonthSelected(null))
                 })
         }
     }

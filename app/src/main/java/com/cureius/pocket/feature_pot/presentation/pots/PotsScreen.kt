@@ -19,10 +19,12 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +44,7 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_pot.presentation.pots.components.AddPotCard
 import com.cureius.pocket.feature_pot.presentation.pots.components.PotItem
+import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsEvent
 import com.cureius.pocket.util.components.MonthPicker
 import java.util.Calendar
 
@@ -54,8 +57,10 @@ fun PotsScreen(
 ) {
     val monthlyPots = viewModel.validPots.value
     val templatePots = viewModel.templatePots.value
+    val scaffoldState = rememberScaffoldState()
+    val scope = rememberCoroutineScope()
 
-    Scaffold {
+    Scaffold (scaffoldState = scaffoldState){
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
@@ -170,6 +175,9 @@ fun PotsScreen(
                     viewModel.onEvent(PotsEvent.ToggleMonthPickerDialog)
                 },
                 cancelClicked = {
+                    viewModel.onEvent(PotsEvent.ToggleMonthPickerDialog)
+                },
+                resetClicked = {
                     viewModel.onEvent(PotsEvent.ToggleMonthPickerDialog)
                 })
         }

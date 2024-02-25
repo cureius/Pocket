@@ -9,6 +9,6 @@ sealed class TransactionsEvent {
     data class DeleteTransaction(val transaction: Transaction) : TransactionsEvent()
     object RestoreTransaction : TransactionsEvent()
     object ToggleOrderSection : TransactionsEvent()
-    data class MonthSelected(val value: String) : TransactionsEvent()
+    data class MonthSelected(val value: String?) : TransactionsEvent()
     object ToggleMonthPickerDialog : TransactionsEvent()
 }
