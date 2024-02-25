@@ -45,6 +45,7 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialo
 import com.cureius.pocket.feature_pot.presentation.pots.components.AddPotCard
 import com.cureius.pocket.feature_pot.presentation.pots.components.PotItem
 import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsEvent
+import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsViewModel
 import com.cureius.pocket.util.components.MonthPicker
 import java.util.Calendar
 
@@ -53,14 +54,16 @@ import java.util.Calendar
 fun PotsScreen(
     navHostController: NavHostController,
     viewModel: PotsViewModel = hiltViewModel(),
-    addPotViewModel: AddPotViewModel = hiltViewModel()
+    addPotViewModel: AddPotViewModel = hiltViewModel(),
+    transactionsViewModel: TransactionsViewModel = hiltViewModel()
+
 ) {
     val monthlyPots = viewModel.validPots.value
     val templatePots = viewModel.templatePots.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
-    Scaffold (scaffoldState = scaffoldState){
+    Scaffold() {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
@@ -88,13 +91,15 @@ fun PotsScreen(
                         Box(
                             modifier = Modifier
                                 .background(
-                                    color = MaterialTheme.colors.primary.copy(
-                                        alpha = 0.1f
+                                    color = if (transactionsViewModel.monthPicked.value != null) MaterialTheme.colors.primary.copy(
+                                        alpha = 0.2f
+                                    ) else MaterialTheme.colors.primary.copy(
+                                        alpha = 0.0f
                                     ), RoundedCornerShape(12.dp)
                                 )
                                 .padding(8.dp)
                                 .clickable {
-                                    viewModel.onEvent(PotsEvent.ToggleMonthPickerDialog)
+                                    transactionsViewModel.onEvent(TransactionsEvent.ToggleMonthPickerDialog)
                                 }, contentAlignment = Alignment.Center
                         ) {
                             val config =
@@ -153,7 +158,7 @@ fun PotsScreen(
             })
         }
 
-        if (viewModel.monthPickerDialogVisibility.value) {
+        if (transactionsViewModel.monthPickerDialogVisibility.value) {
             var visible by remember {
                 mutableStateOf(true)
             }
@@ -162,23 +167,29 @@ fun PotsScreen(
                 mutableStateOf("")
             }
 
-            val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
-            val year = Calendar.getInstance().get(Calendar.YEAR)
-
+            val currentMonth =
+                transactionsViewModel.monthPicked.value?.split("/")?.get(0)?.toInt() ?: (Calendar.getInstance()
+                    .get(Calendar.MONTH) + 1)
+            println("currentMonth: $currentMonth")
+            val year =
+                transactionsViewModel.monthPicked.value?.split("/")?.get(1)?.toInt() ?: Calendar.getInstance()
+                    .get(Calendar.YEAR)
+            println("year: $year")
             // A surface container using the 'background' color from the theme
-            MonthPicker(visible = visible,
+            MonthPicker(
+                visible = visible,
                 currentMonth = currentMonth,
                 currentYear = year,
+                showReset = transactionsViewModel.monthPicked.value != null,
                 confirmButtonCLicked = { month_, year_ ->
                     date = "$month_/$year_"
-                    viewModel.onEvent(PotsEvent.MonthSelected(date))
-                    viewModel.onEvent(PotsEvent.ToggleMonthPickerDialog)
+                    transactionsViewModel.onEvent(TransactionsEvent.MonthSelected(date))
                 },
                 cancelClicked = {
-                    viewModel.onEvent(PotsEvent.ToggleMonthPickerDialog)
+                    transactionsViewModel.onEvent(TransactionsEvent.ToggleMonthPickerDialog)
                 },
                 resetClicked = {
-                    viewModel.onEvent(PotsEvent.ToggleMonthPickerDialog)
+                    transactionsViewModel.onEvent(TransactionsEvent.MonthSelected(null))
                 })
         }
     }
