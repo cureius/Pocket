@@ -90,7 +90,7 @@ class DashBoardViewModel @Inject constructor(
                     }
 
                     override fun onError(throwable: Throwable) {
-                        Log.e(tag, "onError: $throwable", )
+                        Log.e(tag, "onError: ${throwable.printStackTrace()}")
                         Log.d(tag, "Sync Failed")
                     }
                 }
@@ -141,16 +141,16 @@ class DashBoardViewModel @Inject constructor(
                                             .contains("sent") || body.lowercase()
                                             .contains("received"))
                                     ) {
-                                        Log.d(
-                                            tag, "format:  $address, ${
-                                                SyncUtils.extractTransactionalDetails(
-                                                    date, address, body
-                                                )
-                                            }"
-                                        )
+//                                        Log.d(
+//                                            tag, "format:  $address, ${
+//                                                SyncUtils.extractTransactionalDetails(
+//                                                    date, address, body
+//                                                )
+//                                            }"
+//                                        )
                                         SyncUtils.extractTransactionalDetails(
                                             date, address, body
-                                        ).let { transactionList.add(it) }
+                                        ).let { if(it!= null) transactionList.add(it) }
                                     }
                                 }
                             }

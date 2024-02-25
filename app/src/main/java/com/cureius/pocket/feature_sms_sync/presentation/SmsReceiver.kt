@@ -70,7 +70,7 @@ class SmsReceiver : BroadcastReceiver() {
                                     context.startService(serviceIntent)
                                     Log.d(tag, "onReceive: $it")
                                     scope.launch {
-                                        transactionUseCases.addTransaction(it)
+                                        if (it != null) transactionUseCases.addTransaction(it)
                                     }
                                 }
                             }

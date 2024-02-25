@@ -1,6 +1,7 @@
 package com.cureius.pocket.feature_account.presentation.account.components
 
 import android.graphics.RuntimeShader
+import android.os.Build
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -16,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
@@ -77,29 +77,33 @@ fun AccountItem(
             .aspectRatio(aspectRatio),
     ) {
         Box(
-            modifier = Modifier
-                .drawWithCache {
-                    val shader = RuntimeShader(CUSTOM_SHADER)
-                    val shaderBrush = ShaderBrush(shader)
-                    shader.setFloatUniform("resolution", size.width, size.height)
-                    onDrawBehind {
-                        shader.setColorUniform(
-                            "color", android.graphics.Color.valueOf(
-                                LightYellow.red,
-                                LightYellow.green,
-                                LightYellow.blue,
-                                LightYellow.alpha
-                            )
-                        )
-                        shader.setColorUniform(
-                            "color2", android.graphics.Color.valueOf(
-                                Coral.red, Coral.green, Coral.blue, Coral.alpha
-                            )
-                        )
-                        drawRect(shaderBrush)
-                    }
-                }
+            modifier = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                Modifier
+                    .drawWithCache {
+                        val shader = RuntimeShader(CUSTOM_SHADER)
 
+                        val shaderBrush = ShaderBrush(shader)
+                        shader.setFloatUniform("resolution", size.width, size.height)
+                        onDrawBehind {
+                            shader.setColorUniform(
+                                "color", android.graphics.Color.valueOf(
+                                    LightYellow.red,
+                                    LightYellow.green,
+                                    LightYellow.blue,
+                                    LightYellow.alpha
+                                )
+                            )
+                            shader.setColorUniform(
+                                "color2", android.graphics.Color.valueOf(
+                                    Coral.red, Coral.green, Coral.blue, Coral.alpha
+                                )
+                            )
+                            drawRect(shaderBrush)
+                        }
+                    }
+            } else {
+                Modifier.background(MaterialTheme.colors.primary.copy(0.4f), RoundedCornerShape(16.dp))
+            }
 
         ) {
             Box(
