@@ -56,7 +56,11 @@ import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.UpdateTransactionEvent
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.UpdateTransactionViewModel
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun TransactionItem(
@@ -79,7 +83,7 @@ fun TransactionItem(
     }
 
     val pots = potsViewModel.templatePots.value
-    Column() {
+    Column(modifier = modifier.background(MaterialTheme.colors.background, RoundedCornerShape(30.dp))) {
         transaction.date?.let {
             if (showDate) {
                 Text(
@@ -94,19 +98,15 @@ fun TransactionItem(
         Box(
             modifier = modifier
                 .background(
-                    MaterialTheme.colors.surface.copy(0.1f),
-                    RoundedCornerShape(30.dp)
+                    MaterialTheme.colors.surface.copy(0.1f), RoundedCornerShape(30.dp)
                 )
                 .border(
-                    width = 1.dp,
-                    color = if (transaction.type.equals(
-                            "debited",
-                            ignoreCase = true
+                    width = 1.dp, color = if (transaction.type.equals(
+                            "debited", ignoreCase = true
                         ) && transaction.pot.isNullOrBlank() && pots.isNotEmpty()
                     ) MaterialTheme.colors.onSurface.copy(alpha = 0.2f) else {
                         Color.Transparent
-                    },
-                    shape = RoundedCornerShape(30.dp)
+                    }, shape = RoundedCornerShape(30.dp)
                 )
         ) {
             Canvas(modifier = Modifier.matchParentSize()) {
@@ -134,7 +134,7 @@ fun TransactionItem(
                             color = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
                             shape = RoundedCornerShape(30.dp)
                         )
-                        .padding(8.dp),
+                        .padding(12.dp),
                     horizontalArrangement = Arrangement.Absolute.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
 
@@ -142,7 +142,6 @@ fun TransactionItem(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Spacer(modifier = Modifier.width(8.dp))
                         Box(
                             contentAlignment = Alignment.BottomCenter,
                             modifier = Modifier
@@ -154,8 +153,7 @@ fun TransactionItem(
                                         MaterialTheme.colors.secondary
                                     } else {
                                         MaterialTheme.colors.error
-                                    },
-                                    CircleShape
+                                    }, CircleShape
                                 )
                                 .padding(8.dp)
                         ) {
@@ -227,15 +225,33 @@ fun TransactionItem(
                         }
                     }
                     Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(
-                        onClick = { onDeleteClick() },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete Transaction",
-                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.1f)
-                        )
+                    transaction.event_timestamp?.let {
+                        val instant = Instant.ofEpochMilli(it)
+                        val localDateTime = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
+                        val localTime = localDateTime.toLocalTime()
+                        val formatter = DateTimeFormatter.ofPattern("HH:mm")
+                        val formattedTime = localTime.format(formatter)
+                        Row {
+                            Text(
+                                text = formattedTime,
+                                style = TextStyle(
+                                    fontWeight = FontWeight.Light,
+                                    fontSize = 14.sp
+                                ),
+                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                        }
                     }
+//                    IconButton(
+//                        onClick = { onDeleteClick() },
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Delete,
+//                            contentDescription = "Delete Transaction",
+//                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.1f)
+//                        )
+//                    }
                 }
 
                 if (transaction.type.equals(
@@ -287,13 +303,11 @@ fun TransactionItem(
                                         .widthIn(60.dp, Dp.Infinity)
                                         .height(90.dp)
                                         .background(
-                                            color =
-                                            MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
+                                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
                                             potShape
                                         )
                                         .border(
-                                            1.dp,
-                                            color = if (selectedPot.value == item) {
+                                            1.dp, color = if (selectedPot.value == item) {
                                                 MaterialTheme.colors.primary.copy(alpha = 0.5f)
                                             } else {
                                                 MaterialTheme.colors.onSurface.copy(alpha = 0.0f)
@@ -346,8 +360,7 @@ fun TransactionItem(
                                                             .background(
                                                                 color = MaterialTheme.colors.primary.copy(
                                                                     alpha = 0.5f
-                                                                ),
-                                                                shape = CircleShape
+                                                                ), shape = CircleShape
                                                             )
                                                             .clickable {
                                                                 updateTransactionViewModel.onEvent(
