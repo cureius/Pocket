@@ -96,7 +96,22 @@ class TransactionsViewModel @Inject constructor(
                 ) {
                     return
                 }
-                getTransactions(event.transactionOrder)
+                if (monthPicked.value != null){
+                    val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+                    val date = LocalDate.parse("1/${monthPicked.value}", formatter)
+                    val lastDayOfMonth = date.withDayOfMonth(date.lengthOfMonth())
+                    val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
+                    val validityTimestamp = midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC) * 1000
+                    val firstDayOfMonth = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000
+                    println("TransactionsViewModel: onEvent: MonthSelected: event: $firstDayOfMonth $validityTimestamp ")
+                    getTransactionsCreatedOnMonthForAccounts(
+                        event.transactionOrder,
+                        firstDayOfMonth,
+                        validityTimestamp
+                    )
+                }else{
+                    getTransactionsForAccounts(event.transactionOrder)
+                }
             }
             is TransactionsEvent.DeleteTransaction -> {
                 viewModelScope.launch {
@@ -230,7 +245,10 @@ class TransactionsViewModel @Inject constructor(
                         },
                         transactionOrder = transactionOrder
                     )
-                    println("TransactionsViewModel.getTransactionsForAccounts: transactions:  ${transactions.filter { it.account in accountsState.value.map { account: Account -> account.account_number } }.size}")
+                    println("TransactionsViewModel.getTransactionsForAccounts: transactions:  ${transactions.filter {
+                        ((it.account)?.toInt()
+                            ?.rem(1000)).toString() in accountsState.value.map { account: Account -> account.account_number }
+                    }}")
                 }.launchIn(viewModelScope)
     }
 
