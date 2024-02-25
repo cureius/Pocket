@@ -108,33 +108,49 @@ fun TransactionsScreen(
                     fontSize = 24.sp,
                 )
                 Row {
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                color = if (viewModel.monthPicked.value != null) MaterialTheme.colors.primary.copy(
-                                    alpha = 0.2f
-                                ) else MaterialTheme.colors.primary.copy(
-                                    alpha = 0.0f
-                                ), RoundedCornerShape(12.dp)
+                    IconButton(onClick = {
+                        viewModel.onEvent(TransactionsEvent.ToggleMonthPickerDialog)
+                    }) {
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = if (viewModel.monthPicked.value != null) MaterialTheme.colors.primary.copy(
+                                        alpha = 0.2f
+                                    ) else MaterialTheme.colors.primary.copy(
+                                        alpha = 0.0f
+                                    ), RoundedCornerShape(12.dp)
+                                )
+                                .padding(8.dp), contentAlignment = Alignment.Center
+                        ) {
+                            val config =
+                                ImageVector.vectorResource(id = R.drawable.outline_filter_alt_24)
+                            Icon(
+                                imageVector = config,
+                                contentDescription = "filter",
+                                tint = MaterialTheme.colors.onBackground,
                             )
-                            .padding(8.dp)
-                            .clickable {
-                                viewModel.onEvent(TransactionsEvent.ToggleMonthPickerDialog)
-                            }, contentAlignment = Alignment.Center
-                    ) {
-                        val config =
-                            ImageVector.vectorResource(id = R.drawable.outline_filter_alt_24)
-                        Icon(
-                            imageVector = config,
-                            contentDescription = "filter",
-                            tint = MaterialTheme.colors.onBackground,
-                        )
+                        }
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(onClick = {
-                        viewModel?.onEvent(TransactionsEvent.ToggleOrderSection)
+                        viewModel.onEvent(TransactionsEvent.ToggleOrderSection)
                     }) {
-                        Icon(imageVector = Icons.Default.Sort, contentDescription = "Sort")
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = if (viewModel.state.value.isOrderSelectionVisible) MaterialTheme.colors.primary.copy(
+                                        alpha = 0.2f
+                                    ) else MaterialTheme.colors.primary.copy(
+                                        alpha = 0.0f
+                                    ), RoundedCornerShape(12.dp)
+                                )
+                                .padding(8.dp), contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Sort, contentDescription = "Sort",
+                                tint = MaterialTheme.colors.onBackground,
+                            )
+                        }
                     }
                 }
             }
