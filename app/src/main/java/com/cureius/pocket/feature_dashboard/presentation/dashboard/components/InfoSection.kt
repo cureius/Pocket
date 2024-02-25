@@ -42,6 +42,7 @@ import com.cureius.pocket.R
 import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashBoardViewModel
 import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsViewModel
+import java.text.DecimalFormat
 
 
 fun Modifier.vertical() = layout { measurable, constraints ->
@@ -53,7 +54,27 @@ fun Modifier.vertical() = layout { measurable, constraints ->
         )
     }
 }
-
+fun formatBalance(balance: Double): String {
+    return when {
+        balance >= 10000000 -> {
+            String.format("%.2fCr", balance / 10000000)
+        }
+        balance >= 100000 -> {
+            String.format("%.2fL", balance / 100000)
+        }
+        balance >= 1000 -> {
+            String.format("%.2fK", balance / 1000)
+        }
+        balance >= 100 -> {
+            val decimalFormat = DecimalFormat("#,##,###.00")
+            decimalFormat.format(balance)
+        }
+        else -> {
+            val decimalFormat = DecimalFormat("#,##,###.00")
+            decimalFormat.format(balance)
+        }
+    }
+}
 @Preview
 @Composable
 fun InfoSection(
@@ -77,11 +98,11 @@ fun InfoSection(
 //    val totalMTDBalance = totalIncomeAmount - totalSpentAmount
 
     var totalBalance = 0.0;
+    var totalBalanceStr = "0.0";
     for (account in accountsViewModel.state.value) {
         val transaction = transactionsViewModel.state.value.transactionsForAccounts.filter {
             it.account?.contains(
-                account.account_number,
-                true
+                account.account_number, true
             ) == true && it.balance != null && it.balance != -1.0
         }.maxByOrNull { it.event_timestamp!! } ?: continue
         Log.d("TAG", "InfoSection: Account: $account")
@@ -96,8 +117,7 @@ fun InfoSection(
         Log.d("TAG", "InfoSection: Transaction: ${
             transactionsViewModel.state.value.transactionsForAccounts.filter {
                 it.account?.contains(
-                    account.account_number,
-                    true
+                    account.account_number, true
                 ) == true && it.balance != null && it.balance != -1.0
             }.maxByOrNull { it.event_timestamp!! }
         }")
@@ -105,9 +125,11 @@ fun InfoSection(
         Log.d("TAG", "InfoSection: Transaction: $incomeAfterBalance")
         Log.d("TAG", "InfoSection: Transaction: $spendingAfterBalance")
         totalBalance += (transaction?.balance ?: 0.0) + incomeAfterBalance - spendingAfterBalance
+        val decimalFormat = DecimalFormat("#,##,###.00")
+        totalBalanceStr = formatBalance(totalBalance)
     }
 
-    Log.d("TAG", "InfoSection: Total Balance: $totalBalance")
+    Log.d("TAG", "InfoSection: Total Balance: $totalBalance $totalBalanceStr")
     // filter transaction for account
     Box(
         modifier = Modifier
@@ -125,16 +147,17 @@ fun InfoSection(
                 Column(modifier = Modifier.fillMaxWidth(0.7f)) {
                     Row(
                         modifier = Modifier
-                            .padding(8.dp, 8.dp, 4.dp, 12.dp)
+                            .padding(8.dp, 8.dp, 4.dp, 8.dp)
                             .fillMaxWidth(0.9f),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Bottom,
                     ) {
                         Text(
                             text = "You Have",
-                            color = MaterialTheme.colors.onBackground,
+                            color = MaterialTheme.colors.onSurface,
                             textAlign = TextAlign.Center,
                             style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 16.sp,
+                            fontSize = 12.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(0.dp, 0.dp)
@@ -143,22 +166,23 @@ fun InfoSection(
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
+
+                            Text(
+                                text = " ${totalBalanceStr}",
+                                color = MaterialTheme.colors.onBackground,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(fontWeight = FontWeight.Bold, letterSpacing = 3.5.sp),
+                                fontSize = 24.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(0.dp, 0.dp)
+                            )
                             Image(
                                 painter = rupee,
                                 contentDescription = "rupee",
                                 modifier = Modifier.size(16.dp),
-                                colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
                                 alignment = Alignment.Center
-                            )
-                            Text(
-                                text = " ${totalBalance}",
-                                color = MaterialTheme.colors.secondary,
-                                textAlign = TextAlign.Center,
-                                style = TextStyle(fontWeight = FontWeight.Bold),
-                                fontSize = 20.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(0.dp, 0.dp)
                             )
                         }
                     }
@@ -213,13 +237,7 @@ fun InfoSection(
                                     horizontalArrangement = Arrangement.SpaceAround,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Image(
-                                        painter = rupee,
-                                        contentDescription = "rupee",
-                                        modifier = Modifier.size(12.dp),
-                                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
-                                        alignment = Alignment.Center
-                                    )
+
                                     Text(
                                         text = " $totalIncomeAmount",
                                         color = com.cureius.pocket.ui.theme.Green,
@@ -229,6 +247,13 @@ fun InfoSection(
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.padding(0.dp, 0.dp)
+                                    )
+                                    Image(
+                                        painter = rupee,
+                                        contentDescription = "rupee",
+                                        modifier = Modifier.size(12.dp),
+                                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
+                                        alignment = Alignment.Center
                                     )
                                 }
 
@@ -248,13 +273,7 @@ fun InfoSection(
                                     horizontalArrangement = Arrangement.SpaceAround,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Image(
-                                        painter = rupee,
-                                        contentDescription = "rupee",
-                                        modifier = Modifier.size(12.dp),
-                                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
-                                        alignment = Alignment.Center
-                                    )
+
                                     Text(
                                         text = " $totalSpentAmount",
                                         color = MaterialTheme.colors.error,
@@ -265,6 +284,14 @@ fun InfoSection(
                                         overflow = TextOverflow.Ellipsis,
                                         modifier = Modifier.padding(0.dp, 0.dp)
                                     )
+                                    Image(
+                                        painter = rupee,
+                                        contentDescription = "rupee",
+                                        modifier = Modifier.size(12.dp),
+                                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
+                                        alignment = Alignment.Center
+                                    )
+
                                 }
 
                                 Text(
