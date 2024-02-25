@@ -204,7 +204,7 @@ class TransactionsViewModel @Inject constructor(
                         },
                         transactionOrder = transactionOrder
                     )
-                    println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonthForAccounts: transactions:  ${transactions.filter { it.account in accountsState.value.map { account: Account -> account.account_number } }.size}")
+                    println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonthForAccounts: transactions:  ${_state.value.transactionsOnCurrentMonthForAccounts.size}")
                 }.launchIn(viewModelScope)
     }
 
@@ -245,10 +245,7 @@ class TransactionsViewModel @Inject constructor(
                         },
                         transactionOrder = transactionOrder
                     )
-                    println("TransactionsViewModel.getTransactionsForAccounts: transactions:  ${transactions.filter {
-                        ((it.account)?.toInt()
-                            ?.rem(1000)).toString() in accountsState.value.map { account: Account -> account.account_number }
-                    }}")
+                    println("TransactionsViewModel.getTransactionsForAccounts: transactions:  ${_state.value.transactionsForAccounts.size}")
                 }.launchIn(viewModelScope)
     }
 
