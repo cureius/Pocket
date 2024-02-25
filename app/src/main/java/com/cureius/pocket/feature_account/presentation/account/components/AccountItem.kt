@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -113,7 +114,7 @@ fun AccountItem(
                     .padding(16.dp)
             ) {
                 Column(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxWidth().fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row {
@@ -165,16 +166,18 @@ fun AccountItem(
 
                     }
                     Row(
-                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         val pngImage: Painter = painterResource(id = R.drawable.chip)
-                        Image(
-                            painter = pngImage,
-                            contentDescription = "smart chip",
-                            modifier = Modifier.size(110.dp),
-                        )
-                        Column {
+                        Box(modifier = Modifier.width(70.dp)) {
+                            Image(
+                                painter = pngImage,
+                                contentDescription = "smart chip",
+                            )
+                        }
+                        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceBetween){
                             Text(
                                 text = "XXXX XXXX XXXX ${
                                     if (cardNumber != "") {
