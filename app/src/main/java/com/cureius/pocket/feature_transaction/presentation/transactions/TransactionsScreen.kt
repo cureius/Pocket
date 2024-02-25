@@ -177,25 +177,6 @@ fun TransactionsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 if (state != null) {
-//                    items(
-//                        items = programmingLanguages,
-//                        key = { it }
-//                    ) { language ->
-//                        SwipeToDeleteContainer(
-//                            item = language,
-//                            onDelete = {
-//                                programmingLanguages -= language
-//                            }
-//                        ) { language ->
-//                            Text(
-//                                text = language,
-//                                modifier = Modifier
-//                                    .fillMaxWidth()
-//                                    .background(MaterialTheme.colorScheme.background)
-//                                    .padding(16.dp)
-//                            )
-//                        }
-//                    }
                     itemsIndexed(
                         if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts else state.transactionsForAccounts,
                         key = { index, transaction -> transaction.id!! }) { index, transaction ->

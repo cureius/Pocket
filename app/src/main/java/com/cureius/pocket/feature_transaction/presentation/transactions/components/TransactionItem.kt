@@ -243,15 +243,6 @@ fun TransactionItem(
                             Spacer(modifier = Modifier.width(8.dp))
                         }
                     }
-//                    IconButton(
-//                        onClick = { onDeleteClick() },
-//                    ) {
-//                        Icon(
-//                            imageVector = Icons.Default.Delete,
-//                            contentDescription = "Delete Transaction",
-//                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.1f)
-//                        )
-//                    }
                 }
 
                 if (transaction.type.equals(
