@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -74,6 +75,7 @@ import com.cureius.pocket.feature_account.domain.model.Bank
 import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.feature_pot.presentation.pots.PotsViewModel
+import com.cureius.pocket.util.components.MonthPicker
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.datetime.time.timepicker
@@ -82,6 +84,7 @@ import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalComposeUiApi::class)
@@ -360,14 +363,11 @@ fun AddTransactionForm(
                                                 .padding(4.dp, 0.dp)
                                         )
                                     }
-                                    IconButton(onClick = {
-                                    }) {
-                                        Icon(
-                                            imageVector = calendar,
-                                            contentDescription = "Select date",
-                                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
-                                        )
-                                    }
+                                    Icon(
+                                        imageVector = calendar,
+                                        contentDescription = "Select date",
+                                        tint = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
+                                    )
                                 }
                             }
                             Spacer(
@@ -420,18 +420,14 @@ fun AddTransactionForm(
                                                 .padding(4.dp, 0.dp)
                                         )
                                     }
-                                    IconButton(onClick = {
-                                    }) {
-                                        Icon(
-                                            imageVector = clock,
-                                            contentDescription = "Select time",
-                                            tint = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
-                                        )
-                                    }
+                                    Icon(
+                                        imageVector = clock,
+                                        contentDescription = "Select time",
+                                        tint = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
+                                    )
                                 }
                             }
                         }
-
                     } // Transaction Date Text Field
                     item {
                         Spacer(modifier = Modifier.height(20.dp))

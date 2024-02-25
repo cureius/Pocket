@@ -16,22 +16,17 @@ class GetTransactionsForDateRange(
         end: Long
     ): Flow<List<Transaction>> {
         return repository.getTransactionsForDateRange(start, end).map { transactions ->
+            println("GetTransactionsForDateRange: transactions: ${transactionOrder.orderType}")
+            println("GetTransactionsForDateRange: transactions: ${transactions.size} $transactions")
             when (transactionOrder.orderType) {
                 is OrderType.Ascending -> {
                     when (transactionOrder) {
                         is TransactionOrder.Title -> transactions.sortedBy { it.type?.lowercase() }
-                        is TransactionOrder.Date -> transactions.sortedBy { it.date }
+                        is TransactionOrder.Date -> transactions.sortedBy { it.event_timestamp }
                         is TransactionOrder.Color -> transactions.sortedBy { it.color }
                     }
                 }
-
-                is OrderType.Descending -> {
-                    when (transactionOrder) {
-                        is TransactionOrder.Title -> transactions.sortedByDescending { it.type?.lowercase() }
-                        is TransactionOrder.Date -> transactions.sortedByDescending { it.date }
-                        is TransactionOrder.Color -> transactions.sortedByDescending { it.color }
-                    }
-                }
+                else -> transactions.sortedBy { it.event_timestamp }
             }
         }
     }

@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 
@@ -34,6 +35,11 @@ class TransactionsViewModel @Inject constructor(
     private val _accountsState = mutableStateOf(listOf<Account>())
     val accountsState: State<List<Account>> = _accountsState
 
+    private val _monthPickerDialogVisibility = mutableStateOf(false)
+    val monthPickerDialogVisibility: State<Boolean> = _monthPickerDialogVisibility
+
+    private val _monthPicked = mutableStateOf<String?>( null)
+    val monthPicked: State<String?> = _monthPicked
 
     private var recentlyDeletedTransaction: Transaction? = null
     private var getTransactionsJob: Job? = null
@@ -76,7 +82,7 @@ class TransactionsViewModel @Inject constructor(
 
         getAccounts()
         getTransactions(TransactionOrder.Date(OrderType.Descending))
-        getTransactionsForDateRange(TransactionOrder.Date(OrderType.Descending), startOfMonth, endOfMonth)
+//        getTransactionsForDateRange(TransactionOrder.Date(OrderType.Descending), startOfMonth, endOfMonth)
         getTransactionsCreatedOnCurrentMonth(TransactionOrder.Date(OrderType.Descending))
         getTransactionsCreatedOnCurrentMonthForAccounts(TransactionOrder.Date(OrderType.Descending))
         getTransactionsForAccounts(TransactionOrder.Date(OrderType.Descending))
@@ -104,10 +110,32 @@ class TransactionsViewModel @Inject constructor(
                     recentlyDeletedTransaction = null
                 }
             }
+
             is TransactionsEvent.ToggleOrderSection -> {
                 _state.value = state.value.copy(
                     isOrderSelectionVisible = !state.value.isOrderSelectionVisible
                 )
+            }
+
+            is TransactionsEvent.ToggleMonthPickerDialog -> {
+                _monthPickerDialogVisibility.value = !_monthPickerDialogVisibility.value
+            }
+
+            is TransactionsEvent.MonthSelected -> {
+                val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+                val date = LocalDate.parse("1/${event.value}", formatter)
+                val lastDayOfMonth = date.withDayOfMonth(date.lengthOfMonth())
+                val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
+                val validityTimestamp = midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC) * 1000
+                val firstDayOfMonth = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000
+                println("TransactionsViewModel: onEvent: MonthSelected: event: $firstDayOfMonth $validityTimestamp ")
+                getTransactionsCreatedOnMonthForAccounts(
+                    TransactionOrder.Date(OrderType.Descending),
+                    firstDayOfMonth,
+                    validityTimestamp
+                )
+                _monthPicked.value = event.value
+                _monthPickerDialogVisibility.value = false
             }
 
         }
@@ -160,6 +188,31 @@ class TransactionsViewModel @Inject constructor(
                         transactionOrder = transactionOrder
                     )
                     println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonthForAccounts: transactions:  ${transactions.filter { it.account in accountsState.value.map { account: Account -> account.account_number } }.size}")
+                }.launchIn(viewModelScope)
+    }
+
+
+    private fun getTransactionsCreatedOnMonthForAccounts(
+        transactionOrder: TransactionOrder,
+        firstDayOfMonth: Long,
+        lastDayOfMonth: Long
+    ) {
+        getTransactionsCreatedOnCurrentMonthForAccountsJob?.cancel()
+        getTransactionsCreatedOnCurrentMonthForAccountsJob =
+            transactionUseCases.getTransactionsForDateRange(
+                transactionOrder,
+                firstDayOfMonth,
+                lastDayOfMonth
+            )
+                .onEach { transactions ->
+                    _state.value = state.value.copy(
+                        transactionsOnCurrentMonthForAccounts = transactions.filter {
+                            ((it.account)?.toInt()
+                                ?.rem(1000)).toString() in accountsState.value.map { account: Account -> account.account_number }
+                        },
+                        transactionOrder = transactionOrder
+                    )
+                    println("TransactionsViewModel.getTransactionsCreatedOnMonthForAccounts: transactions:  ${_state.value.transactionsOnCurrentMonthForAccounts}")
                 }.launchIn(viewModelScope)
     }
 

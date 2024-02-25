@@ -1,5 +1,6 @@
 package com.cureius.pocket.feature_transaction.presentation.transactions
 
+import com.cureius.pocket.feature_pot.presentation.pots.PotsEvent
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.domain.util.TransactionOrder
 
@@ -8,4 +9,6 @@ sealed class TransactionsEvent {
     data class DeleteTransaction(val transaction: Transaction) : TransactionsEvent()
     object RestoreTransaction : TransactionsEvent()
     object ToggleOrderSection : TransactionsEvent()
+    data class MonthSelected(val value: String) : TransactionsEvent()
+    object ToggleMonthPickerDialog : TransactionsEvent()
 }

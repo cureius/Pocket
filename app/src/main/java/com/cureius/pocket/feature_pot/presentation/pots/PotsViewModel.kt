@@ -12,12 +12,17 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
 class PotsViewModel @Inject constructor(
     private val potUseCases: PotUseCases
 ) : ViewModel() {
+
+    private val _monthPickerDialogVisibility = mutableStateOf(false)
+    val monthPickerDialogVisibility: State<Boolean> = _monthPickerDialogVisibility
+
 
     private val _state = mutableStateOf(listOf<Pot>())
     val state: State<List<Pot>> = _state
@@ -39,6 +44,24 @@ class PotsViewModel @Inject constructor(
         getPots()
         getTemplatePots()
         getPotsValidTillRunningMonth()
+    }
+
+    fun onEvent(event: PotsEvent) {
+        when (event) {
+            is PotsEvent.ToggleMonthPickerDialog -> {
+                _monthPickerDialogVisibility.value = !_monthPickerDialogVisibility.value
+            }
+            is PotsEvent.MonthSelected -> {
+                println("PotsViewModel: onEvent: MonthSelected: event: $event")
+                val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+                val date = LocalDate.parse("1/${event.value}", formatter)
+                val lastDayOfMonth = date.withDayOfMonth(date.lengthOfMonth())
+                val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
+                val validityTimestamp = midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC)
+                getPotsWithValidity(validityTimestamp)
+                _monthPickerDialogVisibility.value = false
+            }
+        }
     }
 
     private fun getPots() {

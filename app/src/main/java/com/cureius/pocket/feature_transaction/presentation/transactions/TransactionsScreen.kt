@@ -6,24 +6,33 @@ import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.cureius.pocket.R
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.OrderSection
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.TransactionItem
@@ -31,13 +40,15 @@ import com.cureius.pocket.feature_transaction.presentation.util.components.Camer
 import com.cureius.pocket.feature_transaction.presentation.util.components.PermissionDialog
 import com.cureius.pocket.feature_transaction.presentation.util.components.PhoneCallPermissionTextProvider
 import com.cureius.pocket.feature_transaction.presentation.util.components.RecordAudioPermissionTextProvider
+import com.cureius.pocket.util.components.MonthPicker
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
 fun TransactionsScreen(
     navController: NavController?,
-    viewModel: TransactionsViewModel? = hiltViewModel(),
+    viewModel: TransactionsViewModel = hiltViewModel(),
     addViewModel: AddTransactionViewModel = hiltViewModel()
 ) {
     val state = viewModel?.state?.value
@@ -53,7 +64,7 @@ fun TransactionsScreen(
     val cameraPermissionResultLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
-            viewModel?.onPermissionResult(
+            viewModel.onPermissionResult(
                 permission = Manifest.permission.READ_SMS,
                 isGranted = isGranted
             )
@@ -64,7 +75,7 @@ fun TransactionsScreen(
         contract = ActivityResultContracts.RequestMultiplePermissions(),
         onResult = { perms ->
             permissionsToRequest.forEach { permission ->
-                viewModel?.onPermissionResult(
+                viewModel.onPermissionResult(
                     permission = permission,
                     isGranted = perms[permission] == true
                 )
@@ -87,12 +98,35 @@ fun TransactionsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Your Transactions", style = MaterialTheme.typography.h4
+                    text = "Transactions", style = MaterialTheme.typography.h4
                 )
-                IconButton(onClick = {
-                    viewModel?.onEvent(TransactionsEvent.ToggleOrderSection)
-                }) {
-                    Icon(imageVector = Icons.Default.Sort, contentDescription = "Sort")
+                Row {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                color = MaterialTheme.colors.primary.copy(
+                                    alpha = 0.1f
+                                ), RoundedCornerShape(12.dp)
+                            )
+                            .padding(8.dp)
+                            .clickable {
+                                viewModel.onEvent(TransactionsEvent.ToggleMonthPickerDialog)
+                            }, contentAlignment = Alignment.Center
+                    ) {
+                        val config =
+                            ImageVector.vectorResource(id = R.drawable.outline_filter_alt_24)
+                        Icon(
+                            imageVector = config,
+                            contentDescription = "filter",
+                            tint = MaterialTheme.colors.onBackground,
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(onClick = {
+                        viewModel?.onEvent(TransactionsEvent.ToggleOrderSection)
+                    }) {
+                        Icon(imageVector = Icons.Default.Sort, contentDescription = "Sort")
+                    }
                 }
             }
             if (state != null) {
@@ -113,7 +147,7 @@ fun TransactionsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 if (state != null) {
-                    itemsIndexed(state.transactionsForAccounts) { index, transaction ->
+                    itemsIndexed(if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts else state.transactionsForAccounts) { index, transaction ->
                         TransactionItem(transaction = transaction, modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
@@ -129,7 +163,9 @@ fun TransactionsScreen(
                                 }
                             }
                         },
-                            showDate = if (index == 0) true else state.transactionsForAccounts[index - 1].date != transaction.date
+                            showDate = if (index == 0) true else {
+                                if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts[index - 1].date != transaction.date else state.transactionsForAccounts[index - 1].date != transaction.date
+                            }
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                     }
@@ -141,7 +177,7 @@ fun TransactionsScreen(
             }
         }
 
-        dialogQueue?.reversed()?.forEach { permission ->
+        dialogQueue.reversed().forEach { permission ->
             PermissionDialog(
                 permissionTextProvider = when (permission) {
                     Manifest.permission.CAMERA -> {
@@ -172,6 +208,31 @@ fun TransactionsScreen(
                 onGoToAppSettingsClick = { }
             )
         }
+
+        if (viewModel.monthPickerDialogVisibility.value) {
+            var visible by remember {
+                mutableStateOf(true)
+            }
+
+            var date by remember {
+                mutableStateOf("")
+            }
+
+            val currentMonth = Calendar.getInstance().get(Calendar.MONTH)
+            val year = Calendar.getInstance().get(Calendar.YEAR)
+
+            // A surface container using the 'background' color from the theme
+            MonthPicker(visible = visible,
+                currentMonth = currentMonth,
+                currentYear = year,
+                confirmButtonCLicked = { month_, year_ ->
+                    date = "$month_/$year_"
+                    viewModel.onEvent(TransactionsEvent.MonthSelected(date))
+                },
+                cancelClicked = {
+                    viewModel.onEvent(TransactionsEvent.ToggleMonthPickerDialog)
+                })
+        }
     }
 
 }
@@ -182,6 +243,5 @@ fun TransactionsScreen(
 fun TransactionsScreenPreview() {
     TransactionsScreen(
         navController = rememberNavController(),
-        viewModel = null
     )
 }

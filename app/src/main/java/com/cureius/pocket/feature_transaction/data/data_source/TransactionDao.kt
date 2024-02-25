@@ -22,7 +22,7 @@ interface TransactionDao {
     @Query("SELECT * FROM `transaction` WHERE strftime('%Y-%m', date / 1000 , 'unixepoch') = strftime('%Y-%m', 'now')")
     fun getTransactionsCreatedForCurrentMonth(): Flow<List<Transaction>>
 
-    @Query("SELECT * FROM `transaction` WHERE date BETWEEN :startOfMonth AND :endOfMonth")
+    @Query("SELECT * FROM `transaction` WHERE event_timestamp BETWEEN :startOfMonth AND :endOfMonth")
     fun getTransactionsForDateRange(startOfMonth: Long, endOfMonth: Long): Flow<List<Transaction>>
 
     @Query("SELECT * FROM `transaction` WHERE substr(account, -3) IN (:lastThreeDigits)")
