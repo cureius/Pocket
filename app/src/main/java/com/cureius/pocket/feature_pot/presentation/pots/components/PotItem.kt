@@ -259,7 +259,7 @@ fun PotItem(
                 )
             } else if (transactions.isEmpty()) {
                 Text(
-                    text = "Not Initialized",
+                    text = "Not Date",
                     color = MaterialTheme.colors.onBackground,
                     textAlign = TextAlign.Center,
                     style = TextStyle(fontWeight = FontWeight.Bold),
