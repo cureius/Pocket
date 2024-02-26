@@ -61,6 +61,7 @@ fun TransactionsScreen(
 ) {
     val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val dialogQueue = viewModel.visiblePermissionDialogQueue
 
@@ -188,6 +189,14 @@ fun TransactionsScreen(
                                         transaction
                                     )
                                 )
+                                scope.launch {
+                                    val result = snackbarHostState.showSnackbar(
+                                        message = "Transaction Deleted..!", actionLabel = "Undo"
+                                    )
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        viewModel.onEvent(TransactionsEvent.RestoreTransaction)
+                                    }
+                                }
                             }
                         ) { transaction ->
                             TransactionItem(transaction = transaction, modifier = Modifier
@@ -201,7 +210,7 @@ fun TransactionsScreen(
                                     )
                                 )
                                 scope.launch {
-                                    val result = scaffoldState.snackbarHostState.showSnackbar(
+                                    val result = snackbarHostState.showSnackbar(
                                         message = "Transaction Deleted..!", actionLabel = "Undo"
                                     )
                                     if (result == SnackbarResult.ActionPerformed) {
@@ -291,7 +300,14 @@ fun TransactionsScreen(
                 })
         }
     }
-
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(0.dp, 0.dp, 0.dp, 128.dp),
+        contentAlignment = Alignment.BottomCenter //Change to your desired position
+    ) {
+        SnackbarHost(hostState = snackbarHostState)
+    }
 }
 
 
