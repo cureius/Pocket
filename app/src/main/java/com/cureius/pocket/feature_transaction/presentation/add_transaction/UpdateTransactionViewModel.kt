@@ -206,6 +206,26 @@ class UpdateTransactionViewModel @Inject constructor(
                     }
                 }
             }
+            is UpdateTransactionEvent.UpdateTransactionTitle -> {
+                viewModelScope.launch {
+                    try {
+                        transaction.value?.let {
+                            transactionUseCases.updateTransaction(
+                                it.copy(
+                                    title  = transactionTitle.value,
+                                )
+                            )
+                        }
+                        _eventFlow.emit(UiEvent.SaveTransaction)
+                    } catch (e: InvalidTransactionException) {
+                        _eventFlow.emit(
+                            UiEvent.ShowSnackBar(
+                                message = e.message ?: "Cant Update Transaction"
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 

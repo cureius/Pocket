@@ -32,6 +32,7 @@ sealed class UpdateTransactionEvent {
 
     data class ChangeColor(val color: Int) : UpdateTransactionEvent()
     object UpdateTransaction : UpdateTransactionEvent()
+    object UpdateTransactionTitle : UpdateTransactionEvent()
 
     data class EnteredTransactionsList(val value: List<Transaction>) : UpdateTransactionEvent()
     object SaveAllTransactions : UpdateTransactionEvent()

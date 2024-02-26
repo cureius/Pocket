@@ -21,14 +21,19 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -76,6 +81,14 @@ fun TransactionItem(
         mutableStateOf<Pot?>(
             null
         )
+    }
+
+    var transactionTitle by remember {
+        mutableStateOf("Give title")
+    }
+
+    var transactionTitleFiledFocused by remember {
+        mutableStateOf(false)
     }
 
     val pots = potsViewModel?.templatePots?.value ?: emptyList()
@@ -134,7 +147,7 @@ fun TransactionItem(
                             color = MaterialTheme.colors.onSurface.copy(alpha = 0.1f),
                             shape = RoundedCornerShape(30.dp)
                         )
-                        .padding(12.dp),
+                        .padding(12.dp, 4.dp, 12.dp, 4.dp),
                     horizontalArrangement = Arrangement.Absolute.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
 
@@ -146,26 +159,52 @@ fun TransactionItem(
                             contentAlignment = Alignment.BottomCenter,
                             modifier = Modifier
                                 .background(
-                                    color = if (transaction.type
-                                            ?.lowercase()
-                                            .equals("credited", true)
-                                    ) {
-                                        MaterialTheme.colors.secondary
+                                    color = if (transactionTitleFiledFocused) {
+                                        MaterialTheme.colors.primary
                                     } else {
-                                        MaterialTheme.colors.error
+                                        if (transaction.type
+                                                ?.lowercase()
+                                                .equals("credited", true)
+                                        ) {
+                                            MaterialTheme.colors.secondary
+                                        } else {
+                                            MaterialTheme.colors.error
+                                        }
                                     }, CircleShape
                                 )
                                 .padding(8.dp)
+                                .clickable {
+                                    if (transactionTitleFiledFocused && transactionTitle.isNotBlank()) {
+                                        updateTransactionViewModel.onEvent(
+                                            UpdateTransactionEvent.PickTransaction(
+                                                transaction
+                                            )
+                                        )
+                                        updateTransactionViewModel.onEvent(
+                                            UpdateTransactionEvent.EnteredTitle(
+                                                transactionTitle
+                                            )
+                                        )
+                                        updateTransactionViewModel.onEvent(
+                                            UpdateTransactionEvent.UpdateTransactionTitle
+                                        )
+                                        transactionTitleFiledFocused = false
+                                    }
+                                }
                         ) {
                             Image(
-                                painter = painterResource(id = IconDictionary.allIcons["outGoingArrow"]!!),
+                                painter = if (transactionTitleFiledFocused) {
+                                    painterResource(R.drawable.baseline_done_24)
+                                } else {
+                                    painterResource(id = IconDictionary.allIcons["outGoingArrow"]!!)
+                                },
                                 contentDescription = "outGoingArrow",
                                 modifier = Modifier
                                     .size(20.dp)
                                     .rotate(
                                         degrees = if (transaction.type
                                                 ?.lowercase()
-                                                .equals("credited", true)
+                                                .equals("credited", true) && !transactionTitleFiledFocused
                                         ) {
                                             180f
                                         } else {
@@ -186,7 +225,52 @@ fun TransactionItem(
                                 color = MaterialTheme.colors.onBackground,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
-                            )
+                            ) else {
+//                                TextField(
+//                                    value = "Give title",
+//                                    onValueChange = { amount ->
+//                                        // Ensure that the input is numeric
+////                                        if (amount.all { it.isDigit() }) {
+////                                            viewModel.onEvent(
+////                                                AddTransactionEvent.EnteredAmount(
+////                                                    amount
+////                                                )
+////                                            )
+////                                        }
+//                                    },
+//                                    textStyle = MaterialTheme.typography.h6.copy(
+//                                        color = MaterialTheme.colors.onSurface
+//                                    ),
+//                                    label = { Text(text = "How much?") },
+//                                    placeholder = { Text(text = "Enter Transaction Amount") },
+//                                )
+                                Row {
+                                    BasicTextField(value = transactionTitle,
+                                        onValueChange = {
+                                            transactionTitle = it
+                                            transactionTitleFiledFocused = it.isNotBlank()
+                                        },
+                                        maxLines = 3,
+                                        textStyle = MaterialTheme.typography.h6.copy(
+                                            color = if (transactionTitleFiledFocused) MaterialTheme.colors.onSurface.copy(
+                                                1f
+                                            ) else MaterialTheme.colors.onSurface.copy(0.4f)
+                                        ),
+                                        singleLine = true,
+                                        modifier = Modifier
+                                            .onFocusChanged {
+                                                if (transactionTitle.isEmpty()) {
+                                                    transactionTitle =
+                                                        "Give title";
+                                                    transactionTitleFiledFocused = false
+                                                }
+                                            }
+                                            .onFocusEvent {
+
+                                            }
+                                    )
+                                }
+                            }
                             Text(
                                 text = if (transaction.type?.lowercase().equals("credited", true)) {
                                     "+" + transaction.amount.toString()
@@ -262,7 +346,7 @@ fun TransactionItem(
                                                         contentDescription = "Pot",
                                                         colorFilter = ColorFilter.tint(
                                                             MaterialTheme.colors.primary.copy(
-                                                                alpha = 0.5f
+                                                                alpha = 0.7f
                                                             )
                                                         )
 
