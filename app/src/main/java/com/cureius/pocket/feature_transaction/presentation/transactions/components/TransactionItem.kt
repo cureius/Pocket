@@ -21,12 +21,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,7 +65,7 @@ fun TransactionItem(
     cornerRadius: Dp = 50.dp,
     cutCornerSize: Dp = 0.dp,
     showDate: Boolean = true,
-    potsViewModel: PotsViewModel = hiltViewModel(),
+    potsViewModel: PotsViewModel? = hiltViewModel(),
     updateTransactionViewModel: UpdateTransactionViewModel = hiltViewModel(),
     onDeleteClick: () -> Unit,
 ) {
@@ -82,8 +78,12 @@ fun TransactionItem(
         )
     }
 
-    val pots = potsViewModel.templatePots.value
-    Column(modifier = modifier.background(MaterialTheme.colors.background, RoundedCornerShape(30.dp))) {
+    val pots = potsViewModel?.templatePots?.value ?: emptyList()
+    Column(
+        modifier = modifier.background(
+            MaterialTheme.colors.background, RoundedCornerShape(30.dp)
+        )
+    ) {
         transaction.date?.let {
             if (showDate) {
                 Text(
@@ -172,8 +172,7 @@ fun TransactionItem(
                                             0f
                                         }
                                     ),
-                                colorFilter =
-                                ColorFilter.tint(
+                                colorFilter = ColorFilter.tint(
                                     MaterialTheme.colors.surface
                                 )
 
@@ -181,14 +180,13 @@ fun TransactionItem(
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         Column {
-                            if (transaction.title != null)
-                                Text(
-                                    text = transaction.title.toString(),
-                                    style = MaterialTheme.typography.h6,
-                                    color = MaterialTheme.colors.onBackground,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
+                            if (transaction.title != null) Text(
+                                text = transaction.title.toString(),
+                                style = MaterialTheme.typography.h6,
+                                color = MaterialTheme.colors.onBackground,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
                             Text(
                                 text = if (transaction.type?.lowercase().equals("credited", true)) {
                                     "+" + transaction.amount.toString()
@@ -208,46 +206,96 @@ fun TransactionItem(
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    transaction.body.let {
-                        if (it != null) {
-                            if (it.isNotEmpty()) {
-                                Text(
-                                    text = transaction.body.toString().split(" ")
-                                        .joinToString(" ") { it.capitalize() },
-                                    style = MaterialTheme.typography.body2,
-                                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis,
-                                    modifier = Modifier.fillMaxWidth(0.75f)
-                                )
+//                    transaction.body.let {
+//                        if (it != null) {
+//                            if (it.isNotEmpty()) {
+//                                Text(
+//                                    text = transaction.body.toString().split(" ")
+//                                        .joinToString(" ") { it.capitalize() },
+//                                    style = MaterialTheme.typography.body2,
+//                                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
+//                                    maxLines = 2,
+//                                    overflow = TextOverflow.Ellipsis,
+//                                    modifier = Modifier.fillMaxWidth(0.75f)
+//                                )
+//                            }
+//                        }
+//                    }
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+
+                    ) {
+                        if (transaction.pot != null) transaction.pot.let {
+                            Box(
+                                contentAlignment = Alignment.BottomCenter,
+                                modifier = Modifier
+                                    .background(
+                                        MaterialTheme.colors.secondary.copy(0.05f),
+                                        RoundedCornerShape(14.dp)
+                                    )
+                                    .size(40.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxHeight()
+                                ) {
+                                    Row {
+                                        Column(
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.Bottom
+                                        ) {
+                                            Box(
+                                                contentAlignment = Alignment.BottomCenter,
+                                                modifier = Modifier.padding(8.dp)
+                                            ) {
+                                                if (IconDictionary.allIcons[pots.find { pot ->
+                                                        it.equals(
+                                                            pot.title, true
+                                                        )
+                                                    }?.icon] != null) {
+                                                    Image(
+                                                        painter = painterResource(id = IconDictionary.allIcons[pots.find { pot ->
+                                                            it.equals(
+                                                                pot.title, true
+                                                            )
+                                                        }?.icon]!!),
+                                                        contentDescription = "Pot",
+                                                        colorFilter = ColorFilter.tint(
+                                                            MaterialTheme.colors.primary.copy(
+                                                                alpha = 0.5f
+                                                            )
+                                                        )
+
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                    transaction.event_timestamp?.let {
-                        val instant = Instant.ofEpochMilli(it)
-                        val localDateTime = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
-                        val localTime = localDateTime.toLocalTime()
-                        val formatter = DateTimeFormatter.ofPattern("HH:mm")
-                        val formattedTime = localTime.format(formatter)
-                        Row {
-                            Text(
-                                text = formattedTime,
-                                style = TextStyle(
-                                    fontWeight = FontWeight.Light,
-                                    fontSize = 14.sp
-                                ),
-                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        transaction.event_timestamp?.let {
+                            val instant = Instant.ofEpochMilli(it)
+                            val localDateTime = LocalDateTime.ofInstant(instant, ZoneOffset.UTC)
+                            val localTime = localDateTime.toLocalTime()
+                            val formatter = DateTimeFormatter.ofPattern("HH:mm")
+                            val formattedTime = localTime.format(formatter)
+                            Row {
+                                Text(
+                                    text = formattedTime, style = TextStyle(
+                                        fontWeight = FontWeight.Light, fontSize = 14.sp
+                                    ), color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
                         }
+                        Spacer(modifier = Modifier.width(8.dp))
                     }
                 }
 
                 if (transaction.type.equals(
-                        "debited",
-                        ignoreCase = true
+                        "debited", ignoreCase = true
                     ) && transaction.pot.isNullOrBlank() && pots.isNotEmpty()
                 ) {
                     Column {
@@ -274,7 +322,6 @@ fun TransactionItem(
                                 Box(
                                     modifier = Modifier
                                         .clickable(onClick = {
-
                                             if (selectedPot.value == item) {
                                                 selectedPot.value = null
                                                 updateTransactionViewModel.onEvent(
@@ -312,8 +359,7 @@ fun TransactionItem(
                                     ) {
                                         Row {
                                             Column(
-                                                modifier = Modifier
-                                                    .width(60.dp),
+                                                modifier = Modifier.width(60.dp),
                                                 horizontalAlignment = Alignment.CenterHorizontally,
                                                 verticalArrangement = Arrangement.Bottom
                                             ) {
@@ -326,8 +372,7 @@ fun TransactionItem(
                                                             painter = painterResource(id = IconDictionary.allIcons[item.icon]!!),
                                                             contentDescription = item.title,
                                                             modifier = Modifier.size(40.dp),
-                                                            colorFilter =
-                                                            ColorFilter.tint(
+                                                            colorFilter = ColorFilter.tint(
                                                                 MaterialTheme.colors.primary.copy(
                                                                     alpha = 0.5f
                                                                 )
@@ -339,13 +384,11 @@ fun TransactionItem(
                                             }
                                             if (selectedPot.value == item) {
                                                 Column(
-                                                    modifier = Modifier
-                                                        .width(60.dp),
+                                                    modifier = Modifier.width(60.dp),
                                                     horizontalAlignment = Alignment.CenterHorizontally,
                                                     verticalArrangement = Arrangement.Bottom
                                                 ) {
-                                                    Box(
-                                                        contentAlignment = Alignment.BottomCenter,
+                                                    Box(contentAlignment = Alignment.BottomCenter,
                                                         modifier = Modifier
                                                             .padding(8.dp)
                                                             .background(
@@ -367,14 +410,14 @@ fun TransactionItem(
                                                                 updateTransactionViewModel.onEvent(
                                                                     UpdateTransactionEvent.UpdateTransaction
                                                                 )
-                                                            }
-                                                    ) {
+                                                            }) {
                                                         Image(
                                                             painter = painterResource(R.drawable.add),
                                                             contentDescription = item.title,
                                                             modifier = Modifier.size(40.dp),
-                                                            colorFilter =
-                                                            ColorFilter.tint(MaterialTheme.colors.onBackground)
+                                                            colorFilter = ColorFilter.tint(
+                                                                MaterialTheme.colors.onBackground
+                                                            )
 
                                                         )
 
@@ -421,8 +464,7 @@ fun IncomeTransactionItemPreview() {
             body = "This is a transaction",
             color = Color.White.toArgb(),
             timestamp = System.currentTimeMillis()
-        ),
-        modifier = Modifier
+        ), modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {}
@@ -441,8 +483,7 @@ fun SpendingTransactionItemPreview() {
             color = Color.White.toArgb(),
             timestamp = System.currentTimeMillis(),
             date = LocalDate.now().toEpochDay()
-        ),
-        modifier = Modifier
+        ), modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
     ) {}
