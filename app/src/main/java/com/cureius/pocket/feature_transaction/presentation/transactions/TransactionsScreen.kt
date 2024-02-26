@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +49,7 @@ import com.cureius.pocket.feature_transaction.presentation.util.components.Permi
 import com.cureius.pocket.feature_transaction.presentation.util.components.PhoneCallPermissionTextProvider
 import com.cureius.pocket.feature_transaction.presentation.util.components.RecordAudioPermissionTextProvider
 import com.cureius.pocket.util.components.MonthPicker
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Calendar
@@ -181,6 +183,7 @@ fun TransactionsScreen(
                     itemsIndexed(
                         if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts else state.transactionsForAccounts,
                         key = { index, transaction -> transaction.id!! }) { index, transaction ->
+                        var result: SnackbarResult? = null
                         SwipeToDeleteContainer(
                             item = transaction,
                             onDelete = {
@@ -190,14 +193,20 @@ fun TransactionsScreen(
                                     )
                                 )
                                 scope.launch {
-                                    val result = snackbarHostState.showSnackbar(
+                                    result = snackbarHostState.showSnackbar(
                                         message = "Transaction Deleted..!", actionLabel = "Undo"
                                     )
                                     if (result == SnackbarResult.ActionPerformed) {
                                         viewModel.onEvent(TransactionsEvent.RestoreTransaction)
                                     }
                                 }
-                            }
+                            },
+                            onUndo = {
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    viewModel.onEvent(TransactionsEvent.RestoreTransaction)
+                                }
+                            },
+                            coroutineScope = scope
                         ) { transaction ->
                             TransactionItem(transaction = transaction, modifier = Modifier
                                 .fillMaxWidth()
@@ -324,6 +333,9 @@ fun TransactionsScreenPreview() {
 fun <T> SwipeToDeleteContainer(
     item: T,
     onDelete: (T) -> Unit,
+    onUndo: () -> Unit,
+    isRetrieveRequested: Boolean = false,
+    coroutineScope: CoroutineScope = rememberCoroutineScope(),
     animationDuration: Int = 500,
     content: @Composable (T) -> Unit
 ) {
@@ -340,36 +352,41 @@ fun <T> SwipeToDeleteContainer(
             }
         }
     )
-
-    LaunchedEffect(key1 = isRemoved) {
-        if (isRemoved) {
-            delay(animationDuration.toLong())
-            onDelete(item)
-        }
-    }
-
-    AnimatedVisibility(
-        visible = !isRemoved,
-        exit = shrinkVertically(
-            animationSpec = tween(durationMillis = animationDuration),
-            shrinkTowards = Alignment.Top
-        ) + fadeOut()
-    ) {
+//
+//    LaunchedEffect(key1 = isRemoved) {
+//        if (isRemoved) {
+//            delay(animationDuration.toLong())
+//            onDelete(item)
+//        }
+//    }
+//
+//    AnimatedVisibility(
+//        visible = !isRemoved,
+//        exit = shrinkVertically(
+//            animationSpec = tween(durationMillis = animationDuration),
+//            shrinkTowards = Alignment.Top
+//        ) + fadeOut()
+//    ) {
         SwipeToDismiss(
             state = state,
             background = {
-                DeleteBackground(swipeDismissState = state)
+                DeleteBackground(swipeDismissState = state, onDismiss = {
+                    onDelete(item)
+                }, onUndo = onUndo, scope = coroutineScope)
             },
             dismissContent = { content(item) },
             directions = setOf(DismissDirection.EndToStart)
         )
-    }
+//    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DeleteBackground(
-    swipeDismissState: DismissState
+    swipeDismissState: DismissState,
+    scope: CoroutineScope = rememberCoroutineScope(),
+    onDismiss: () -> Unit = {},
+    onUndo: () -> Unit = {},
 ) {
     val color = if (swipeDismissState.dismissDirection == DismissDirection.EndToStart) {
         Color.Red
@@ -380,12 +397,16 @@ fun DeleteBackground(
             .fillMaxSize()
             .background(color, RoundedCornerShape(30.dp))
             .padding(16.dp),
-        contentAlignment = Alignment.CenterEnd
+        contentAlignment = Alignment.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.Delete,
-            contentDescription = null,
-            tint = Color.White
-        )
+        Row {
+            IconButton(onClick = { scope.launch { swipeDismissState.reset() } }) {
+                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+            }
+            if (swipeDismissState.targetValue == DismissValue.DismissedToStart)
+                IconButton(onClick = { onDismiss() }) {
+                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                }
+        }
     }
 }
