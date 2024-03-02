@@ -10,6 +10,7 @@ import com.cureius.pocket.feature_account.presentation.account.AccountsScreen
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashboardScreen
 import com.cureius.pocket.feature_pot.presentation.configure_pots.ConfigurePotsScreen
 import com.cureius.pocket.feature_pot.presentation.pots.PotsScreen
+import com.cureius.pocket.feature_qr_scanner.presentation.widgets.QrScanner
 
 @Composable
 fun NavigationController(navController: NavHostController) {
@@ -33,6 +34,9 @@ fun NavigationController(navController: NavHostController) {
         }
         composable("configure_pots") {
             ConfigurePotsScreen()
+        }
+        composable("qr_scanner") {
+            QrScanner()
         }
     }
 }

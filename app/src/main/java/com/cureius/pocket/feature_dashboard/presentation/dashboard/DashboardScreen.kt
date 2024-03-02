@@ -260,7 +260,7 @@ fun DashboardScreen(
         ) {
             DashBoardHeader(navHostController)
             if (transactionsViewModel.state.value.transactionsOnCurrentMonthForAccounts.isNotEmpty() && accountsViewModel.state.value.isNotEmpty()) {
-                InfoSection(viewModel)
+                InfoSection(viewModel, navHostController)
             }
         }
         Box(contentAlignment = Alignment.TopCenter) {
