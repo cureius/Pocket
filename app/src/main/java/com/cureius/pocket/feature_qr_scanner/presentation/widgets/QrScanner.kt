@@ -48,20 +48,6 @@ fun QrScanner() {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
-
-            val cameraPermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
-
-            Button(
-                onClick = {
-                    cameraPermissionState.launchPermissionRequest()
-                }
-            ) {
-                Text(text = "Camera Permission")
-            }
-
-            Spacer(modifier = Modifier.height(10.dp))
-
             CameraPreview()
         }
     }

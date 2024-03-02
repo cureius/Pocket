@@ -1,7 +1,7 @@
 package com.cureius.pocket.feature_dashboard.presentation.dashboard.components
 
+import android.Manifest
 import android.util.Log
-import android.widget.ImageButton
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -45,6 +45,8 @@ import com.cureius.pocket.R
 import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashBoardViewModel
 import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberPermissionState
 import java.text.DecimalFormat
 
 
@@ -78,6 +80,8 @@ fun formatBalance(balance: Double): String {
         }
     }
 }
+
+@OptIn(ExperimentalPermissionsApi::class)
 @Preview
 @Composable
 fun InfoSection(
@@ -103,6 +107,7 @@ fun InfoSection(
 
     var totalBalance = 0.0;
     var totalBalanceStr = "0.0";
+    val cameraPermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
     for (account in accountsViewModel.state.value) {
         val transaction = transactionsViewModel.state.value.transactionsForAccounts.filter {
             it.account?.contains(
@@ -326,6 +331,7 @@ fun InfoSection(
                         val pngImage: Painter = painterResource(id = R.drawable.sc2)
                         IconButton(
                             onClick = {
+                                cameraPermissionState.launchPermissionRequest()
                                 navHostController.navigate("qr_scanner")
                             }
                         ) {
