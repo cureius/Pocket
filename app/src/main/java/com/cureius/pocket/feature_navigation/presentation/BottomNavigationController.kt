@@ -34,5 +34,5 @@ fun BottomNavigationController(navController: NavHostController, bottomNavHostCo
         composable("accounts") {
             AccountsScreen()
         }
-        }
     }
+}
