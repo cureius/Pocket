@@ -173,7 +173,8 @@ fun TransactionsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 if (state != null) {
-                    itemsIndexed(if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts.filter { it.kind != "calibration" } else state.transactionsForAccounts.filter { it.kind != "calibration" },
+                    val transactionsToShow = if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts.filter { it.kind != "calibration" } else state.transactionsForAccounts.filter { it.kind != "calibration" }
+                    itemsIndexed(transactionsToShow,
                         key = { _, transaction -> transaction.id!! }) { index, transaction ->
                         var result: SnackbarResult? = null
                         SwipeToDeleteContainer(item = transaction, onDelete = {
@@ -218,7 +219,7 @@ fun TransactionsScreen(
                                     }
                                 },
                                 showDate = if (index == 0) true else {
-                                    if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts[index - 1].date != transaction.date else state.transactionsForAccounts[index - 1].date != transaction.date
+                                    transactionsToShow[index - 1].date != transaction.date
                                 }
                             )
                         }
