@@ -34,14 +34,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.cureius.pocket.feature_pot.presentation.configure_pots.components.ConfigurablePotItem
 import kotlin.math.roundToInt
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-@RequiresApi(Build.VERSION_CODES.N)
-@Preview
 @Composable
-fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
+fun ConfigurePotsScreen(navController:NavHostController, viewModel: ConfigurePotsViewModel = hiltViewModel()) {
     val income = viewModel.income.value
     val nodeList = viewModel.nodes.value
     val potTemplateList = viewModel.state.value
@@ -54,6 +53,7 @@ fun ConfigurePotsScreen(viewModel: ConfigurePotsViewModel = hiltViewModel()) {
                     viewModel.onEvent(
                         ConfigurePotsEvent.SaveConfiguration
                     )
+                    navController.popBackStack()
                 },
                 modifier = Modifier
                     .fillMaxWidth()

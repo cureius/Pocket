@@ -33,7 +33,7 @@ fun NavigationController(navController: NavHostController) {
             AccountsScreen()
         }
         composable("configure_pots") {
-            ConfigurePotsScreen()
+            ConfigurePotsScreen(navController)
         }
         composable("qr_scanner") {
             QrScanner(navController)
