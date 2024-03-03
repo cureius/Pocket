@@ -52,6 +52,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_account.domain.model.Bank
+import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
 import com.cureius.pocket.feature_account.presentation.add_account.components.OutlineTextBox
 import com.cureius.pocket.feature_account.presentation.add_account.components.SeparatedNumberField
 import kotlinx.coroutines.flow.collectLatest
@@ -59,7 +60,11 @@ import kotlinx.coroutines.flow.collectLatest
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AddAccountFormDialog(
-    onDismiss: () -> Unit, onSubmit: () -> Unit, viewModel: AddAccountViewModel = hiltViewModel()
+    onDismiss: () -> Unit,
+    onSubmit: () -> Unit,
+    accountsViewModel: AccountsViewModel = hiltViewModel(),
+    viewModel: AddAccountViewModel = hiltViewModel(),
+    isOneAccountAlreadyPresent: Boolean
 ) {
     val context = LocalContext.current
     val holderName = viewModel.accountHolderName.value
@@ -108,285 +113,365 @@ fun AddAccountFormDialog(
             }
         }
     }
-
-    Dialog(
-        onDismissRequest = {
-            onDismiss()
-        }, properties = DialogProperties(
-            usePlatformDefaultWidth = true
-        )
-    ) {
-        Card(
-            elevation = 8.dp,
-            shape = RoundedCornerShape(15.dp),
+    if (isOneAccountAlreadyPresent) {
+        Dialog(
+            onDismissRequest = {
+                onDismiss()
+            }, properties = DialogProperties(
+                usePlatformDefaultWidth = true
+            )
         ) {
-            Box(
-                modifier = Modifier
-                    .background(mixedColor)
-                    .padding(16.dp)
+            Card(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(15.dp),
             ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxWidth(),
+                Box(
+                    modifier = Modifier
+                        .background(mixedColor)
+                        .padding(16.dp)
                 ) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
 
-                    item {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            val checkedState = remember { mutableStateOf(false) }
+                        item {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "Accounts",
+                                    color = MaterialTheme.colors.onBackground,
+                                    textAlign = TextAlign.Center,
+                                    style = TextStyle(fontWeight = FontWeight.Bold),
+                                    fontSize = 20.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(4.dp, 0.dp)
+                                )
+                            }
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+                        item {
                             Text(
-                                text = "Add Account",
-                                color = MaterialTheme.colors.onBackground,
-                                textAlign = TextAlign.Center,
-                                style = TextStyle(fontWeight = FontWeight.Bold),
-                                fontSize = 20.sp,
-                                maxLines = 1,
+                                text = "Currently we support single account tracking so you can only add one account",
+                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                                textAlign = TextAlign.Start,
+                                style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                fontSize = 12.sp,
+                                maxLines = 3,
                                 overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.padding(4.dp, 0.dp)
+                                modifier = Modifier
+                                    .padding(4.dp, 0.dp)
+                                    .fillMaxWidth()
                             )
-                            Box() {
-                                Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Button(
+                                    onClick = {
+                                        onDismiss()
+                                    },
+                                    modifier = Modifier.padding(8.dp),
+                                    shape = RoundedCornerShape(20.dp)
                                 ) {
-                                    Text(
-                                        text = "Primary",
-                                        color = MaterialTheme.colors.onBackground,
-                                        textAlign = TextAlign.Center,
-                                        style = TextStyle(fontWeight = FontWeight.Bold),
-                                        fontSize = 12.sp,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.padding(0.dp, 0.dp)
-                                    )
-                                    Switch(checked = viewModel.isPrimaryAccount.value,
-                                        onCheckedChange = {
-                                            viewModel.onEvent(AddAccountEvent.ToggleIsPrimaryAccount)
-                                        }
-                                    )
+                                    Text(text = "Ok")
                                 }
                             }
                         }
                     }
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
-                        ) {
-                            TextField(
-                                value = holderName,
-                                onValueChange = { newText ->
-                                    viewModel.onEvent(AddAccountEvent.EnteredHolderName(newText))
-                                },
-                                label = { Text(text = "Holder Name") },
-                                placeholder = { Text(text = "Enter Account Holders Name") },
-                            )
-                        }
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
-                    item {
-                        Text(
-                            text = "Choose Bank",
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-                            textAlign = TextAlign.Start,
-                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(4.dp, 0.dp)
-                                .fillMaxWidth()
-                        )
-                    }
-                    item {
-                        LazyRow(
-                            modifier = Modifier.height(80.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            items(banks) { item ->
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .clickable(onClick = {
-                                            viewModel.onEvent(AddAccountEvent.SelectedBank(item))
-                                        })
-                                        .width(60.dp)
-                                        .height(76.dp)
-                                        .background(
-                                            color = if (selectedBank == item) {
-                                                MaterialTheme.colors.primary.copy(alpha = 0.5f)
-                                            } else {
-                                                MaterialTheme.colors.surface
-                                            }, potShape
-                                        ),
-                                ) {
-                                    Column(
-                                        modifier = Modifier.fillMaxHeight(),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        verticalArrangement = Arrangement.Bottom
-                                    ) {
-                                        Box(
-                                            contentAlignment = Alignment.BottomCenter,
-                                            modifier = Modifier
-                                                .background(
-                                                    Color.Green.copy(alpha = 0.1f), CircleShape
-                                                )
-                                                .padding(8.dp)
-                                        ) {
-                                            Image(
-                                                painter = item.icon!!,
-                                                contentDescription = item.name,
-                                                modifier = Modifier.size(20.dp),
-                                            )
+                }
+            }
+        }
+    } else {
+        Dialog(
+            onDismissRequest = {
+                onDismiss()
+            }, properties = DialogProperties(
+                usePlatformDefaultWidth = true
+            )
+        ) {
+            Card(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(15.dp),
+            ) {
+                Box(
+                    modifier = Modifier
+                        .background(mixedColor)
+                        .padding(16.dp)
+                ) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
 
-                                        }
+                        item {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                val checkedState = remember { mutableStateOf(false) }
+                                Text(
+                                    text = "Add Account",
+                                    color = MaterialTheme.colors.onBackground,
+                                    textAlign = TextAlign.Center,
+                                    style = TextStyle(fontWeight = FontWeight.Bold),
+                                    fontSize = 20.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                    modifier = Modifier.padding(4.dp, 0.dp)
+                                )
+                                Box() {
+                                    Column(
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
                                         Text(
-                                            text = item.name!!,
-                                            color = MaterialTheme.colors.onSurface,
+                                            text = "Primary",
+                                            color = MaterialTheme.colors.onBackground,
                                             textAlign = TextAlign.Center,
                                             style = TextStyle(fontWeight = FontWeight.Bold),
                                             fontSize = 12.sp,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(4.dp, 8.dp)
+                                            modifier = Modifier.padding(0.dp, 0.dp)
+                                        )
+                                        Switch(checked = viewModel.isPrimaryAccount.value,
+                                            onCheckedChange = {
+                                                viewModel.onEvent(AddAccountEvent.ToggleIsPrimaryAccount)
+                                            }
                                         )
                                     }
                                 }
-                                Spacer(modifier = Modifier.width(6.dp))
                             }
                         }
-
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-                    item {
-                        Divider()
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(14.dp))
-                    }
-                    item {
-                        Text(
-                            text = "Last 3 Digit Of Account Number",
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-                            textAlign = TextAlign.End,
-                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(4.dp, 0.dp)
-                                .fillMaxWidth()
-                        )
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End,
-                        ) {
-                            OutlineTextBox("....XXXXXXXXXXX")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            SeparatedNumberField(
-                                digitText = accountNumber,
-                                digitCount = 3,
-                                onNumberChange = { value, _ ->
-                                    viewModel.onEvent(AddAccountEvent.EnteredAccountNumber(value))
-                                },
-                            )
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
                         }
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
-                    item {
-                        Text(
-                            text = "Last 4 Digit Of Card Number",
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-                            textAlign = TextAlign.End,
-                            style = TextStyle(fontWeight = FontWeight.SemiBold),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(4.dp, 0.dp)
-                                .fillMaxWidth()
-                        )
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                    }
-                    item {
-                        Row(
-                            horizontalArrangement = Arrangement.End,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            OutlineTextBox("....XXXX-XXXX")
-                            Spacer(modifier = Modifier.width(8.dp))
-                            SeparatedNumberField(
-                                digitText = cardNumber,
-                                digitCount = 4,
-                                onNumberChange = { value, _ ->
-                                    viewModel.onEvent(AddAccountEvent.EnteredCardNumber(value))
-                                },
-                            )
-                        }
-                    }
-                    item {
-                        Spacer(modifier = Modifier.height(10.dp))
-                    }
-                    item {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
-                            // Rounded Button
-                            OutlinedButton(
-                                onClick = { onDismiss() },
-                                border = BorderStroke(1.dp, MaterialTheme.colors.onBackground),
-                                modifier = Modifier.padding(8.dp),
-                                shape = RoundedCornerShape(20.dp)
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Text(text = "Cancel")
+                                TextField(
+                                    value = holderName,
+                                    onValueChange = { newText ->
+                                        viewModel.onEvent(AddAccountEvent.EnteredHolderName(newText))
+                                    },
+                                    label = { Text(text = "Holder Name") },
+                                    placeholder = { Text(text = "Enter Account Holders Name") },
+                                )
                             }
-                            Button(
-                                onClick = {
-                                    viewModel.onEvent(
-                                        AddAccountEvent.SaveAccount
-                                    )
-                                    viewModel.onEvent(
-                                        AddAccountEvent.EnteredHolderName("")
-                                    )
-                                    viewModel.onEvent(
-                                        AddAccountEvent.EnteredAccountNumber("")
-                                    )
-                                    viewModel.onEvent(
-                                        AddAccountEvent.EnteredCardNumber("")
-                                    )
-                                    viewModel.onEvent(
-                                        AddAccountEvent.SelectedBank(Bank(null, null))
-                                    )
-                                    onSubmit()
-                                },
-                                modifier = Modifier.padding(8.dp),
-                                shape = RoundedCornerShape(20.dp)
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
+                        }
+                        item {
+                            Text(
+                                text = "Choose Bank",
+                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                                textAlign = TextAlign.Start,
+                                style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                fontSize = 12.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .padding(4.dp, 0.dp)
+                                    .fillMaxWidth()
+                            )
+                        }
+                        item {
+                            LazyRow(
+                                modifier = Modifier.height(80.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = "Confirm")
+                                items(banks) { item ->
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .clickable(onClick = {
+                                                viewModel.onEvent(AddAccountEvent.SelectedBank(item))
+                                            })
+                                            .width(60.dp)
+                                            .height(76.dp)
+                                            .background(
+                                                color = if (selectedBank == item) {
+                                                    MaterialTheme.colors.primary.copy(alpha = 0.5f)
+                                                } else {
+                                                    MaterialTheme.colors.surface
+                                                }, potShape
+                                            ),
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.fillMaxHeight(),
+                                            horizontalAlignment = Alignment.CenterHorizontally,
+                                            verticalArrangement = Arrangement.Bottom
+                                        ) {
+                                            Box(
+                                                contentAlignment = Alignment.BottomCenter,
+                                                modifier = Modifier
+                                                    .background(
+                                                        Color.Green.copy(alpha = 0.1f), CircleShape
+                                                    )
+                                                    .padding(8.dp)
+                                            ) {
+                                                Image(
+                                                    painter = item.icon!!,
+                                                    contentDescription = item.name,
+                                                    modifier = Modifier.size(20.dp),
+                                                )
+
+                                            }
+                                            Text(
+                                                text = item.name!!,
+                                                color = MaterialTheme.colors.onSurface,
+                                                textAlign = TextAlign.Center,
+                                                style = TextStyle(fontWeight = FontWeight.Bold),
+                                                fontSize = 12.sp,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(4.dp, 8.dp)
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                }
+                            }
+
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+                        item {
+                            Divider()
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(14.dp))
+                        }
+                        item {
+                            Text(
+                                text = "Last 3 Digit Of Account Number",
+                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                                textAlign = TextAlign.End,
+                                style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                fontSize = 12.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .padding(4.dp, 0.dp)
+                                    .fillMaxWidth()
+                            )
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End,
+                            ) {
+                                OutlineTextBox("....XXXXXXXXXXX")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                SeparatedNumberField(
+                                    digitText = accountNumber,
+                                    digitCount = 3,
+                                    onNumberChange = { value, _ ->
+                                        viewModel.onEvent(AddAccountEvent.EnteredAccountNumber(value))
+                                    },
+                                )
+                            }
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(20.dp))
+                        }
+                        item {
+                            Text(
+                                text = "Last 4 Digit Of Card Number",
+                                color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+                                textAlign = TextAlign.End,
+                                style = TextStyle(fontWeight = FontWeight.SemiBold),
+                                fontSize = 12.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier
+                                    .padding(4.dp, 0.dp)
+                                    .fillMaxWidth()
+                            )
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                        }
+                        item {
+                            Row(
+                                horizontalArrangement = Arrangement.End,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                OutlineTextBox("....XXXX-XXXX")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                SeparatedNumberField(
+                                    digitText = cardNumber,
+                                    digitCount = 4,
+                                    onNumberChange = { value, _ ->
+                                        viewModel.onEvent(AddAccountEvent.EnteredCardNumber(value))
+                                    },
+                                )
+                            }
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+                        item {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                // Rounded Button
+                                OutlinedButton(
+                                    onClick = { onDismiss() },
+                                    border = BorderStroke(1.dp, MaterialTheme.colors.onBackground),
+                                    modifier = Modifier.padding(8.dp),
+                                    shape = RoundedCornerShape(20.dp)
+                                ) {
+                                    Text(text = "Cancel")
+                                }
+                                Button(
+                                    onClick = {
+                                        viewModel.onEvent(
+                                            AddAccountEvent.SaveAccount
+                                        )
+                                        viewModel.onEvent(
+                                            AddAccountEvent.EnteredHolderName("")
+                                        )
+                                        viewModel.onEvent(
+                                            AddAccountEvent.EnteredAccountNumber("")
+                                        )
+                                        viewModel.onEvent(
+                                            AddAccountEvent.EnteredCardNumber("")
+                                        )
+                                        viewModel.onEvent(
+                                            AddAccountEvent.SelectedBank(Bank(null, null))
+                                        )
+                                        onSubmit()
+                                    },
+                                    modifier = Modifier.padding(8.dp),
+                                    shape = RoundedCornerShape(20.dp)
+                                ) {
+                                    Text(text = "Confirm")
+                                }
                             }
                         }
                     }

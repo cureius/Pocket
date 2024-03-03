@@ -1,9 +1,5 @@
 package com.cureius.pocket.feature_qr_scanner.presentation.widgets
 
-import android.graphics.ImageFormat
-import com.google.zxing.*
-import com.google.zxing.common.HybridBinarizer
-import java.nio.ByteBuffer
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.camera.core.ImageAnalysis

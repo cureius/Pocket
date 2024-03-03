@@ -27,6 +27,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountFormDialog
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountViewModel
@@ -49,7 +50,8 @@ fun BottomNavigationContainer(
     navController: NavHostController,
     addPotViewModel: AddPotViewModel = hiltViewModel(),
     addAccountViewModel: AddAccountViewModel = hiltViewModel(),
-    addTransactionViewModel: AddTransactionViewModel = hiltViewModel()
+    addTransactionViewModel: AddTransactionViewModel = hiltViewModel(),
+    accountsViewModel: AccountsViewModel = hiltViewModel(),
 ) {
     // A surface container using the 'background' color from the theme
     val bottomNavController = rememberNavController()
@@ -133,9 +135,11 @@ fun BottomNavigationContainer(
             }
         },
     ) {
-        BottomNavigationController(
-            navController = navController, bottomNavHostController = bottomNavController
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            BottomNavigationController(
+                navController = navController, bottomNavHostController = bottomNavController
+            )
+        }
     }
 
     if (addAccountViewModel.dialogVisibility.value) {
@@ -143,7 +147,7 @@ fun BottomNavigationContainer(
             addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
         }, onSubmit = {
 
-        })
+        }, isOneAccountAlreadyPresent = accountsViewModel.state.value.isNotEmpty())
     }
     if (addPotViewModel.dialogVisibility.value) {
         AddPotDialog(onDismiss = {

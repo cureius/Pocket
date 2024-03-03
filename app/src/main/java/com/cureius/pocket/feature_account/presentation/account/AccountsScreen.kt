@@ -2,7 +2,6 @@ package com.cureius.pocket.feature_account.presentation.account
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -100,7 +99,7 @@ fun AccountsScreen(
                 addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
             }, onSubmit = {
 
-            })
+            }, isOneAccountAlreadyPresent = viewModel.state.value.isNotEmpty())
         }
     }
 

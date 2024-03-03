@@ -416,7 +416,7 @@ fun DashboardScreen(
                 addAccountViewModel.onEvent(AddAccountEvent.ToggleAddAccountDialog)
             }, onSubmit = {
 
-            })
+            }, isOneAccountAlreadyPresent = accountsViewModel.state.value.isNotEmpty())
         }
         if (addPotViewModel.dialogVisibility.value) {
             AddPotDialog(onDismiss = {
