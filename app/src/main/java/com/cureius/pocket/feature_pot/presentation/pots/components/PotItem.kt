@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +17,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -36,6 +36,7 @@ import com.cureius.pocket.feature_transaction.presentation.transactions.Transact
 @Composable
 fun PotItem(
     pot: Pot,
+    isMonthFormat: Boolean = false,
     transactionsViewModel: TransactionsViewModel = hiltViewModel(),
     data: MutableMap<String, Float>? = mutableMapOf(
         Pair("MONDAY", 0.0f),
@@ -217,13 +218,59 @@ fun PotItem(
                         Box(
                             modifier = Modifier.background(Color.Yellow.copy(alpha = 0.0f))
                         ) {
-                            if (updatedData != null && maxValue != 0.0f) {
-                                Chart(
-                                    data = updatedData!!,
-                                    maxValue = maxValue.toDouble(),
+//                            if (updatedData != null && maxValue != 0.0f) {
+//                                Chart(
+//                                    data = updatedData!!,
+//                                    maxValue = maxValue.toDouble(),
+//                                    modifier = Modifier
+//                                        .fillMaxSize()
+//                                        .offset(y = (8).dp)
+//                                )
+//                            }
+                            val data = listOf(
+                                Pair(1, 0.45),
+                                Pair(2, 0.0),
+                                Pair(3, 10000.45),
+                                Pair(4, 112.25),
+                                Pair(5, 116.45),
+                                Pair(6, 113.35),
+                                Pair(7, 118.65),
+                                Pair(8, 110.15),
+                                Pair(9, 113.05),
+                                Pair(10, 114.25),
+                                Pair(11, 0.35),
+                                Pair(12, 117.45),
+                                Pair(13, 112.65),
+                                Pair(14, 115.45),
+                                Pair(15, 20000.00),
+                                Pair(16, 111.45),
+                                Pair(17, 111.0),
+                                Pair(18, 0.45),
+                                Pair(19, 112.25),
+                                Pair(20, 116.45),
+                                Pair(21, 113.35),
+                                Pair(22, 0.65),
+                                Pair(23, 110.15),
+                                Pair(24, 113.05),
+                                Pair(25, 50501.00),
+                                Pair(26, 116.35),
+                                Pair(27, 117.45),
+                                Pair(28, 112.65),
+                                Pair(29, 115.45),
+                                Pair(30, 111.85),
+                                Pair(31, 0.45),
+                            )
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                            ) {
+                                QuadChart(
+                                    data = data,
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .offset(y = (8).dp)
+                                        .fillMaxWidth()
+                                        .height(300.dp)
+                                        .background(Color.Transparent)
+                                        .align(CenterHorizontally)
                                 )
                             }
                         }

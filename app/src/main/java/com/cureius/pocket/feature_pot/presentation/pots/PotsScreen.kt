@@ -62,6 +62,9 @@ fun PotsScreen(
     val templatePots = viewModel.templatePots.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
+    val isMonthFormat by remember {
+        mutableStateOf(false)
+    }
 
     Scaffold() {
         LazyColumn(
@@ -120,6 +123,26 @@ fun PotsScreen(
                                 )
                                 .padding(8.dp)
                                 .clickable {
+
+                                }, contentAlignment = Alignment.Center
+                        ) {
+                            val config = ImageVector.vectorResource(id = R.drawable.edit_calendar)
+                            Icon(
+                                imageVector = config,
+                                contentDescription = "config",
+                                tint = MaterialTheme.colors.onBackground,
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = MaterialTheme.colors.primary.copy(
+                                        alpha = 0.1f
+                                    ), RoundedCornerShape(12.dp)
+                                )
+                                .padding(8.dp)
+                                .clickable {
                                     navHostController.navigate("configure_pots")
                                 }, contentAlignment = Alignment.Center
                         ) {
@@ -137,7 +160,7 @@ fun PotsScreen(
             }
             for (pot in templatePots) {
                 item {
-                    PotItem(pot)
+                    PotItem(pot, isMonthFormat)
                 }
             }
             if (templatePots.isEmpty()) {
