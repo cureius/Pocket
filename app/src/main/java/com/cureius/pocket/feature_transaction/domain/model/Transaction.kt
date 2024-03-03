@@ -10,10 +10,7 @@ import com.cureius.pocket.ui.theme.RedPink
 import com.cureius.pocket.ui.theme.Violet
 
 @Entity(
-    indices = [Index(
-        value = ["title", "type", "account", "amount", "date", "date_time", "balance", "day", "amount_string", "UPI_ref", "IMPS_ref", "card_number", "place", "bank", "body"],
-        unique = true
-    ), Index(value = ["body"], unique = true)]
+    indices = [Index(value = ["event_timestamp"], unique = true)]
 )
 data class Transaction(
     /*-------------From-SMS---------------*/
