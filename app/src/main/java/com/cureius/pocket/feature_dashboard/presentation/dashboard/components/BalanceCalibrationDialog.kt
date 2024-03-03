@@ -272,7 +272,7 @@ fun BalanceCalibrationDialog(
                                 contentAlignment = Alignment.Center
                             ) {
                                 TextField(
-                                    value = transactionBalance,
+                                    value = transactionBalance?: "",
                                     onValueChange = { amount ->
 
                                         // Ensure that the input is numeric

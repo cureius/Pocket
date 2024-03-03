@@ -79,13 +79,10 @@ class TransactionsViewModel @Inject constructor(
             .atStartOfDay(ZoneOffset.UTC)
             .toInstant()
             .toEpochMilli()
-
         getAccounts()
         getTransactions(TransactionOrder.Date(OrderType.Descending))
-//        getTransactionsForDateRange(TransactionOrder.Date(OrderType.Descending), startOfMonth, endOfMonth)
-        getTransactionsCreatedOnCurrentMonth(TransactionOrder.Date(OrderType.Descending))
-        getTransactionsCreatedOnCurrentMonthForAccounts(TransactionOrder.Date(OrderType.Descending))
         getTransactionsForAccounts(TransactionOrder.Date(OrderType.Descending))
+        getTransactionsCreatedOnCurrentMonthForAccounts(TransactionOrder.Date(OrderType.Descending))
     }
 
     fun onEvent(event: TransactionsEvent) {

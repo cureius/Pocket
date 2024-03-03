@@ -78,10 +78,10 @@ class AddTransactionViewModel @Inject constructor(
     )
     val transactionTime: State<LocalTime> = _transactionTime
 
-    private val _transactionBalance = mutableStateOf(
-        ""
+    private val _transactionBalance = mutableStateOf<String?>(
+        null
     )
-    val transactionBalance: State<String> = _transactionBalance
+    val transactionBalance: State<String?> = _transactionBalance
 
     private val _pot = mutableStateOf<Pot?>(null)
     val pot: State<Pot?> = _pot
@@ -209,7 +209,7 @@ class AddTransactionViewModel @Inject constructor(
                                 title = transactionTitle.value,
                                 type = transactionType.value,
                                 amount = transactionAmount.value.ifBlank { "0" }.toDouble(),
-                                balance = transactionBalance.value.toDouble(),
+                                balance = transactionBalance.value?.toDouble(),
                                 date = transactionDate.value.toEpochDay(),
                                 event_timestamp = LocalDateTime.of(
                                     transactionDate.value,

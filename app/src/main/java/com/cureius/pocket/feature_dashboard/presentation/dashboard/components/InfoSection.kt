@@ -37,7 +37,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -62,29 +61,60 @@ fun Modifier.vertical() = layout { measurable, constraints ->
     }
 }
 fun formatBalance(balance: Double): String {
-    return when {
-        balance >= 10000000 -> {
-            String.format("%.2fCr", balance / 10000000)
+    if (balance < 0.0) {
+        val positiveBalance = balance * -1
+        var balanceString = when {
+            positiveBalance >= 10000000 -> {
+                String.format("%.2fCr", positiveBalance / 10000000)
+            }
+
+            positiveBalance >= 100000 -> {
+                String.format("%.2fL", positiveBalance / 100000)
+            }
+
+            positiveBalance >= 1000 -> {
+                String.format("%.2fK", positiveBalance / 1000)
+            }
+
+            positiveBalance >= 100 -> {
+                val decimalFormat = DecimalFormat("#,##,###.00")
+                decimalFormat.format(positiveBalance)
+            }
+            else -> {
+                val decimalFormat = DecimalFormat("#,##,###.00")
+                decimalFormat.format(positiveBalance)
+            }
         }
-        balance >= 100000 -> {
-            String.format("%.2fL", balance / 100000)
+        return "-$balanceString"
+    } else {
+        var balanceString = when {
+            balance >= 10000000 -> {
+                String.format("%.2fCr", balance / 10000000)
+            }
+
+            balance >= 100000 -> {
+                String.format("%.2fL", balance / 100000)
+            }
+
+            balance >= 1000 -> {
+                String.format("%.2fK", balance / 1000)
+            }
+
+            balance >= 100 -> {
+                val decimalFormat = DecimalFormat("#,##,###.00")
+                decimalFormat.format(balance)
+            }
+
+            else -> {
+                val decimalFormat = DecimalFormat("#,##,###.00")
+                decimalFormat.format(balance)
+            }
         }
-        balance >= 1000 -> {
-            String.format("%.2fK", balance / 1000)
-        }
-        balance >= 100 -> {
-            val decimalFormat = DecimalFormat("#,##,###.00")
-            decimalFormat.format(balance)
-        }
-        else -> {
-            val decimalFormat = DecimalFormat("#,##,###.00")
-            decimalFormat.format(balance)
-        }
+        return balanceString
     }
 }
 
 @OptIn(ExperimentalPermissionsApi::class)
-@Preview
 @Composable
 fun InfoSection(
     viewModel: DashBoardViewModel = hiltViewModel(),
@@ -116,29 +146,46 @@ fun InfoSection(
             it.account?.contains(
                 account.account_number, true
             ) == true && it.balance != null && it.balance != -1.0
-        }.maxByOrNull { it.event_timestamp!! } ?: continue
-        Log.d("TAG", "InfoSection: Account: $account")
-        val transactions = transactionsViewModel.state.value.transactionsForAccounts.filter {
-            it.account?.contains(
-                account.account_number, true
-            ) == true && it.date != null && it.event_timestamp!! > transaction.event_timestamp!!
-        }.sortedByDescending { it.date }
-        val incomeAfterBalance = transactions.filter { it.type == "credited" }.sumOf { it.amount!! }
-        val spendingAfterBalance =
-            transactions.filter { it.type == "debited" }.sumOf { it.amount!! }
-        Log.d("TAG", "InfoSection: Transaction: ${
-            transactionsViewModel.state.value.transactionsForAccounts.filter {
+        }.maxByOrNull { it.event_timestamp!! }
+        if (transaction != null) {
+            Log.d("TAG", "InfoSection: Account: $account")
+            val transactions = transactionsViewModel.state.value.transactionsForAccounts.filter {
                 it.account?.contains(
                     account.account_number, true
-                ) == true && it.balance != null && it.balance != -1.0
-            }.maxByOrNull { it.event_timestamp!! }
-        }")
-        Log.d("TAG", "InfoSection: Transaction: ${transaction.balance}")
-        Log.d("TAG", "InfoSection: Transaction: $incomeAfterBalance")
-        Log.d("TAG", "InfoSection: Transaction: $spendingAfterBalance")
-        totalBalance += (transaction?.balance ?: 0.0) + incomeAfterBalance - spendingAfterBalance
-        val decimalFormat = DecimalFormat("#,##,###.00")
-        totalBalanceStr = formatBalance(totalBalance)
+                ) == true && it.date != null && it.event_timestamp!! > transaction.event_timestamp!!
+            }.sortedByDescending { it.date }
+            val incomeAfterBalance =
+                transactions.filter { it.type == "credited" }.sumOf { it.amount!! }
+            val spendingAfterBalance =
+                transactions.filter { it.type == "debited" }.sumOf { it.amount!! }
+            Log.d("TAG", "InfoSection: Transaction: ${
+                transactionsViewModel.state.value.transactionsForAccounts.filter {
+                    it.account?.contains(
+                        account.account_number, true
+                    ) == true && it.balance != null && it.balance != -1.0
+                }.maxByOrNull { it.event_timestamp!! }
+            }")
+            Log.d("TAG", "InfoSection: Transaction: ${transaction.balance}")
+            Log.d("TAG", "InfoSection: Transaction: $incomeAfterBalance")
+            Log.d("TAG", "InfoSection: Transaction: $spendingAfterBalance")
+            totalBalance += (transaction.balance ?: 0.0) + incomeAfterBalance - spendingAfterBalance
+            totalBalanceStr = formatBalance(totalBalance)
+        } else {
+            Log.d("TAG", "InfoSection: Account: $account")
+            val transactions = transactionsViewModel.state.value.transactionsForAccounts.filter {
+                it.account?.contains(
+                    account.account_number, true
+                ) == true && it.date != null
+            }.sortedByDescending { it.date }
+            val incomeAllTime = transactions.filter { it.type == "credited" }.sumOf { it.amount!! }
+            val spendingAllTime =
+                transactions.filter { it.type == "debited" }.sumOf { it.amount!! }
+            Log.d("TAG", "InfoSection: Transaction: $incomeAllTime")
+            Log.d("TAG", "InfoSection: Transaction: $spendingAllTime")
+            totalBalance += incomeAllTime - spendingAllTime
+            totalBalanceStr = formatBalance(totalBalance)
+        }
+
     }
 
     Log.d("TAG", "InfoSection: Total Balance: $totalBalance $totalBalanceStr")
