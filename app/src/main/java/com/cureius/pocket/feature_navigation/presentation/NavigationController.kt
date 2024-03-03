@@ -7,10 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.cureius.pocket.feature_account.presentation.account.AccountsScreen
-import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashboardScreen
 import com.cureius.pocket.feature_pot.presentation.configure_pots.ConfigurePotsScreen
 import com.cureius.pocket.feature_pot.presentation.pots.PotsScreen
 import com.cureius.pocket.feature_qr_scanner.presentation.widgets.QrScanner
+import com.cureius.pocket.feature_upi_payment.presentation.manager.UpiPaymentScreen
 
 @Composable
 fun NavigationController(navController: NavHostController) {
@@ -36,7 +36,10 @@ fun NavigationController(navController: NavHostController) {
             ConfigurePotsScreen()
         }
         composable("qr_scanner") {
-            QrScanner()
+            QrScanner(navController)
+        }
+        composable("upi_payment") {
+            UpiPaymentScreen()
         }
     }
 }

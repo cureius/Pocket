@@ -10,25 +10,29 @@ import com.cureius.pocket.feature_account.presentation.account.AccountsScreen
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashboardScreen
 import com.cureius.pocket.feature_pot.presentation.pots.PotsScreen
 import com.cureius.pocket.feature_qr_scanner.presentation.widgets.QrScanner
+import com.cureius.pocket.feature_upi_payment.presentation.manager.UpiPaymentScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun BottomNavigationController(navController: NavHostController, bottomNavHostController: NavHostController) {
     NavHost(navController = bottomNavHostController, startDestination = "home") {
-            composable("home") {
-                DashboardScreen(navController)
-            }
-            composable("qr_scanner") {
-                QrScanner()
-            }
-            composable("records") {
-                RecordsScreen()
-            }
-            composable("pots") {
-                PotsScreen(navController)
-            }
-            composable("accounts") {
-                AccountsScreen()
-            }
+        composable("home") {
+            DashboardScreen(navController)
+        }
+        composable("qr_scanner") {
+            QrScanner(navController)
+        }
+        composable("upi_payment") {
+            UpiPaymentScreen()
+        }
+        composable("records") {
+            RecordsScreen()
+        }
+        composable("pots") {
+            PotsScreen(navController)
+        }
+        composable("accounts") {
+            AccountsScreen()
+        }
         }
     }
