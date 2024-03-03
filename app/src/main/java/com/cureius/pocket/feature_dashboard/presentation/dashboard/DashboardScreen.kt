@@ -53,6 +53,7 @@ import com.cureius.pocket.feature_account.presentation.add_account.AddAccountFor
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountViewModel
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.ActionElement
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.ActionItem
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.BalanceCalibrationDialog
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.CurveBottomMask
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.DashBoardHeader
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.components.IncomeCreditPrompt
@@ -260,7 +261,7 @@ fun DashboardScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             DashBoardHeader(navHostController)
-            if (transactionsViewModel.state.value.transactionsOnCurrentMonthForAccounts.isNotEmpty() && accountsViewModel.state.value.isNotEmpty()) {
+            if (transactionsViewModel.state.value.transactionsForAccounts.isNotEmpty() && accountsViewModel.state.value.isNotEmpty()) {
                 InfoSection(viewModel, navHostController)
             }
         }
@@ -425,8 +426,15 @@ fun DashboardScreen(
 
             })
         }
-
+        if (viewModel.calibrationPrompt.value) {
+            BalanceCalibrationDialog(onDismiss = {
+                viewModel.onEvent(DashBoardEvent.TurnOffBalanceCalibration)
+            }, onSubmit = {
+                viewModel.onEvent(DashBoardEvent.TurnOffBalanceCalibration)
+            })
+        }
     }
+
 }
 
 @OptIn(ExperimentalPermissionsApi::class)

@@ -6,7 +6,6 @@ import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,7 +18,6 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,7 +48,6 @@ import com.cureius.pocket.feature_transaction.presentation.util.components.Phone
 import com.cureius.pocket.feature_transaction.presentation.util.components.RecordAudioPermissionTextProvider
 import com.cureius.pocket.util.components.MonthPicker
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -72,27 +69,23 @@ fun TransactionsScreen(
         Manifest.permission.CALL_PHONE,
     )
 
-    val cameraPermissionResultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            viewModel.onPermissionResult(
-                permission = Manifest.permission.READ_SMS,
-                isGranted = isGranted
-            )
-        }
-    )
-
-    val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestMultiplePermissions(),
-        onResult = { perms ->
-            permissionsToRequest.forEach { permission ->
+    val cameraPermissionResultLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission(),
+            onResult = { isGranted ->
                 viewModel.onPermissionResult(
-                    permission = permission,
-                    isGranted = perms[permission] == true
+                    permission = Manifest.permission.READ_SMS, isGranted = isGranted
                 )
-            }
-        }
-    )
+            })
+
+    val multiplePermissionResultLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestMultiplePermissions(),
+            onResult = { perms ->
+                permissionsToRequest.forEach { permission ->
+                    viewModel.onPermissionResult(
+                        permission = permission, isGranted = perms[permission] == true
+                    )
+                }
+            })
 
     Scaffold(
         floatingActionButton = {},
@@ -180,53 +173,50 @@ fun TransactionsScreen(
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 if (state != null) {
-                    itemsIndexed(
-                        if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts else state.transactionsForAccounts,
-                        key = { index, transaction -> transaction.id!! }) { index, transaction ->
+                    itemsIndexed(if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts.filter { it.kind != "calibration" } else state.transactionsForAccounts.filter { it.kind != "calibration" },
+                        key = { _, transaction -> transaction.id!! }) { index, transaction ->
                         var result: SnackbarResult? = null
-                        SwipeToDeleteContainer(
-                            item = transaction,
-                            onDelete = {
-                                viewModel.onEvent(
-                                    TransactionsEvent.DeleteTransaction(
-                                        transaction
-                                    )
+                        SwipeToDeleteContainer(item = transaction, onDelete = {
+                            viewModel.onEvent(
+                                TransactionsEvent.DeleteTransaction(
+                                    transaction
                                 )
-                                scope.launch {
-                                    result = snackbarHostState.showSnackbar(
-                                        message = "Transaction Deleted..!", actionLabel = "Undo"
-                                    )
-                                    if (result == SnackbarResult.ActionPerformed) {
-                                        viewModel.onEvent(TransactionsEvent.RestoreTransaction)
-                                    }
-                                }
-                            },
-                            onUndo = {
+                            )
+                            scope.launch {
+                                result = snackbarHostState.showSnackbar(
+                                    message = "Transaction Deleted..!", actionLabel = "Undo"
+                                )
                                 if (result == SnackbarResult.ActionPerformed) {
                                     viewModel.onEvent(TransactionsEvent.RestoreTransaction)
                                 }
-                            },
-                            coroutineScope = scope
+                            }
+                        }, onUndo = {
+                            if (result == SnackbarResult.ActionPerformed) {
+                                viewModel.onEvent(TransactionsEvent.RestoreTransaction)
+                            }
+                        }, coroutineScope = scope
                         ) { transaction ->
-                            TransactionItem(transaction = transaction, modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
+                            TransactionItem(transaction = transaction,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
 //                                navController?.navigate(Screen.AddTransactionScreen.route + "?transactionId=${transaction.id}&transactionColor=${transaction.color}")
-                                }, onDeleteClick = {
-                                viewModel.onEvent(
-                                    TransactionsEvent.DeleteTransaction(
-                                        transaction
+                                    },
+                                onDeleteClick = {
+                                    viewModel.onEvent(
+                                        TransactionsEvent.DeleteTransaction(
+                                            transaction
+                                        )
                                     )
-                                )
-                                scope.launch {
-                                    val result = snackbarHostState.showSnackbar(
-                                        message = "Transaction Deleted..!", actionLabel = "Undo"
-                                    )
-                                    if (result == SnackbarResult.ActionPerformed) {
-                                        viewModel.onEvent(TransactionsEvent.RestoreTransaction)
+                                    scope.launch {
+                                        val result = snackbarHostState.showSnackbar(
+                                            message = "Transaction Deleted..!", actionLabel = "Undo"
+                                        )
+                                        if (result == SnackbarResult.ActionPerformed) {
+                                            viewModel.onEvent(TransactionsEvent.RestoreTransaction)
+                                        }
                                     }
-                                }
-                            },
+                                },
                                 showDate = if (index == 0) true else {
                                     if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts[index - 1].date != transaction.date else state.transactionsForAccounts[index - 1].date != transaction.date
                                 }
@@ -243,35 +233,28 @@ fun TransactionsScreen(
         }
 
         dialogQueue.reversed().forEach { permission ->
-            PermissionDialog(
-                permissionTextProvider = when (permission) {
-                    Manifest.permission.CAMERA -> {
-                        CameraPermissionTextProvider()
-                    }
+            PermissionDialog(permissionTextProvider = when (permission) {
+                Manifest.permission.CAMERA -> {
+                    CameraPermissionTextProvider()
+                }
 
-                    Manifest.permission.RECORD_AUDIO -> {
-                        RecordAudioPermissionTextProvider()
-                    }
+                Manifest.permission.RECORD_AUDIO -> {
+                    RecordAudioPermissionTextProvider()
+                }
 
-                    Manifest.permission.CALL_PHONE -> {
-                        PhoneCallPermissionTextProvider()
-                    }
+                Manifest.permission.CALL_PHONE -> {
+                    PhoneCallPermissionTextProvider()
+                }
 
-                    else -> return@forEach
-                },
-                isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
-                    LocalContext.current as Activity,
-                    permission
-                ),
-                onDismiss = viewModel::dismissDialog,
-                onOkClick = {
-                    viewModel.dismissDialog()
-                    multiplePermissionResultLauncher.launch(
-                        arrayOf(permission)
-                    )
-                },
-                onGoToAppSettingsClick = { }
-            )
+                else -> return@forEach
+            }, isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
+                LocalContext.current as Activity, permission
+            ), onDismiss = viewModel::dismissDialog, onOkClick = {
+                viewModel.dismissDialog()
+                multiplePermissionResultLauncher.launch(
+                    arrayOf(permission)
+                )
+            }, onGoToAppSettingsClick = { })
         }
 
         if (viewModel.monthPickerDialogVisibility.value) {
@@ -292,8 +275,7 @@ fun TransactionsScreen(
                     .get(Calendar.YEAR)
             println("year: $year")
             // A surface container using the 'background' color from the theme
-            MonthPicker(
-                visible = visible,
+            MonthPicker(visible = visible,
                 currentMonth = currentMonth,
                 currentYear = year,
                 showReset = viewModel.monthPicked.value != null,
@@ -342,16 +324,14 @@ fun <T> SwipeToDeleteContainer(
     var isRemoved by remember {
         mutableStateOf(false)
     }
-    val state = rememberDismissState(
-        confirmStateChange = { value ->
-            if (value == DismissValue.DismissedToStart) {
-                isRemoved = true
-                true
-            } else {
-                false
-            }
+    val state = rememberDismissState(confirmStateChange = { value ->
+        if (value == DismissValue.DismissedToStart) {
+            isRemoved = true
+            true
+        } else {
+            false
         }
-    )
+    })
 //
 //    LaunchedEffect(key1 = isRemoved) {
 //        if (isRemoved) {
@@ -367,16 +347,12 @@ fun <T> SwipeToDeleteContainer(
 //            shrinkTowards = Alignment.Top
 //        ) + fadeOut()
 //    ) {
-        SwipeToDismiss(
-            state = state,
-            background = {
-                DeleteBackground(swipeDismissState = state, onDismiss = {
-                    onDelete(item)
-                }, onUndo = onUndo, scope = coroutineScope)
-            },
-            dismissContent = { content(item) },
-            directions = setOf(DismissDirection.EndToStart)
-        )
+    SwipeToDismiss(state = state, background = {
+        DeleteBackground(swipeDismissState = state, onDismiss = {
+            onDelete(item)
+        }, onUndo = onUndo, scope = coroutineScope)
+    }, dismissContent = { content(item) }, directions = setOf(DismissDirection.EndToStart)
+    )
 //    }
 }
 
@@ -396,17 +372,15 @@ fun DeleteBackground(
         modifier = Modifier
             .fillMaxSize()
             .background(color, RoundedCornerShape(30.dp))
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+            .padding(16.dp), contentAlignment = Alignment.Center
     ) {
         Row {
             IconButton(onClick = { scope.launch { swipeDismissState.reset() } }) {
                 Icon(Icons.Default.Refresh, contentDescription = "Refresh")
             }
-            if (swipeDismissState.targetValue == DismissValue.DismissedToStart)
-                IconButton(onClick = { onDismiss() }) {
-                    Icon(Icons.Default.Delete, contentDescription = "Delete")
-                }
+            if (swipeDismissState.targetValue == DismissValue.DismissedToStart) IconButton(onClick = { onDismiss() }) {
+                Icon(Icons.Default.Delete, contentDescription = "Delete")
+            }
         }
     }
 }

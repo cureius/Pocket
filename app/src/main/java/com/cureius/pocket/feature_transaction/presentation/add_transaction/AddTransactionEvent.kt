@@ -10,6 +10,7 @@ import java.time.LocalTime
 sealed class AddTransactionEvent {
     data class EnteredTitle(val value: String) : AddTransactionEvent()
     data class EnteredType(val value: String) : AddTransactionEvent()
+    data class EnteredKind(val value: String) : AddTransactionEvent()
     data class ChangeTypeFocus(val focusState: FocusState) : AddTransactionEvent()
 
     data class EnteredAccount(val value: String) : AddTransactionEvent()

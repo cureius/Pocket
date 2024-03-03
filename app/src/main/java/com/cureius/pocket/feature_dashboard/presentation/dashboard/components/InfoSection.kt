@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_account.presentation.account.AccountsViewModel
+import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashBoardEvent
 import com.cureius.pocket.feature_dashboard.presentation.dashboard.DashBoardViewModel
 import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -91,6 +93,7 @@ fun InfoSection(
     accountsViewModel: AccountsViewModel = hiltViewModel(),
 ) {
     val rupee = painterResource(id = R.drawable.rupee)
+    val edit = painterResource(R.drawable.outline_mode_edit_24)
     val shape = RoundedCornerShape(
         topStart = 24.dp, topEnd = 24.dp, bottomStart = 24.dp, bottomEnd = 24.dp
     )
@@ -156,31 +159,48 @@ fun InfoSection(
                 Column(modifier = Modifier.fillMaxWidth(0.7f)) {
                     Row(
                         modifier = Modifier
-                            .padding(8.dp, 8.dp, 4.dp, 8.dp)
+                            .padding(4.dp, 8.dp, 4.dp, 8.dp)
                             .fillMaxWidth(0.9f),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.Bottom,
                     ) {
-                        Text(
-                            text = "You Have",
-                            color = MaterialTheme.colors.onSurface,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(0.dp, 0.dp)
-                        )
+                        Row(
+                            modifier = Modifier.clickable {
+                                viewModel.onEvent(DashBoardEvent.TurnOnBalanceCalibration)
+                            },
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = edit,
+                                contentDescription = "edit",
+                                modifier = Modifier.size(12.dp),
+                                colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
+                                alignment = Alignment.Center
+                            )
+                            Text(
+                                text = "You Have",
+                                color = MaterialTheme.colors.onSurface,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(fontWeight = FontWeight.Bold),
+                                fontSize = 12.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(0.dp, 0.dp)
+                            )
+                        }
                         Row(
                             horizontalArrangement = Arrangement.SpaceAround,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-
                             Text(
                                 text = " ${totalBalanceStr}",
                                 color = MaterialTheme.colors.onBackground,
                                 textAlign = TextAlign.Center,
-                                style = TextStyle(fontWeight = FontWeight.Bold, letterSpacing = 3.5.sp),
+                                style = TextStyle(
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 3.5.sp
+                                ),
                                 fontSize = 24.sp,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,

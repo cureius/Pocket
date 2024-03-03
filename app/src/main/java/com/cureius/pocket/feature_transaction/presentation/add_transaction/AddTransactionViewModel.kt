@@ -48,6 +48,11 @@ class AddTransactionViewModel @Inject constructor(
     )
     val transactionType: State<String> = _transactionType
 
+    private val _transactionKind = mutableStateOf(
+        ""
+    )
+    val transactionKind: State<String> = _transactionKind
+
     private val _transactionAccount = mutableStateOf(
         null as String?
     )
@@ -115,7 +120,10 @@ class AddTransactionViewModel @Inject constructor(
 
             is AddTransactionEvent.EnteredType -> {
                 _transactionType.value = event.value
+            }
 
+            is AddTransactionEvent.EnteredKind -> {
+                _transactionKind.value = event.value
             }
 
             is AddTransactionEvent.ChangeTypeFocus -> {
@@ -150,17 +158,14 @@ class AddTransactionViewModel @Inject constructor(
 
             is AddTransactionEvent.EnteredTime -> {
                 _transactionTime.value = event.value
-
             }
 
             is AddTransactionEvent.EnteredBalance -> {
                 _transactionBalance.value = event.value.toString()
-
             }
 
             is AddTransactionEvent.ChangeBalanceFocus -> {
                 _transactionBalance.value = (!event.focusState.isFocused).toString()
-
             }
 
             is AddTransactionEvent.EnteredTransactionsList -> {
@@ -204,18 +209,17 @@ class AddTransactionViewModel @Inject constructor(
                                 title = transactionTitle.value,
                                 type = transactionType.value,
                                 amount = transactionAmount.value.ifBlank { "0" }.toDouble(),
-//                                balance = transactionBalance.value.toDouble(),
-//                                date = transactionDate.value.atTime(transactionTime.value).toEpochSecond(ZoneOffset.UTC),
+                                balance = transactionBalance.value.toDouble(),
                                 date = transactionDate.value.toEpochDay(),
                                 event_timestamp = LocalDateTime.of(
                                     transactionDate.value,
                                     transactionTime.value
                                 ).toEpochSecond(ZoneOffset.UTC) * 1000,
                                 timestamp = System.currentTimeMillis(),
-//                                color = transactionColor.value,
                                 account = account.value?.account_number,
                                 pot = pot.value?.title,
-                                id = currentTransactionId
+                                id = currentTransactionId,
+                                kind = transactionKind.value,
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveTransaction)

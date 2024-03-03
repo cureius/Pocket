@@ -40,6 +40,9 @@ class DashBoardViewModel @Inject constructor(
     private val _permissionPrompt = mutableStateOf(false)
     val permissionPrompt: State<Boolean> = _permissionPrompt
 
+    private val _calibrationPrompt = mutableStateOf(false)
+    val calibrationPrompt: State<Boolean> = _calibrationPrompt
+
     private val _creditDetectionPromptVisibility = mutableStateOf(false)
     val creditDetectionPromptVisibility: State<Boolean> = _creditDetectionPromptVisibility
 
@@ -68,6 +71,14 @@ class DashBoardViewModel @Inject constructor(
 
             is DashBoardEvent.ToggleAskPermission -> {
                 _permissionPrompt.value = !permissionPrompt.value
+            }
+
+            is DashBoardEvent.TurnOnBalanceCalibration -> {
+                _calibrationPrompt.value = true
+            }
+
+            is DashBoardEvent.TurnOffBalanceCalibration -> {
+                _calibrationPrompt.value = false
             }
 
             is DashBoardEvent.ChangeTotalBalance -> {
