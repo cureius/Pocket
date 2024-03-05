@@ -32,11 +32,19 @@ fun QuadChart(
     labelColor: Color = MaterialTheme.colors.onSurface,
     modifier: Modifier = Modifier,
 ) {
+    println("QuadChart: data = $data")
     val spacing = 10f
     val graphColor = graphCustomColor.copy(alpha = 0.5f)
     val transparentGraphColor = remember { graphColor.copy(alpha = 0.5f) }
-    val upperValue = remember { (data.maxOfOrNull { it.second }?.plus(1))?.roundToInt() ?: 0 }
-    val lowerValue = remember { (data.minOfOrNull { it.second }?.toInt() ?: 0) }
+    println(
+        "QuadChart: graphColor = ${
+            (data.maxOfOrNull { it.second }?.plus(1))?.roundToInt() ?: 0
+        }"
+    )
+    val upperValue = (data.maxOfOrNull { it.second }?.plus(1))?.roundToInt() ?: 0
+    println("QuadChart: upperValue = $upperValue")
+    val lowerValue = (data.minOfOrNull { it.second }?.toInt() ?: 0)
+    println("QuadChart: lowerValue = $lowerValue")
     val density = LocalDensity.current
 
     val textPaint = remember(density) {
@@ -70,6 +78,10 @@ fun QuadChart(
         }
 
         val priceStep = (upperValue - lowerValue) / 5f
+        println("QuadChart: priceStep = $priceStep")
+        println("QuadChart: upperValue = $upperValue")
+        println("QuadChart: lowerValue = $lowerValue")
+        println("QuadChart: Text = ${(lowerValue + priceStep * 5) - 1}")
         drawContext.canvas.nativeCanvas.apply {
             drawTextOnRight(
                 text = round((lowerValue + priceStep * 5) - 1).toString(),

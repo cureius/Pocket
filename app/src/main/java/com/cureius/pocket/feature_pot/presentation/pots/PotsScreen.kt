@@ -62,7 +62,7 @@ fun PotsScreen(
     val templatePots = viewModel.templatePots.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
-    val isMonthFormat by remember {
+    var isMonthFormat by remember {
         mutableStateOf(false)
     }
 
@@ -117,13 +117,19 @@ fun PotsScreen(
                         Box(
                             modifier = Modifier
                                 .background(
-                                    color = MaterialTheme.colors.primary.copy(
-                                        alpha = 0.1f
-                                    ), RoundedCornerShape(12.dp)
+                                    color = if (isMonthFormat) {
+                                        MaterialTheme.colors.primary.copy(
+                                            alpha = 0.1f
+                                        )
+                                    } else {
+                                        MaterialTheme.colors.primary.copy(
+                                            alpha = 0.0f
+                                        )
+                                    }, RoundedCornerShape(12.dp)
                                 )
                                 .padding(8.dp)
                                 .clickable {
-
+                                    isMonthFormat = !isMonthFormat
                                 }, contentAlignment = Alignment.Center
                         ) {
                             val config = ImageVector.vectorResource(id = R.drawable.edit_calendar)
