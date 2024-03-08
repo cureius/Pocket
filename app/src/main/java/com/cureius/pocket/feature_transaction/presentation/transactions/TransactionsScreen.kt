@@ -43,6 +43,7 @@ import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTr
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.OrderSection
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.PotsSection
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.TransactionItem
+import com.cureius.pocket.feature_transaction.presentation.transactions.components.TypewriterTextEffect
 import com.cureius.pocket.feature_transaction.presentation.util.components.CameraPermissionTextProvider
 import com.cureius.pocket.feature_transaction.presentation.util.components.PermissionDialog
 import com.cureius.pocket.feature_transaction.presentation.util.components.PhoneCallPermissionTextProvider
@@ -212,32 +213,64 @@ fun TransactionsScreen(
             }
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier.fillMaxSize()) {
+                item {
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        TypewriterTextEffect(
+                            texts = listOf(
+                                "Food",
+                                "Travel",
+                                "Shopping",
+                                "Entertainment",
+                                "Health",
+                                "Education",
+                                "Investment",
+                                "Salary",
+                                "Gift",
+                                "Search for a transaction",
+                            )
+                        ) { displayedText ->
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = displayedText,
+                                style = MaterialTheme.typography.body2
+                            )
+                        }
+                    }
+                }
                 if (state != null) {
-                    val transactionsToShow = if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts.filter { it.kind != "calibration" } else state.transactionsForAccounts.filter { it.kind != "calibration" }
+                    val transactionsToShow =
+                        if (viewModel.monthPicked.value != null) state.transactionsOnCurrentMonthForAccounts.filter { it.kind != "calibration" } else state.transactionsForAccounts.filter { it.kind != "calibration" }
                     itemsIndexed(transactionsToShow,
                         key = { _, transaction -> transaction.id!! }) { index, transaction ->
                         var result: SnackbarResult? = null
-                        SwipeToDeleteContainer(item = transaction, onDelete = {
-                            viewModel.onEvent(
-                                TransactionsEvent.DeleteTransaction(
-                                    transaction
+                        SwipeToDeleteContainer(
+                            item = transaction, onDelete = {
+                                viewModel.onEvent(
+                                    TransactionsEvent.DeleteTransaction(
+                                        transaction
+                                    )
                                 )
-                            )
-                            scope.launch {
-                                result = snackbarHostState.showSnackbar(
-                                    message = "Transaction Deleted..!", actionLabel = "Undo"
-                                )
+                                scope.launch {
+                                    result = snackbarHostState.showSnackbar(
+                                        message = "Transaction Deleted..!", actionLabel = "Undo"
+                                    )
+                                    if (result == SnackbarResult.ActionPerformed) {
+                                        viewModel.onEvent(TransactionsEvent.RestoreTransaction)
+                                    }
+                                }
+                            }, onUndo = {
                                 if (result == SnackbarResult.ActionPerformed) {
                                     viewModel.onEvent(TransactionsEvent.RestoreTransaction)
                                 }
-                            }
-                        }, onUndo = {
-                            if (result == SnackbarResult.ActionPerformed) {
-                                viewModel.onEvent(TransactionsEvent.RestoreTransaction)
-                            }
-                        }, coroutineScope = scope
+                            }, coroutineScope = scope
                         ) { transaction ->
-                            TransactionItem(transaction = transaction,
+                            TransactionItem(
+                                transaction = transaction,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
