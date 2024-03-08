@@ -11,5 +11,7 @@ data class TransactionsState(
     val transactionsOnCurrentMonthForAccounts: List<Transaction> = emptyList(),
     val transactionsForAccounts: List<Transaction> = emptyList(),
     val transactionOrder: TransactionOrder = TransactionOrder.Date(OrderType.Descending),
-    val isOrderSelectionVisible: Boolean = false
+    val selectedPots: List<String> = emptyList(),
+    val isOrderSelectionVisible: Boolean = false,
+    val isPotSelectionVisible: Boolean = false
 )

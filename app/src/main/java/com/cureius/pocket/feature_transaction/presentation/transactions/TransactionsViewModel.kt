@@ -7,14 +7,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cureius.pocket.feature_account.domain.model.Account
 import com.cureius.pocket.feature_account.domain.use_case.AccountUseCases
+import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
 import com.cureius.pocket.feature_transaction.domain.util.OrderType
 import com.cureius.pocket.feature_transaction.domain.util.TransactionOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -33,6 +32,9 @@ class TransactionsViewModel @Inject constructor(
 
     private val _state = mutableStateOf(TransactionsState())
     val state: State<TransactionsState> = _state
+
+    private val _selectedPots = mutableStateOf(mutableListOf<Pot?>())
+    val selectedPots: State<List<Pot?>?> = _selectedPots
 
     private val _accountsState = mutableStateOf(listOf<Account>())
     val accountsState: State<List<Account>> = _accountsState
@@ -87,7 +89,6 @@ class TransactionsViewModel @Inject constructor(
                     val validityTimestamp =
                         midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC) * 1000
                     val firstDayOfMonth = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000
-                    println("TransactionsViewModel: onEvent: MonthSelected: event: $firstDayOfMonth $validityTimestamp ")
                     getTransactionsCreatedOnMonthForAccounts(
                         event.transactionOrder, firstDayOfMonth, validityTimestamp
                     )
@@ -116,8 +117,73 @@ class TransactionsViewModel @Inject constructor(
                 )
             }
 
+            is TransactionsEvent.TogglePotsSection -> {
+                if(selectedPots.value?.isNotEmpty() == true){
+                    _selectedPots.value.clear()
+                    if (monthPicked.value != null) {
+                        val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+                        val date = LocalDate.parse("1/${monthPicked.value}", formatter)
+                        val lastDayOfMonth = date.withDayOfMonth(date.lengthOfMonth())
+                        val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
+                        val validityTimestamp =
+                            midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC) * 1000
+                        val firstDayOfMonth = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000
+                        getTransactionsCreatedOnMonthForAccounts(
+                            TransactionOrder.Date(OrderType.Descending),
+                            firstDayOfMonth,
+                            validityTimestamp
+                        )
+                    } else {
+                        getTransactionsForAccounts(TransactionOrder.Date(OrderType.Descending))
+                    }
+                }
+                _state.value = state.value.copy(
+                    isPotSelectionVisible = !state.value.isPotSelectionVisible
+                )
+            }
+
             is TransactionsEvent.ToggleMonthPickerDialog -> {
                 _monthPickerDialogVisibility.value = !_monthPickerDialogVisibility.value
+            }
+
+            is TransactionsEvent.SelectPots -> {
+                _selectedPots.value.add(event.pot)
+                if (monthPicked.value != null) {
+                    val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+                    val date = LocalDate.parse("1/${monthPicked.value}", formatter)
+                    val lastDayOfMonth = date.withDayOfMonth(date.lengthOfMonth())
+                    val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
+                    val validityTimestamp =
+                        midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC) * 1000
+                    val firstDayOfMonth = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000
+                    getTransactionsCreatedOnMonthForAccounts(
+                        TransactionOrder.Date(OrderType.Descending),
+                        firstDayOfMonth,
+                        validityTimestamp
+                    )
+                } else {
+                    getTransactionsForAccounts(TransactionOrder.Date(OrderType.Descending))
+                }
+            }
+
+            is TransactionsEvent.RemovePots -> {
+                _selectedPots.value.remove(event.pot)
+                if (monthPicked.value != null) {
+                    val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+                    val date = LocalDate.parse("1/${monthPicked.value}", formatter)
+                    val lastDayOfMonth = date.withDayOfMonth(date.lengthOfMonth())
+                    val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
+                    val validityTimestamp =
+                        midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC) * 1000
+                    val firstDayOfMonth = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000
+                    getTransactionsCreatedOnMonthForAccounts(
+                        TransactionOrder.Date(OrderType.Descending),
+                        firstDayOfMonth,
+                        validityTimestamp
+                    )
+                } else {
+                    getTransactionsForAccounts(TransactionOrder.Date(OrderType.Descending))
+                }
             }
 
             is TransactionsEvent.MonthSelected -> {
@@ -130,7 +196,6 @@ class TransactionsViewModel @Inject constructor(
                     val validityTimestamp =
                         midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC) * 1000
                     val firstDayOfMonth = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000
-                    println("TransactionsViewModel: onEvent: MonthSelected: event: $firstDayOfMonth $validityTimestamp ")
                     getTransactionsCreatedOnMonthForAccounts(
                         TransactionOrder.Date(OrderType.Descending),
                         firstDayOfMonth,
@@ -147,7 +212,6 @@ class TransactionsViewModel @Inject constructor(
         getTransactionsJob?.cancel()
         getTransactionsJob =
             transactionUseCases.getTransactions(transactionOrder).onEach { transactions ->
-                println("TransactionsViewModel.getTransactions: transactions: ${transactions.size}")
                 _state.value = state.value.copy(
                     transactions = transactions, transactionOrder = transactionOrder
                 )
@@ -165,9 +229,16 @@ class TransactionsViewModel @Inject constructor(
                             transactionsOnCurrentMonthForAccounts = transactions.filter {
                                 ((it.account)?.toInt()
                                     ?.rem(1000)).toString() in accounts.map { account: Account -> account.account_number }
+                            }.filter {
+                                if (_selectedPots.value.isEmpty()) {
+                                    true
+                                } else {
+                                    it.pot?.let { pot ->
+                                        _selectedPots.value.map { pot -> pot?.title }.contains(pot)
+                                    } ?: false
+                                }
                             }, transactionOrder = transactionOrder
                         )
-                        println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonthForAccounts: transactions:  ${_state.value.transactionsOnCurrentMonthForAccounts.size}")
                     }.launchIn(viewModelScope)
             }.launchIn(viewModelScope)
 
@@ -186,6 +257,14 @@ class TransactionsViewModel @Inject constructor(
                         transactionsOnCurrentMonthForAccounts = transactions.filter {
                             ((it.account)?.toInt()
                                 ?.rem(1000)).toString() in accounts.map { account: Account -> account.account_number }
+                        }.filter {
+                            if (_selectedPots.value.isEmpty()) {
+                                true
+                            } else {
+                                it.pot?.let { pot ->
+                                    _selectedPots.value.map { pot -> pot?.title }.contains(pot)
+                                } ?: false
+                            }
                         }, transactionOrder = transactionOrder
                     )
                     println("TransactionsViewModel.getTransactionsCreatedOnMonthForAccounts: transactions:  ${_state.value.transactionsOnCurrentMonthForAccounts}")
@@ -201,6 +280,14 @@ class TransactionsViewModel @Inject constructor(
                     transactionsForAccounts = transactions.filter {
                         ((it.account)?.toInt()
                             ?.rem(1000)).toString() in accounts.map { account: Account -> account.account_number }
+                    }.filter {
+                        if (_selectedPots.value.isEmpty()) {
+                            true
+                        } else {
+                            it.pot?.let { pot ->
+                                _selectedPots.value.map { pot -> pot?.title }.contains(pot)
+                            } ?: false
+                        }
                     }, transactionOrder = transactionOrder
                 )
                 println("TransactionsViewModel.getTransactionsForAccounts: transactions:  ${_state.value.transactionsForAccounts.size}")
@@ -223,7 +310,6 @@ class TransactionsViewModel @Inject constructor(
         getTransactionsForDateRangeJob =
             transactionUseCases.getTransactionsForDateRange(transactionOrder, start, end)
                 .onEach { transactions ->
-                    println("TransactionsViewModel.getTransactionsForDateRange: transactions:  ${transactions.size}")
                     _state.value = state.value.copy(
                         transactionsForRange = transactions, transactionOrder = transactionOrder
                     )
@@ -235,7 +321,6 @@ class TransactionsViewModel @Inject constructor(
         getTransactionsCreatedOnCurrentMonthJob =
             transactionUseCases.getTransactionsCreatedOnCurrentMonth(transactionOrder)
                 .onEach { transactions ->
-                    println("TransactionsViewModel.getTransactionsCreatedOnCurrentMonth: transactions:  ${transactions.size}")
                     _state.value = state.value.copy(
                         transactionsOnCurrentMonth = transactions,
                         transactionOrder = transactionOrder

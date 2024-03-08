@@ -41,6 +41,7 @@ import androidx.navigation.compose.rememberNavController
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.OrderSection
+import com.cureius.pocket.feature_transaction.presentation.transactions.components.PotsSection
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.TransactionItem
 import com.cureius.pocket.feature_transaction.presentation.util.components.CameraPermissionTextProvider
 import com.cureius.pocket.feature_transaction.presentation.util.components.PermissionDialog
@@ -110,6 +111,30 @@ fun TransactionsScreen(
                 )
                 Row {
                     IconButton(onClick = {
+                        viewModel.onEvent(TransactionsEvent.TogglePotsSection)
+                    }) {
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    color = if (viewModel.state.value.isPotSelectionVisible) MaterialTheme.colors.primary.copy(
+                                        alpha = 0.2f
+                                    ) else MaterialTheme.colors.primary.copy(
+                                        alpha = 0.0f
+                                    ), RoundedCornerShape(12.dp)
+                                )
+                                .padding(8.dp), contentAlignment = Alignment.Center
+                        ) {
+                            val pot =
+                                ImageVector.vectorResource(R.drawable.pot)
+                            Icon(
+                                imageVector = pot,
+                                contentDescription = "filter",
+                                tint = MaterialTheme.colors.onBackground,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(onClick = {
                         viewModel.onEvent(TransactionsEvent.ToggleMonthPickerDialog)
                     }) {
                         Box(
@@ -167,6 +192,21 @@ fun TransactionsScreen(
                         transactionOrder = state.transactionOrder,
                         onOrderChange = {
                             viewModel.onEvent(TransactionsEvent.Order(it))
+                        })
+                }
+            }
+
+            if (state != null) {
+                AnimatedVisibility(
+                    visible = state.isPotSelectionVisible,
+                    enter = fadeIn() + slideInVertically(),
+                    exit = fadeOut() + slideOutVertically()
+                ) {
+                    PotsSection(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                        onOrderChange = {
+//                            viewModel.onEvent(TransactionsEvent.SelectPots(it))
                         })
                 }
             }
