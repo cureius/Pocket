@@ -9,6 +9,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -17,10 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -51,7 +52,7 @@ val CUSTOM_SHADER = """
 
 @Composable
 fun AccountItem(
-    bankName: String, cardNumber: String, accountNumber: String, holderName: String
+    bankName: String, cardNumber: String, accountNumber: String, holderName: String, onEditClick: () -> Unit
 ) {
     val banks = listOf(
         Bank(
@@ -64,10 +65,8 @@ fun AccountItem(
             icon = painterResource(id = R.drawable.sbi), name = "SBI"
         )
     )
+    val edit = painterResource(R.drawable.outline_mode_edit_24)
     val aspectRatio = 1.58f // Set the aspect ratio as desired
-
-    val paddingModifier = Modifier
-
     val Coral = Color(0xFFA897F3)
     val LightYellow = Color(0xFFF8EE94)
 
@@ -114,7 +113,9 @@ fun AccountItem(
                     .padding(16.dp)
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
                     Row {
@@ -208,16 +209,38 @@ fun AccountItem(
                             )
                         }
                     }
-                    Text(
-                        text = holderName.uppercase(),
-                        color = Color.Black,
-                        textAlign = TextAlign.Center,
-                        style = TextStyle(fontWeight = FontWeight.Bold),
-                        fontSize = 26.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(4.dp, 0.dp)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = holderName.uppercase(),
+                            color = Color.Black,
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(fontWeight = FontWeight.Bold),
+                            fontSize = 26.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(4.dp, 0.dp)
+                        )
+                        IconButton(
+                            onClick = {
+                                onEditClick()
+                            },
+                            modifier = Modifier.size(20.dp),
+                            content = {
+                                Image(
+                                    painter = edit,
+                                    contentDescription = "edit",
+                                    modifier = Modifier.size(20.dp),
+                                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
+                                    alignment = Alignment.Center
+                                )
+                            }
+                        )
+
+                    }
                 }
             }
         }
@@ -241,6 +264,6 @@ fun BoxWithRoundedCorners(
 @Composable
 fun AccountItemPreview() {
     AccountItem(
-        bankName = "HDFC", cardNumber = "1234", accountNumber = "890", holderName = "John Doe"
+        bankName = "HDFC", cardNumber = "1234", accountNumber = "890", holderName = "John Doe", onEditClick = {}
     )
 }

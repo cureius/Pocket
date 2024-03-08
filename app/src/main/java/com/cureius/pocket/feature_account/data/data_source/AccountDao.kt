@@ -5,7 +5,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.cureius.pocket.feature_account.domain.model.Account
+import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
 
 
@@ -20,6 +22,9 @@ interface AccountDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAccount(account: Account)
+
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun updateAccount(account: Account)
 
     @Delete
     suspend fun deleteAccount(account: Account)

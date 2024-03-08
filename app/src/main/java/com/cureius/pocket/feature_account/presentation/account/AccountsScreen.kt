@@ -33,13 +33,17 @@ import com.cureius.pocket.feature_account.presentation.account.components.AddAcc
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountEvent
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountFormDialog
 import com.cureius.pocket.feature_account.presentation.add_account.AddAccountViewModel
+import com.cureius.pocket.feature_account.presentation.update_account.UpdateAccountEvent
+import com.cureius.pocket.feature_account.presentation.update_account.UpdateAccountFormDialog
+import com.cureius.pocket.feature_account.presentation.update_account.UpdateAccountViewModel
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Preview
 @Composable
 fun AccountsScreen(
     viewModel: AccountsViewModel = hiltViewModel(),
-    addAccountViewModel: AddAccountViewModel = hiltViewModel()
+    addAccountViewModel: AddAccountViewModel = hiltViewModel(),
+    updateAccountViewModel: UpdateAccountViewModel = hiltViewModel(),
 ) {
 
     val state = viewModel.state.value
@@ -79,7 +83,18 @@ fun AccountsScreen(
                     bankName = account.bank,
                     cardNumber = account.card_number!!,
                     accountNumber = account.account_number,
-                    holderName = account.holder_name!!
+                    holderName = account.holder_name!!,
+                    onEditClick = {
+                        updateAccountViewModel.onEvent(
+                            UpdateAccountEvent.EnteredAccountNumber(
+                                account.account_number
+                            )
+                        )
+                        updateAccountViewModel.onEvent(UpdateAccountEvent.EnteredCardNumber(account.card_number))
+                        updateAccountViewModel.onEvent(UpdateAccountEvent.EnteredHolderName(account.holder_name))
+                        updateAccountViewModel.onEvent(UpdateAccountEvent.SelectedBank(account.bank))
+                        updateAccountViewModel.onEvent(UpdateAccountEvent.ToggleUpdateAccountDialog)
+                    }
                 )
             }
             if (state.isEmpty()) {
@@ -100,6 +115,13 @@ fun AccountsScreen(
             }, onSubmit = {
 
             }, isOneAccountAlreadyPresent = viewModel.state.value.isNotEmpty())
+        }
+        if (updateAccountViewModel.dialogVisibility.value) {
+            UpdateAccountFormDialog(onDismiss = {
+                updateAccountViewModel.onEvent(UpdateAccountEvent.ToggleUpdateAccountDialog)
+            }, onSubmit = {
+
+            }, isOneAccountAlreadyPresent = false)
         }
     }
 

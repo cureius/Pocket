@@ -98,6 +98,7 @@ object AppModule {
             getAccount = GetAccount(repository),
             deleteAccount = DeleteAccount(repository),
             addAccount = AddAccount(repository),
+            updateAccount = UpdateAccount(repository),
             getAccounts = GetAccounts(repository)
         )
     }
