@@ -1,6 +1,5 @@
 package com.cureius.pocket.feature_transaction.presentation.transactions
 
-import com.cureius.pocket.feature_pot.presentation.pots.PotsEvent
 import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import com.cureius.pocket.feature_transaction.domain.util.TransactionOrder
@@ -14,5 +13,6 @@ sealed class TransactionsEvent {
     object ToggleOrderSection : TransactionsEvent()
     object TogglePotsSection : TransactionsEvent()
     data class MonthSelected(val value: String?) : TransactionsEvent()
+    data class SearchTransactionText(val value: String?) : TransactionsEvent()
     object ToggleMonthPickerDialog : TransactionsEvent()
 }

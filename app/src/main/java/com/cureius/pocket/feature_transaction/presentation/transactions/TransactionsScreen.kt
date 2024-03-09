@@ -40,6 +40,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_transaction.presentation.add_transaction.AddTransactionViewModel
+import com.cureius.pocket.feature_transaction.presentation.add_transaction.components.TransparentHintTextField
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.OrderSection
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.PotsSection
 import com.cureius.pocket.feature_transaction.presentation.transactions.components.TransactionItem
@@ -65,6 +66,7 @@ fun TransactionsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val dialogQueue = viewModel.visiblePermissionDialogQueue
+    val searchTransactionText = viewModel.searchTransactionText.value
 
     val permissionsToRequest = arrayOf(
         Manifest.permission.RECORD_AUDIO,
@@ -211,34 +213,70 @@ fun TransactionsScreen(
                         })
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 item {
                     Box(
                         Modifier
                             .fillMaxSize()
-                            .padding(16.dp),
-                        contentAlignment = Alignment.Center
+                            .background(
+                                color = MaterialTheme.colors.surface,
+                                shape = RoundedCornerShape(16.dp)
+                            ), contentAlignment = Alignment.Center
                     ) {
-                        TypewriterTextEffect(
-                            texts = listOf(
-                                "Food",
-                                "Travel",
-                                "Shopping",
-                                "Entertainment",
-                                "Health",
-                                "Education",
-                                "Investment",
-                                "Salary",
-                                "Gift",
-                                "Search for a transaction",
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp, 16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = ImageVector.vectorResource(id = R.drawable.outline_search_24),
+                                contentDescription = "search",
+                                tint = MaterialTheme.colors.onBackground,
                             )
-                        ) { displayedText ->
-                            Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = displayedText,
-                                style = MaterialTheme.typography.body2
-                            )
+                            TypewriterTextEffect(
+                                texts = listOf(
+                                    "Food",
+                                    "Travel",
+                                    "Shopping",
+                                    "Entertainment",
+                                    "Health",
+                                    "Education",
+                                    "Investment",
+                                    "Salary",
+                                    "Gift",
+                                    "Transactions",
+                                )
+                            ) { displayedText ->
+//                                Text(
+//                                    modifier = Modifier.fillMaxWidth(),
+//                                    text = displayedText,
+//                                    style = MaterialTheme.typography.body2
+//                                )
+                                TransparentHintTextField(
+                                    text = searchTransactionText ?: "",
+                                    hint = "Search '$displayedText'",
+                                    onValueChange = {
+                                        viewModel.onEvent(TransactionsEvent.SearchTransactionText(it))
+                                    },
+                                    onFocusChange = {
+
+                                    },
+                                    isHintVisible = searchTransactionText == null || searchTransactionText == "",
+                                    singleLine = true,
+                                    textStyle = MaterialTheme.typography.body1
+                                )
+//                                BasicTextField(
+//                                    value = searchText,
+//                                    modifier = Modifier.fillMaxWidth(),
+//                                    label = { Text(text = "Monthly Income") },
+//                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                                    onValueChange = {
+//                                        viewModel.onEvent(TransactionsEvent.SearchTransactionText(it!!))
+//                                    },
+//                                )
+                            }
                         }
                     }
                 }

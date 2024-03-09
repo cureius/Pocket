@@ -45,6 +45,9 @@ class TransactionsViewModel @Inject constructor(
     private val _monthPicked = mutableStateOf<String?>(null)
     val monthPicked: State<String?> = _monthPicked
 
+    private val _searchTransactionText = mutableStateOf<String?>(null)
+    val searchTransactionText: State<String?> = _searchTransactionText
+
     private var recentlyDeletedTransaction: Transaction? = null
     private var getTransactionsJob: Job? = null
     private var getTransactionsForDateRangeJob: Job? = null
@@ -205,6 +208,29 @@ class TransactionsViewModel @Inject constructor(
                 _monthPickerDialogVisibility.value = false
             }
 
+            is TransactionsEvent.SearchTransactionText -> {
+                _searchTransactionText.value = event.value
+                if (event.value != null) {
+                    if (monthPicked.value != null) {
+                        val formatter = DateTimeFormatter.ofPattern("d/M/yyyy")
+                        val date = LocalDate.parse("1/${event.value}", formatter)
+                        val lastDayOfMonth = date.withDayOfMonth(date.lengthOfMonth())
+                        val midnightLastDayOfMonth = lastDayOfMonth.atStartOfDay()
+                        val validityTimestamp =
+                            midnightLastDayOfMonth.toEpochSecond(ZoneOffset.UTC) * 1000
+                        val firstDayOfMonth = date.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000
+                        getTransactionsCreatedOnMonthForAccounts(
+                            TransactionOrder.Date(OrderType.Descending),
+                            firstDayOfMonth,
+                            validityTimestamp
+                        )
+                    } else {
+                       getTransactionsForAccounts(TransactionOrder.Date(OrderType.Descending))
+                    }
+
+                }
+            }
+
         }
     }
 
@@ -237,6 +263,17 @@ class TransactionsViewModel @Inject constructor(
                                         _selectedPots.value.map { pot -> pot?.title }.contains(pot)
                                     } ?: false
                                 }
+                            }.filter {
+                                if (_searchTransactionText.value?.isEmpty() == true || _searchTransactionText.value == null) {
+                                    true
+                                } else {
+                                    _searchTransactionText.value?.let { it1 ->
+                                        it.title?.contains(
+                                            it1, ignoreCase = true
+                                        )
+                                    }
+                                        ?: false
+                                }
                             }, transactionOrder = transactionOrder
                         )
                     }.launchIn(viewModelScope)
@@ -265,6 +302,17 @@ class TransactionsViewModel @Inject constructor(
                                     _selectedPots.value.map { pot -> pot?.title }.contains(pot)
                                 } ?: false
                             }
+                        }.filter {
+                            if (_searchTransactionText.value?.isEmpty() == true || _searchTransactionText.value == null) {
+                                true
+                            } else {
+                                _searchTransactionText.value?.let { it1 ->
+                                    it.title?.contains(
+                                        it1, ignoreCase = true
+                                    )
+                                }
+                                    ?: false
+                            }
                         }, transactionOrder = transactionOrder
                     )
                     println("TransactionsViewModel.getTransactionsCreatedOnMonthForAccounts: transactions:  ${_state.value.transactionsOnCurrentMonthForAccounts}")
@@ -287,6 +335,17 @@ class TransactionsViewModel @Inject constructor(
                             it.pot?.let { pot ->
                                 _selectedPots.value.map { pot -> pot?.title }.contains(pot)
                             } ?: false
+                        }
+                    }.filter {
+                        if (_searchTransactionText.value?.isEmpty() == true || _searchTransactionText.value == null) {
+                            true
+                        } else {
+                            _searchTransactionText.value?.let { it1 ->
+                                it.title?.contains(
+                                    it1, ignoreCase = true
+                                )
+                            }
+                                ?: false
                         }
                     }, transactionOrder = transactionOrder
                 )

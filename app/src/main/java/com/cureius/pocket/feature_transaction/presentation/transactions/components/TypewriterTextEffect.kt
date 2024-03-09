@@ -1,20 +1,11 @@
 package com.cureius.pocket.feature_transaction.presentation.transactions.components
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
@@ -60,35 +51,5 @@ fun TypewriterTextEffect(
             delay(Random.nextLong(minDelayInMillis, maxDelayInMillis))
         }
         onEffectCompleted()
-    }
-}
-
-/**
- * An example composable that uses the TypewriterTextEffect function.
- */
-@Preview
-@Composable
-fun ExampleTypewriterTextEffect() {
-    // Use the TypewriterTextEffect composable with a Text composable to display the texts with the typewriter effect
-    Box(
-        Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        TypewriterTextEffect(
-            texts = listOf(
-                "Lorem ipsum dolor sit amet",
-                "consectetur adipiscing elit",
-                "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam",
-                "quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident",
-                "sunt in culpa qui officia deserunt mollit anim id est laborum."
-            )
-        ) { displayedText ->
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = displayedText,
-                style = MaterialTheme.typography.h5
-            )
-        }
     }
 }
