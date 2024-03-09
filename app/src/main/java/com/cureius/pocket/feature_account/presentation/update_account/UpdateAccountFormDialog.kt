@@ -32,9 +32,11 @@ import androidx.compose.material.TextField
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -96,6 +98,7 @@ fun UpdateAccountFormDialog(
     val potShape = RoundedCornerShape(
         topStart = 12.dp, topEnd = 12.dp, bottomStart = 12.dp, bottomEnd = 12.dp
     )
+    var text by remember { mutableStateOf("") }
 
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
@@ -219,7 +222,11 @@ fun UpdateAccountFormDialog(
                                 Box(
                                     modifier = Modifier
                                         .clickable(onClick = {
-                                            viewModel.onEvent(UpdateAccountEvent.SelectedBank(item.toString()))
+                                            item.name?.let {
+                                                UpdateAccountEvent.SelectedBank(
+                                                    it
+                                                )
+                                            }?.let { viewModel.onEvent(it) }
                                         })
                                         .width(60.dp)
                                         .height(76.dp)

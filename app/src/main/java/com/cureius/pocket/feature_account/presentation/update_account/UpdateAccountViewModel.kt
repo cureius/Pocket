@@ -21,6 +21,9 @@ class UpdateAccountViewModel @Inject constructor(
     private val _dialogVisibility = mutableStateOf(false)
     val dialogVisibility: State<Boolean> = _dialogVisibility
 
+    private val _selectedAccount = mutableStateOf<Account?>(null)
+    val selectedAccount: State<Account?> = _selectedAccount
+
     private val _accountHolderName = mutableStateOf("")
     val accountHolderName: State<String> = _accountHolderName
 
@@ -62,6 +65,10 @@ class UpdateAccountViewModel @Inject constructor(
                 _dialogVisibility.value = !_dialogVisibility.value
             }
 
+            is UpdateAccountEvent.SelectAccount -> {
+                _selectedAccount.value = event.value
+            }
+
             is UpdateAccountEvent.ToggleIsPrimaryAccount -> {
                 _isPrimaryAccount.value = !_isPrimaryAccount.value
             }
@@ -83,23 +90,29 @@ class UpdateAccountViewModel @Inject constructor(
             }
 
             is UpdateAccountEvent.SaveAccount -> {
+                println("Save Account")
+                println("Account Number: ${_accountNumber.value}")
+                println("Bank: ${_bank.value}")
+                println("Holder Name: ${_accountHolderName.value}")
+                println("Card Number: ${_cardNumber.value}")
+
                 viewModelScope.launch {
                     try {
-                        accountUseCases.updateAccount(
-                            Account(
-                                accountNumber.value,
-                                bank.value,
-                                accountHolderName.value,
-                                cardNumber.value,
-                                is_primary = isPrimaryAccount.value,
-                                timestamp = System.currentTimeMillis(),
+                        _selectedAccount.value?.let {
+                            accountUseCases.updateAccount(
+                                it.copy(
+                                    account_number = _accountNumber.value,
+                                    bank = _bank.value,
+                                    holder_name = _accountHolderName.value,
+                                    card_number = _cardNumber.value
+                                )
                             )
-                        )
+                        }
                         _eventFlow.emit(UiEvent.SaveAccount)
                     } catch (e: InvalidTransactionException) {
                         _eventFlow.emit(
                             UiEvent.ShowSnackBar(
-                                message = e.message ?: "Cant Save Account"
+                                message = e.message ?: "Cant Update Account"
                             )
                         )
                     }

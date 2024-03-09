@@ -83,19 +83,19 @@ fun AccountsScreen(
                     bankName = account.bank,
                     cardNumber = account.card_number!!,
                     accountNumber = account.account_number,
-                    holderName = account.holder_name!!,
-                    onEditClick = {
-                        updateAccountViewModel.onEvent(
-                            UpdateAccountEvent.EnteredAccountNumber(
-                                account.account_number
-                            )
+                    holderName = account.holder_name!!
+                ) {
+                    updateAccountViewModel.onEvent(
+                        UpdateAccountEvent.EnteredAccountNumber(
+                            account.account_number
                         )
-                        updateAccountViewModel.onEvent(UpdateAccountEvent.EnteredCardNumber(account.card_number))
-                        updateAccountViewModel.onEvent(UpdateAccountEvent.EnteredHolderName(account.holder_name))
-                        updateAccountViewModel.onEvent(UpdateAccountEvent.SelectedBank(account.bank))
-                        updateAccountViewModel.onEvent(UpdateAccountEvent.ToggleUpdateAccountDialog)
-                    }
-                )
+                    )
+                    updateAccountViewModel.onEvent(UpdateAccountEvent.EnteredCardNumber(account.card_number))
+                    updateAccountViewModel.onEvent(UpdateAccountEvent.EnteredHolderName(account.holder_name))
+                    updateAccountViewModel.onEvent(UpdateAccountEvent.SelectedBank(account.bank))
+                    updateAccountViewModel.onEvent(UpdateAccountEvent.SelectAccount(account))
+                    updateAccountViewModel.onEvent(UpdateAccountEvent.ToggleUpdateAccountDialog)
+                }
             }
             if (state.isEmpty()) {
                 item {
