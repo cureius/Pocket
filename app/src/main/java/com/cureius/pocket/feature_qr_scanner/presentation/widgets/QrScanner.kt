@@ -23,7 +23,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.cureius.pocket.feature_transaction.presentation.util.Screen
+import com.cureius.pocket.feature_upi_payment.presentation.manager.UpiPaymentViewModel
 import com.google.common.util.concurrent.ListenableFuture
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -41,66 +44,97 @@ fun QrScanner(navController : NavHostController) {
 
 
 @Composable
-fun CameraPreview(navController: NavHostController) {
+fun CameraPreview(
+    navController: NavHostController, upiPaymentViewModel: UpiPaymentViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     var preview by remember { mutableStateOf<Preview?>(null) }
     val barCodeVal = remember { mutableStateOf("") }
 
-    AndroidView(
-        factory = { AndroidViewContext ->
-            PreviewView(AndroidViewContext).apply {
-                this.scaleType = PreviewView.ScaleType.FILL_CENTER
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                )
-                implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-            }
-        },
-        modifier = Modifier
-            .fillMaxSize(),
-        update = { previewView ->
-            val cameraSelector: CameraSelector = CameraSelector.Builder()
-                .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                .build()
-            val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
-            val cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
-                ProcessCameraProvider.getInstance(context)
-
-            cameraProviderFuture.addListener({
-                preview = Preview.Builder().build().also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
-                }
-                val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-                val barcodeAnalyser = QrCodeAnalyzer { barcodes ->
-                    barcodes.forEach { barcode ->
-                        barcode.rawValue?.let { barcodeValue ->
-                            barCodeVal.value = barcodeValue
-                            navController.navigate("upi_payment")
-                            Toast.makeText(context, barcodeValue, Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                }
-                val imageAnalysis: ImageAnalysis = ImageAnalysis.Builder()
-                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                    .build()
-                    .also {
-                        it.setAnalyzer(cameraExecutor, barcodeAnalyser)
-                    }
-
-                try {
-                    cameraProvider.unbindAll()
-                    cameraProvider.bindToLifecycle(
-                        lifecycleOwner,
-                        cameraSelector,
-                        preview,
-                        imageAnalysis
-                    )
-                } catch (e: Exception) {
-                    Log.d("TAG", "CameraPreview: ${e.localizedMessage}")
-                }
-            }, ContextCompat.getMainExecutor(context))
+    AndroidView(factory = { AndroidViewContext ->
+        PreviewView(AndroidViewContext).apply {
+            this.scaleType = PreviewView.ScaleType.FILL_CENTER
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+            )
+            implementationMode = PreviewView.ImplementationMode.COMPATIBLE
         }
-    )
+    }, modifier = Modifier.fillMaxSize(), update = { previewView ->
+        val cameraSelector: CameraSelector =
+            CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
+        val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor()
+        val cameraProviderFuture: ListenableFuture<ProcessCameraProvider> =
+            ProcessCameraProvider.getInstance(context)
+
+        cameraProviderFuture.addListener({
+            preview = Preview.Builder().build().also {
+                it.setSurfaceProvider(previewView.surfaceProvider)
+            }
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            val barcodeAnalyser = QrCodeAnalyzer { barcodes ->
+                barcodes.forEach { barcode ->
+                    barcode.rawValue?.let { barcodeValue ->
+                        barCodeVal.value = barcodeValue
+                        val (upiId, payeeName, transactionAmount) = extractDetailsFromUPIString(
+                            barcodeValue
+                        )
+                        val params = extractParamsFromUPIString(barcodeValue)
+                        println(barcodeValue)
+                        println(params)
+                        println("UPI Id: $upiId")
+                        println("Payee Name: $payeeName")
+                        println("Transaction Amount: $transactionAmount")
+                        navController.navigate(Screen.UpiPaymentScreen.route + "?upiId=$upiId&receiverName=$payeeName&amount=$transactionAmount&description=UPI Payment")
+                        Toast.makeText(context, barcodeValue, Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+            val imageAnalysis: ImageAnalysis = ImageAnalysis.Builder()
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build().also {
+                    it.setAnalyzer(cameraExecutor, barcodeAnalyser)
+                }
+
+            try {
+                cameraProvider.unbindAll()
+                cameraProvider.bindToLifecycle(
+                    lifecycleOwner, cameraSelector, preview, imageAnalysis
+                )
+            } catch (e: Exception) {
+                Log.d("TAG", "CameraPreview: ${e.localizedMessage}")
+            }
+        }, ContextCompat.getMainExecutor(context))
+    })
+}
+
+fun extractParamsFromUPIString(upiString: String): Map<String, String> {
+    val regex = """[?&]([^=]+)=([^&]+)""".toRegex()
+    val matchResults = regex.findAll(upiString)
+
+    val paramsMap = mutableMapOf<String, String>()
+
+    for (matchResult in matchResults) {
+        val (key, value) = matchResult.destructured
+        paramsMap[key] = value
+    }
+
+    return paramsMap
+}
+
+fun extractDetailsFromUPIString(upiString: String): Triple<String?, String?, String?> {
+    val regex = """pa=([^&]+).*?pn=([^&]+).*?am=([^&]+)""".toRegex()
+    val matchResult = regex.find(upiString)
+
+    var upiId: String? = null
+    var payeeName: String? = null
+    var transactionAmount: String? = null
+
+    matchResult?.let {
+        upiId = it.groupValues[1]
+        payeeName = it.groupValues[2]
+        transactionAmount = it.groupValues[3]
+    }
+
+    return Triple(upiId, payeeName, transactionAmount)
 }
