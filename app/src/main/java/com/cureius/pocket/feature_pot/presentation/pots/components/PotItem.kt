@@ -1,5 +1,6 @@
 package com.cureius.pocket.feature_pot.presentation.pots.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -30,6 +34,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.cureius.pocket.R
 import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
@@ -52,7 +57,8 @@ fun PotItem(
         Pair("FRIDAY", 0.0f),
         Pair("SATURDAY", 0.0f),
         Pair("SUNDAY", 0.0f),
-    )
+    ),
+    onPotEditClick: (Pot) -> Unit
 ) {
 
     val icon = IconDictionary.allIcons[pot.icon]
@@ -74,6 +80,8 @@ fun PotItem(
             filled = totalAmount.toFloat() / actualCapacity.toFloat();
         }
     }
+    val edit = painterResource(R.drawable.outline_mode_edit_24)
+
     transactions.forEach {
         if (it.amount != null) {
             // Or, you can directly access the key and update its value
@@ -146,6 +154,23 @@ fun PotItem(
                                 modifier = Modifier.padding(4.dp, 0.dp)
                             )
                         }
+
+                        IconButton(
+                            onClick = {
+                                onPotEditClick(pot)
+                            },
+                            modifier = Modifier.size(20.dp),
+                            content = {
+                                Image(
+                                    painter = edit,
+                                    contentDescription = "edit",
+                                    modifier = Modifier.size(12.dp),
+                                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface.copy(0.3f)),
+                                    alignment = Alignment.Center
+                                )
+                            }
+                        )
+
                     }
                     Box(
                         modifier = Modifier.background(

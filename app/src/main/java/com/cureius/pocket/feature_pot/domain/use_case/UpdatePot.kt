@@ -12,6 +12,6 @@ class UpdatePot(
         if (pot.title?.isBlank() == true) {
             throw InvalidPotException("A Pot Need A Title")
         }
-        repository.insertPot(pot)
+        repository.updatePot(pot)
     }
 }

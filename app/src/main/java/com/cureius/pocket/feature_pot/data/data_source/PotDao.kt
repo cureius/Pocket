@@ -6,8 +6,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import kotlinx.coroutines.flow.Flow
 import com.cureius.pocket.feature_pot.domain.model.Pot
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PotDao {
@@ -32,7 +32,7 @@ interface PotDao {
     @Query("SELECT * FROM Pot WHERE validity = :validity")
     fun getPotsWithValidity(validity: Long): Flow<List<Pot>>
 
-    @Update
+    @Update(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updatePot(pot: Pot)
 
 }

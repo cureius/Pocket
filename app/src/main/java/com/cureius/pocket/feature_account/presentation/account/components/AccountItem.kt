@@ -239,7 +239,6 @@ fun AccountItem(
                                 )
                             }
                         )
-
                     }
                 }
             }

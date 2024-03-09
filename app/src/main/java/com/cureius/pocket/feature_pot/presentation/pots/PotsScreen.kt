@@ -44,6 +44,9 @@ import com.cureius.pocket.feature_pot.presentation.add_pot.AddPotViewModel
 import com.cureius.pocket.feature_pot.presentation.add_pot.cmponents.AddPotDialog
 import com.cureius.pocket.feature_pot.presentation.pots.components.AddPotCard
 import com.cureius.pocket.feature_pot.presentation.pots.components.PotItem
+import com.cureius.pocket.feature_pot.presentation.update_pot.UpdatePotEvent
+import com.cureius.pocket.feature_pot.presentation.update_pot.UpdatePotViewModel
+import com.cureius.pocket.feature_pot.presentation.update_pot.cmponents.UpdatePotDialog
 import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsEvent
 import com.cureius.pocket.feature_transaction.presentation.transactions.TransactionsViewModel
 import com.cureius.pocket.util.components.MonthPicker
@@ -54,6 +57,7 @@ import java.util.Calendar
 fun PotsScreen(
     navHostController: NavHostController,
     viewModel: PotsViewModel = hiltViewModel(),
+    updatePotViewModel: UpdatePotViewModel = hiltViewModel(),
     addPotViewModel: AddPotViewModel = hiltViewModel(),
     transactionsViewModel: TransactionsViewModel = hiltViewModel()
 
@@ -166,7 +170,12 @@ fun PotsScreen(
             }
             for (pot in templatePots) {
                 item {
-                    PotItem(pot, isMonthFormat)
+                    PotItem(pot, isMonthFormat){
+                        updatePotViewModel.onEvent(UpdatePotEvent.SelectPot(it))
+                        updatePotViewModel.onEvent(UpdatePotEvent.EnteredTitle(it.title ?: ""))
+                        updatePotViewModel.onEvent(UpdatePotEvent.SelectedIcon(it.icon ?: ""))
+                        updatePotViewModel.onEvent(UpdatePotEvent.ToggleUpdateAccountDialog)
+                    }
                 }
             }
             if (templatePots.isEmpty()) {
@@ -187,6 +196,13 @@ fun PotsScreen(
             })
         }
 
+        if (updatePotViewModel.dialogVisibility.value) {
+            UpdatePotDialog(onDismiss = {
+                updatePotViewModel.onEvent(UpdatePotEvent.ToggleUpdateAccountDialog)
+            }, onSubmit = {
+
+            })
+        }
         if (transactionsViewModel.monthPickerDialogVisibility.value) {
             var visible by remember {
                 mutableStateOf(true)
