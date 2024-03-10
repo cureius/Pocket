@@ -7,8 +7,13 @@ import android.app.Service
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.Typeface
 import android.os.Build
 import android.os.IBinder
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -57,7 +62,8 @@ class PopUpService : Service(), PotAdapter.OnItemSelectedListener {
     private val scope: CoroutineScope = CoroutineScope(Job() + Dispatchers.Main)
     private var currentPosition: Int? = null
     private var selectedPot: Pot? = null
-
+    private var instructionText: String? = null
+    private var textView: TextView? = null
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val date = intent?.getLongExtra("detected-transaction-date", 0)
         val address = intent?.getStringExtra("detected-transaction-address")
@@ -129,7 +135,55 @@ class PopUpService : Service(), PotAdapter.OnItemSelectedListener {
             mFloatingView!!.findViewById<RecyclerView>(R.id.categoryRecyclerView)
         val potRecyclerView = mFloatingView!!.findViewById<RecyclerView>(R.id.potRecyclerView)
         val confirmButton = mFloatingView!!.findViewById<Button>(R.id.confirm_button)
+        categoryRecyclerView.visibility = GONE
 
+        textView =  mFloatingView!!.findViewById<TextView>(R.id.textView)
+        instructionText = "No POT selected for this Transaction yet"
+        val text = instructionText
+
+        // Create a SpannableString to apply different styles
+        val spannableString = SpannableString(text)
+
+        // Find the index of the word "POT" and apply styles
+        val potIndex = text?.indexOf("POT", ignoreCase = true)
+        if (potIndex != null) {
+            spannableString.setSpan(
+                ForegroundColorSpan(resources.getColor(R.color.black)),
+                potIndex,
+                potIndex + 3,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        if (potIndex != null) {
+            spannableString.setSpan(
+                StyleSpan(Typeface.BOLD),
+                potIndex,
+                potIndex + 3,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        // Find the index of the word "Transaction" and apply styles
+        val transactionIndex = text?.indexOf("Transaction", ignoreCase = true)
+        if (transactionIndex != null) {
+            spannableString.setSpan(
+                ForegroundColorSpan(resources.getColor(R.color.black)),
+                transactionIndex,
+                transactionIndex + 11,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        if (transactionIndex != null) {
+            spannableString.setSpan(
+                StyleSpan(Typeface.BOLD),
+                transactionIndex,
+                transactionIndex + 11,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+
+        // Set the SpannableString to the TextView
+        textView!!.text = spannableString
 
         var dataList: List<Pot> = listOf()
         val layoutFlag: Int
@@ -257,7 +311,9 @@ class PopUpService : Service(), PotAdapter.OnItemSelectedListener {
                                 if (dashCard.visibility == VISIBLE) {
                                     dashCard.visibility = GONE
                                 } else {
-                                    dashCard.visibility = VISIBLE
+                                    if(transaction!=null){
+                                        dashCard.visibility = VISIBLE
+                                    }
                                 }
                                 // Change the text of the TextView element when it is clicked
                                 if(transaction?.amount != null){
@@ -269,7 +325,7 @@ class PopUpService : Service(), PotAdapter.OnItemSelectedListener {
                                 }
                                 if(transaction?.account != null){
                                     account.visibility = VISIBLE
-                                    account.text = transaction?.account.toString()
+                                    account.text = "Account: " + transaction?.account.toString()
                                 }else{
                                     account.visibility = GONE
                                 }
@@ -343,6 +399,7 @@ class PopUpService : Service(), PotAdapter.OnItemSelectedListener {
     override fun onItemSelected(pot: Pot) {
         Toast.makeText(this, "Pot Selected ${pot.title}", Toast.LENGTH_SHORT).show()
         selectedPot = pot
+        textView!!.text = "Selected pot: ${pot.title}"
     }
 
 }

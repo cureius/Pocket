@@ -4,9 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.cureius.pocket.R
@@ -47,7 +46,7 @@ class PotAdapter(
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val potIcon: ImageView = itemView.findViewById(R.id.pot_icon)
         val potName: TextView = itemView.findViewById(R.id.pot_name)
-        val potContainer: LinearLayout = itemView.findViewById(R.id.pot_item)
+        val potContainer: CardView = itemView.findViewById(R.id.pot_item)
     }
 
     interface OnItemSelectedListener {

@@ -10,7 +10,7 @@
         android:id="@+id/category_container"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/gray300"
+        android:backgroundTint="@color/gray200"
         android:padding="10dp"
         app:cardCornerRadius="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -30,7 +30,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_margin="8dp"
                 android:src="@drawable/health"
-                android:tint="#0040FF"
+                android:tint="#000000"
                 tools:ignore="UseAppTint" />
 
             <TextView

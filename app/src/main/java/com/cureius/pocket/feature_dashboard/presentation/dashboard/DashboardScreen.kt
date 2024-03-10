@@ -175,6 +175,9 @@ fun DashboardScreen(
         )
     )
     val lifecycleOwner = LocalLifecycleOwner.current
+    val isCategoryEnabled = false
+    val isServiceControlEnabled = false
+
     DisposableEffect(key1 = lifecycleOwner) {
         val observer = LifecycleEventObserver { source, event ->
             when (event) {
@@ -260,7 +263,7 @@ fun DashboardScreen(
             modifier = Modifier.background(MaterialTheme.colors.surface),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            DashBoardHeader(navHostController)
+            DashBoardHeader(navHostController, viewModel, permissionState)
             if (transactionsViewModel.state.value.transactionsForAccounts.isNotEmpty() && accountsViewModel.state.value.isNotEmpty()) {
                 InfoSection(viewModel, navHostController)
             }
@@ -364,51 +367,60 @@ fun DashboardScreen(
                 }
                 item { Spacer(modifier = Modifier.height(16.dp)) }
                 item {
-                    Text(
-                        text = "Expense Categories",
-                        color = MaterialTheme.colors.onBackground,
-                        textAlign = TextAlign.Center,
-                        style = TextStyle(fontWeight = FontWeight.Bold),
-                        fontSize = 20.sp,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(4.dp, 0.dp)
-                    )
-                }
-                item { Spacer(modifier = Modifier.height(16.dp)) }
-                (1..rowNumber).forEach {
-                    item {
-                        ItemRow(
-                            gridItems.subList(
-                                (rowCap * (it - 1)),
-                                if ((rowCap * (it - 1)) + rowCap > gridItems.size) {
-                                    gridItems.size
-                                } else {
-                                    (rowCap * (it - 1)) + rowCap
-                                }
-                            ), modifier = Modifier.padding(start = startPadding.dp)
+                    if(isCategoryEnabled){
+                        Text(
+                            text = "Expense Categories",
+                            color = MaterialTheme.colors.onBackground,
+                            textAlign = TextAlign.Center,
+                            style = TextStyle(fontWeight = FontWeight.Bold),
+                            fontSize = 20.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(4.dp, 0.dp)
                         )
                     }
+
                 }
-                item {
-                    Spacer(modifier = Modifier.height(100.dp))
-                }
-                item {
-                    Button(onClick = {
-                        requestOverlayPermission(context)
-                        context.startService(popUpIntent)
-                    }) {
-                        Text(text = "Start Service")
+                item { Spacer(modifier = Modifier.height(16.dp)) }
+                if(isCategoryEnabled){
+                    (1..rowNumber).forEach {
+                        item {
+                            ItemRow(
+                                gridItems.subList(
+                                    (rowCap * (it - 1)),
+                                    if ((rowCap * (it - 1)) + rowCap > gridItems.size) {
+                                        gridItems.size
+                                    } else {
+                                        (rowCap * (it - 1)) + rowCap
+                                    }
+                                ), modifier = Modifier.padding(start = startPadding.dp)
+                            )
+                        }
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(100.dp))
                     }
                 }
-                item {
-                    Button(onClick = {
-                        context.stopService(popUpIntent)
-                    }) {
-                        Text(text = "Stop Service")
+                if(isServiceControlEnabled){
+                    item {
+                        Button(onClick = {
+                            requestOverlayPermission(context)
+                            context.startService(popUpIntent)
+                        }) {
+                            Text(text = "Start Service")
+                        }
                     }
+                    item {
+                        Button(onClick = {
+                            context.stopService(popUpIntent)
+                        }) {
+                            Text(text = "Stop Service")
+                        }
+                    }
+                    item { Spacer(modifier = Modifier.height(88.dp)) }
                 }
-                item { Spacer(modifier = Modifier.height(88.dp)) }
+
+
             }
             CurveBottomMask(cornerColor = MaterialTheme.colors.surface)
         }
