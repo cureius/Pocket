@@ -6,8 +6,9 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import kotlinx.coroutines.flow.Flow
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
+import kotlinx.coroutines.flow.Flow
+
 @Dao
 interface TransactionDao {
     @Query("SELECT * FROM `transaction`")
@@ -15,6 +16,9 @@ interface TransactionDao {
 
     @Query("SELECT * FROM `transaction` WHERE id = :id")
     suspend fun getTransactionById(id: Long): Transaction?
+
+    @Query("SELECT * FROM `transaction` WHERE event_timestamp = :eventTimestamp")
+    suspend fun getTransactionByEventTimestamp(eventTimestamp: Long): Transaction?
 
     @Query("SELECT * FROM `transaction` WHERE strftime('%Y-%m', event_timestamp / 1000, 'unixepoch') = strftime('%Y-%m', 'now')")
     fun getTransactionsCreatedOnCurrentMonth(): Flow<List<Transaction>>

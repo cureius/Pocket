@@ -28,6 +28,10 @@ class TransactionRepositoryImpl(
         return dao.getTransactionById(id)
     }
 
+    override suspend fun getTransactionByEventTimestamp(eventTimestamp: Long): Transaction? {
+        return dao.getTransactionByEventTimestamp(eventTimestamp)
+    }
+
     override fun getTransactionsForDateRange(
         start: Long,
         end: Long

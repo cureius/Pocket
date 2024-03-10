@@ -23,4 +23,6 @@ interface TransactionRepository {
     suspend fun insertTransactions(transactions: List<Transaction>)
 
     suspend fun deleteTransaction(transaction: Transaction)
+
+    suspend fun getTransactionByEventTimestamp(eventTimestamp: Long): Transaction?
 }

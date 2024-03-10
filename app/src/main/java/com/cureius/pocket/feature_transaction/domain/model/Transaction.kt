@@ -23,6 +23,7 @@ data class Transaction(
     val date_time: String? = date?.let { java.time.LocalDate.ofEpochDay(it).toString() },
     val balance: Double? = null,
     val day: String? = date?.let { java.time.LocalDate.ofEpochDay(it).dayOfWeek.toString() },
+    val day_of_month: String? = date?.let { java.time.LocalDate.ofEpochDay(it).dayOfMonth.toString() },
     val amount_string: String? = amount?.let { it.toString() },
     val UPI_ref: String? = null,
     val IMPS_ref: String? = null,

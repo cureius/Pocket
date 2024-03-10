@@ -18,9 +18,11 @@ import android.view.View.GONE
 import android.view.View.OnTouchListener
 import android.view.View.VISIBLE
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +33,7 @@ import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.domain.use_case.PotUseCases
 import com.cureius.pocket.feature_sms_sync.util.SyncUtils
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
+import com.cureius.pocket.feature_transaction.domain.use_case.TransactionUseCases
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,10 +41,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 @AndroidEntryPoint
-class PopUpService : Service() {
+class PopUpService : Service(), PotAdapter.OnItemSelectedListener {
     @Inject
     lateinit var potUseCases: PotUseCases
+
+    @Inject
+    lateinit var transactionUseCases: TransactionUseCases
     private var mWindowManager: WindowManager? = null
     private var mFloatingView: View? = null
     private var pots: List<Pot>? = null
@@ -49,6 +56,7 @@ class PopUpService : Service() {
     private lateinit var params: WindowManager.LayoutParams
     private val scope: CoroutineScope = CoroutineScope(Job() + Dispatchers.Main)
     private var currentPosition: Int? = null
+    private var selectedPot: Pot? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val date = intent?.getLongExtra("detected-transaction-date", 0)
@@ -120,12 +128,13 @@ class PopUpService : Service() {
         val categoryRecyclerView =
             mFloatingView!!.findViewById<RecyclerView>(R.id.categoryRecyclerView)
         val potRecyclerView = mFloatingView!!.findViewById<RecyclerView>(R.id.potRecyclerView)
+        val confirmButton = mFloatingView!!.findViewById<Button>(R.id.confirm_button)
+
 
         var dataList: List<Pot> = listOf()
         val layoutFlag: Int
-        val potAdapter = PotAdapter(dataList, currentPosition)
+        val potAdapter = PotAdapter(dataList, currentPosition, this)
         val categoryAdapter = CategoryAdapter(categories, currentPosition)
-
         scope.launch {
             potUseCases.getPots().collect {
                 pots = it
@@ -187,6 +196,32 @@ class PopUpService : Service() {
         val rootContainer =
             mFloatingView!!.findViewById<View>(R.id.root_container) as RelativeLayout
 
+        confirmButton.setOnClickListener {
+            scope.launch {
+                try {
+                    if (selectedPot != null && transaction != null) {
+                        println("transaction $transaction")
+                        println("selectedPot $selectedPot")
+                        transaction!!.event_timestamp?.let { timestamp ->
+                            var transactionToUpdate =
+                                transactionUseCases.getTransactionByEventTimestamp(
+                                    timestamp
+                                )
+                            if (transactionToUpdate != null) {
+                                transactionUseCases.updateTransaction(
+                                    transactionToUpdate.copy(pot = selectedPot!!.title)
+                                )
+                                stopSelf()
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    Log.e("PopUpService", "onCreate: ", e)
+                }
+
+            }
+        }
         mFloatingView!!.findViewById<View>(R.id.root_container)
             .setOnTouchListener(object : OnTouchListener {
                 private var initialX = 0
@@ -283,7 +318,6 @@ class PopUpService : Service() {
             mWindowManager?.removeView(mFloatingView)
         }
         // Remove the view from the WindowManager
-
     }
 
     private fun startMyOwnForeground() {
@@ -291,22 +325,24 @@ class PopUpService : Service() {
             val NOTIFICATION_CHANNEL_ID = "com.example.simpleapp"
             val channelName = "My Background Service"
             val chan = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                channelName,
-                NotificationManager.IMPORTANCE_NONE
+                NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE
             )
             chan.lightColor = Color.BLUE
             chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
             val manager = (getSystemService(NOTIFICATION_SERVICE) as NotificationManager)
             manager.createNotificationChannel(chan)
             val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            val notification = notificationBuilder.setOngoing(true)
-                .setContentTitle("App is running in background")
-                .setPriority(NotificationManager.IMPORTANCE_MIN)
-                .setCategory(Notification.CATEGORY_SERVICE)
-                .build()
+            val notification =
+                notificationBuilder.setOngoing(true).setContentTitle("App is running in background")
+                    .setPriority(NotificationManager.IMPORTANCE_MIN)
+                    .setCategory(Notification.CATEGORY_SERVICE).build()
             startForeground(2, notification)
         }
+    }
+
+    override fun onItemSelected(pot: Pot) {
+        Toast.makeText(this, "Pot Selected ${pot.title}", Toast.LENGTH_SHORT).show()
+        selectedPot = pot
     }
 
 }

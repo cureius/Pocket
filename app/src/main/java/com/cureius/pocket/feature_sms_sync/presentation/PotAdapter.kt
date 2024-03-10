@@ -6,13 +6,18 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.cureius.pocket.R
 import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.domain.util.IconDictionary
 
-class PotAdapter(var dataList: List<Pot>, private val currentPosition: Int?) :
+class PotAdapter(
+    var dataList: List<Pot>,
+    private val currentPosition: Int?,
+    private val listener: OnItemSelectedListener
+) :
     RecyclerView.Adapter<PotAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -22,6 +27,7 @@ class PotAdapter(var dataList: List<Pot>, private val currentPosition: Int?) :
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
         val data = dataList[position]
         holder.potName.text = data.title
         holder.potIcon.setImageDrawable(
@@ -29,6 +35,9 @@ class PotAdapter(var dataList: List<Pot>, private val currentPosition: Int?) :
                 holder.potIcon.context, (IconDictionary.allIcons[data.icon]!!)
             )
         )
+        holder.potIcon.setOnClickListener {
+            listener.onItemSelected(dataList[position])
+        }
     }
 
     override fun getItemCount(): Int {
@@ -40,4 +49,10 @@ class PotAdapter(var dataList: List<Pot>, private val currentPosition: Int?) :
         val potName: TextView = itemView.findViewById(R.id.pot_name)
         val potContainer: LinearLayout = itemView.findViewById(R.id.pot_item)
     }
+
+    interface OnItemSelectedListener {
+        fun onItemSelected(pot: Pot)
+    }
 }
+
+
