@@ -225,10 +225,31 @@ class PopUpService : Service() {
                                     dashCard.visibility = VISIBLE
                                 }
                                 // Change the text of the TextView element when it is clicked
-                                amount.text = transaction?.amount.toString()
-                                account.text = transaction?.account.toString()
-                                type.text = transaction?.type.toString()
-                                body.text = transaction?.body.toString()
+                                if(transaction?.amount != null){
+                                    amount.visibility = VISIBLE
+                                    amount.text = transaction?.amount.toString()
+                                }else{
+                                    amount.visibility = GONE
+                                    imageView.visibility = GONE
+                                }
+                                if(transaction?.account != null){
+                                    account.visibility = VISIBLE
+                                    account.text = transaction?.account.toString()
+                                }else{
+                                    account.visibility = GONE
+                                }
+                                if(transaction?.type != null){
+                                    type.visibility = VISIBLE
+                                    type.text = transaction?.type.toString()
+                                }else{
+                                    type.visibility = GONE
+                                }
+                                if(transaction?.body != null){
+                                    body.visibility = VISIBLE
+                                    body.text = transaction?.body.toString()
+                                }else{
+                                    body.visibility = GONE
+                                }
                                 Log.d("OnClick", "onTouch: $dataList")
 
                                 mWindowManager!!.updateViewLayout(mFloatingView, params)
