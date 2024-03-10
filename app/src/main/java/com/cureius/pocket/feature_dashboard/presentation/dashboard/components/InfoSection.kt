@@ -413,10 +413,8 @@ fun InfoSection(
                                     modifier = Modifier.padding(0.dp, 0.dp)
                                 )
                             }
-
                         }
                     }
-
                 }
                 Box(
                     modifier = Modifier
@@ -447,7 +445,7 @@ fun InfoSection(
                                     .size(100.dp)
                                     .background(Color.Transparent),
                                 maxRange = 100f,
-                                chartColors = listOf(MaterialTheme.colors.onBackground),
+                                chartColors = listOf(MaterialTheme.colors.primary),
                                 chartBorderColor = MaterialTheme.colors.surface,
                                 chartPrimaryAxisColor = MaterialTheme.colors.surface,
                                 chartSecondaryAxisColor = MaterialTheme.colors.surface,

@@ -3,8 +3,10 @@ package com.cureius.pocket.feature_sms_sync.util
 import android.util.Log
 import com.cureius.pocket.feature_transaction.domain.model.Transaction
 import java.text.SimpleDateFormat
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 object SyncUtils {
@@ -136,28 +138,18 @@ object SyncUtils {
             // Define input and output formatters
             val inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yy")
             val outputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-
-            Log.d("TAG", "extractTransactionalDetails: $transactionDate $transactionTime")
-            if (transactionDate != null && transactionDate.contains("/")) {
-                val parts = transactionDate.split("/")
-                val formattedDate = "${parts[0]}-${parts[1]}-${parts[2]}"
-                println("Formatted Date: $formattedDate")
-                transactionDate = formattedDate
-            }
-
-            // Parse the input date string and format it to the desired output format
-            val inputDate = LocalDate.parse(transactionDate, inputFormatter)
-            val outputDateStr = inputDate?.format(outputFormatter)
-            // Create a TransactionalDetails object with the extracted transactional details
-
-//            println("Transaction: $type, $transactionAccount, $amount, $date, $outputDateStr, $balance, $transactionUpiId, $transactionImpsId, $bankName, $messageBody")
+            val timestamp = date
+            val dateTime = LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC)
+            val formattedDateFromEvent = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            println(formattedDateFromEvent)
             return Transaction(
                 type = type,
                 account = transactionAccount,
                 amount = amount ?: -1.0,
-                date = dateToTimeStamp(transactionDate, transactionTime)?.toEpochDay(),
+                date = LocalDateTime.ofInstant(Instant.ofEpochMilli(date), ZoneOffset.UTC)
+                    .toLocalDate().toEpochDay(),
                 event_timestamp = date,
-                date_time = outputDateStr,
+                date_time = formattedDateFromEvent,
                 balance = balance,
                 UPI_ref = transactionUpiId,
                 IMPS_ref = transactionImpsId,

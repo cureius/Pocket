@@ -78,8 +78,6 @@ class SmsReceiver : BroadcastReceiver() {
                             abortBroadcast()
                         }
                     }
-
-
                     Log.d(tag, "onReceive: $address -- $body")
                     // Do something with the message and sender
                 }

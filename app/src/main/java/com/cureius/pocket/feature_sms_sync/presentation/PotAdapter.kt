@@ -4,10 +4,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.cardview.widget.CardView
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.cureius.pocket.R
@@ -40,6 +38,6 @@ class PotAdapter(var dataList: List<Pot>, private val currentPosition: Int?) :
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val potIcon: ImageView = itemView.findViewById(R.id.pot_icon)
         val potName: TextView = itemView.findViewById(R.id.pot_name)
-        val potContainer: CardView = itemView.findViewById(R.id.pot_item)
+        val potContainer: LinearLayout = itemView.findViewById(R.id.pot_item)
     }
 }

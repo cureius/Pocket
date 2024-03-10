@@ -26,6 +26,7 @@ import androidx.core.app.NotificationCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.cureius.pocket.R
+import com.cureius.pocket.feature_category.domain.model.Category
 import com.cureius.pocket.feature_pot.domain.model.Pot
 import com.cureius.pocket.feature_pot.domain.use_case.PotUseCases
 import com.cureius.pocket.feature_sms_sync.util.SyncUtils
@@ -37,7 +38,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.cureius.pocket.feature_category.domain.model.Category
 @AndroidEntryPoint
 class PopUpService : Service() {
     @Inject
@@ -112,6 +112,7 @@ class PopUpService : Service() {
         // Create the floating view
         mFloatingView = LayoutInflater.from(this).inflate(R.layout.pop_up_window, null)
 
+        val imageView = mFloatingView!!.findViewById<ImageView>(R.id.imageView)
         val amount = mFloatingView!!.findViewById<TextView>(R.id.detected_amount)
         val account = mFloatingView!!.findViewById<TextView>(R.id.detected_account)
         val type = mFloatingView!!.findViewById<TextView>(R.id.category_title)
