@@ -4,7 +4,11 @@ package com.cureius.pocket.feature_upi_payment.presentation.manager
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -18,6 +22,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -49,15 +55,38 @@ fun UpiPaymentScreen(
     viewModel: UpiPaymentViewModel = hiltViewModel()
 ) {
     val ctx = LocalContext.current
+
+    val context = LocalContext.current
+    val paymentResult = remember { mutableStateOf<String?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val resultCode = result.resultCode
+
+        if (resultCode == android.app.Activity.RESULT_OK ) {
+            // Payment successful
+            paymentResult.value = "Payment successful"
+        } else {
+            // Payment failed or was canceled
+            paymentResult.value = "Payment failed or canceled"
+        }
+    }
+
+
     val activity = (LocalContext.current as? Activity)
     val amount = amount.toDoubleOrNull()
     val upiId = upiId
     val description = description
+    amount?.let { UpiPaymentEvent.SetPaymentAmount(it) }?.let { viewModel.onEvent(it) }
+    upiId.let { UpiPaymentEvent.SetPaymentReceiverId(it) }.let { viewModel.onEvent(it) }
+    receiverName.let { UpiPaymentEvent.SetPaymentReceiverName(it) }.let { viewModel.onEvent(it) }
+    description.let { UpiPaymentEvent.SetPaymentDescription(it) }.let { viewModel.onEvent(it) }
+
 
     println("Amount: $amount")
     println("UPI ID: $upiId")
     println("Name: $receiverName")
     println("Description: $description")
+    println("ViewModel: ${viewModel.state.value}")
 
 
     // on the below line we are creating a column.
@@ -99,11 +128,13 @@ fun UpiPaymentScreen(
         TextField(
             // on below line we are specifying
             // value for our email text field.
-            value = amount.toString(),
+            value = viewModel.amount.value.toString(),
 
             // on below line we are adding on
             // value change for text field.
-            onValueChange = { },
+            onValueChange = {
+                viewModel.onEvent(UpiPaymentEvent.SetPaymentAmount(it.toDoubleOrNull() ?: 0.0))
+            },
 
             // on below line we are adding place holder
             // as text as "Enter your email"
@@ -130,32 +161,36 @@ fun UpiPaymentScreen(
 
         // on below line we are creating a text field for our email.
         if (upiId != null) {
-            TextField(
-                // on below line we are specifying value
-                // for our email text field.
-                value = upiId,
+            viewModel.receiverId.value?.let {id ->
+                TextField(
+                    // on below line we are specifying value
+                    // for our email text field.
+                    value = id,
 
-                // on below line we are adding on value
-                // change for text field.
-                onValueChange = { },
+                    // on below line we are adding on value
+                    // change for text field.
+                    onValueChange = {
+                        viewModel.onEvent(UpiPaymentEvent.SetPaymentReceiverId(it))
+                    },
 
-                // on below line we are adding place holder as
-                // text as "Enter your email"
-                placeholder = { Text(text = "Enter UPI Id") },
+                    // on below line we are adding place holder as
+                    // text as "Enter your email"
+                    placeholder = { Text(text = "Enter UPI Id") },
 
-                // on below line we are adding modifier to it
-                // and adding padding to it and filling max width
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
+                    // on below line we are adding modifier to it
+                    // and adding padding to it and filling max width
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
 
-                // on below line we are adding text style
-                // specifying color and font size to it.
-                textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
+                    // on below line we are adding text style
+                    // specifying color and font size to it.
+                    textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
 
-                // on below line we are adding single line to it.
-                singleLine = true,
-            )
+                    // on below line we are adding single line to it.
+                    singleLine = true,
+                )
+            }
         }
 
         // on below line we are adding spacer
@@ -166,11 +201,13 @@ fun UpiPaymentScreen(
             TextField(
                 // on below line we are specifying value
                 // for our email text field.
-                value = receiverName,
+                value = viewModel.receiverName.value.toString(),
 
                 // on below line we are adding on value
                 // change for text field.
-                onValueChange = {},
+                onValueChange = {
+                    viewModel.onEvent(UpiPaymentEvent.SetPaymentReceiverName(it))
+                },
 
                 // on below line we are adding place holder
                 // as text as "Enter your email"
@@ -200,10 +237,12 @@ fun UpiPaymentScreen(
             TextField(
                 // on below line we are specifying value
                 // for our email text field.
-                value = description,
+                value = viewModel.description.value.toString(),
 
                 // on below line we are adding on value change for text field.
-                onValueChange = { },
+                onValueChange = {
+                    viewModel.onEvent(UpiPaymentEvent.SetPaymentDescription(it))
+                },
 
                 // on below line we are adding place holder
                 // as text as "Enter your email"
@@ -234,23 +273,29 @@ fun UpiPaymentScreen(
                 val df = SimpleDateFormat("ddMMyyyyHHmmss", Locale.getDefault())
                 val transactionId: String = df.format(c)
 
+                initiatePayment(context, launcher)
                 // on below line we are calling make
                 // payment method to make payment.
-                if (description != null) {
-                    if (receiverName != null) {
-                        if (upiId != null) {
-                            makePayment(
-                                amount.toString(),
-                                upiId,
-                                receiverName,
-                                description,
-                                transactionId,
-                                ctx,
-                                activity!!,
-                            )
-                        }
-                    }
+                try {
+//                    if (description != null) {
+//                        if (receiverName != null) {
+//                            if (upiId != null) {
+//                                makePayment(
+//                                    viewModel.amount.value.toString(),
+//                                    viewModel.receiverId.value.toString(),
+//                                    viewModel.receiverName.value.toString(),
+//                                    viewModel.description.value.toString(),
+//                                    transactionId,
+//                                    ctx,
+//                                    activity!!,
+//                                )
+//                            }
+//                        }
+//                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
+
             },
             // on below line we are adding modifier to our button.
             modifier = Modifier
@@ -260,6 +305,31 @@ fun UpiPaymentScreen(
             // on below line we are adding text for our button
             Text(text = "Make Payment", modifier = Modifier.padding(8.dp))
         }
+    }
+}
+
+private fun initiatePayment(context: android.content.Context, launcher: androidx.activity.result.ActivityResultLauncher<android.content.Intent>) {
+    val upiUri = Uri.Builder()
+        .scheme("upi")
+        .authority("pay")
+        .appendQueryParameter("pa", "palsouraj@ybl@upi") // Replace with your UPI ID
+        .appendQueryParameter("pn", "Souraj Pal")    // Replace with payee name
+        .appendQueryParameter("mc", "")              // Replace with merchant code if any
+        .appendQueryParameter("tid", "4256363562356q4142345")            // Replace with transaction ID
+        .appendQueryParameter("tr", "transactionReference") // Replace with a unique transaction reference
+        .appendQueryParameter("tn", "Transaction Note")     // Replace with transaction note
+        .appendQueryParameter("am", "1.00")        // Replace with transaction amount
+        .appendQueryParameter("cu", "INR")          // Replace with currency code
+        .build()
+
+    val intent = Intent(Intent.ACTION_VIEW)
+    intent.data = upiUri
+
+    val chooser = Intent.createChooser(intent, "Pay")
+    if (chooser.resolveActivity(context.packageManager) != null) {
+        launcher.launch(chooser)
+    } else {
+        // Handle the case where no UPI app is available
     }
 }
 
@@ -283,8 +353,8 @@ private fun makePayment(
             this.transactionId = transactionId
             this.transactionRefId = transactionId
             this.payeeMerchantCode = transactionId
-            this.description = desc
-            this.amount = amount
+            this.description = "Testing amount"
+            this.amount = "1.0"
         }
         // END INITIALIZATION
 

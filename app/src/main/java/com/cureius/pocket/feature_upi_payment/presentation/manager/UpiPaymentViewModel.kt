@@ -13,19 +13,31 @@ class UpiPaymentViewModel @Inject constructor(
     private val _state = mutableStateOf(UpiPaymentState())
     val state: State<UpiPaymentState> = _state
 
+    private val _amount = mutableStateOf<Double?>(null)
+    val amount: State<Double?> = _amount
+
+    private val _receiverName = mutableStateOf<String?>(null)
+    val receiverName: State<String?> = _receiverName
+
+    private val _receiverId = mutableStateOf<String?>(null)
+    val receiverId: State<String?> = _receiverId
+
+    private val _description = mutableStateOf<String?>(null)
+    val description: State<String?> = _description
+
     fun onEvent(event: UpiPaymentEvent) {
         when (event) {
             is UpiPaymentEvent.SetPaymentAmount -> {
-                _state.value = _state.value.copy(paymentAmount = event.amount)
+                _amount.value = event.amount
             }
             is UpiPaymentEvent.SetPaymentReceiverName -> {
-                _state.value = _state.value.copy(paymentReceiverName = event.receiverName)
+                _receiverName.value = event.receiverName
             }
             is UpiPaymentEvent.SetPaymentReceiverId -> {
-                _state.value = _state.value.copy(paymentReceiverId = event.receiverId)
+                _receiverId.value = event.receiverId
             }
             is UpiPaymentEvent.SetPaymentDescription -> {
-                _state.value = _state.value.copy(paymentDescription = event.description)
+                _description.value = event.description
             }
             is UpiPaymentEvent.SetPaymentSuccessful -> {
                 _state.value = _state.value.copy(isPaymentSuccessful = event.isSuccessful)

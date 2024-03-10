@@ -83,10 +83,7 @@ fun CameraPreview(
                         val params = extractParamsFromUPIString(barcodeValue)
                         println(barcodeValue)
                         println(params)
-                        println("UPI Id: $upiId")
-                        println("Payee Name: $payeeName")
-                        println("Transaction Amount: $transactionAmount")
-                        navController.navigate(Screen.UpiPaymentScreen.route + "?upiId=$upiId&receiverName=$payeeName&amount=$transactionAmount&description=UPI Payment")
+                        navController.navigate(Screen.UpiPaymentScreen.route + "?upiId=${params["pa"].toString()}&receiverName=${params["pn"].toString()}&amount=${params["am"].toString()}&description=${params["tn"].toString()}")
                         Toast.makeText(context, barcodeValue, Toast.LENGTH_SHORT).show()
                     }
                 }
