@@ -122,6 +122,15 @@ fun InfoSection(
     transactionsViewModel: TransactionsViewModel = hiltViewModel(),
     accountsViewModel: AccountsViewModel = hiltViewModel(),
 ) {
+    val data: MutableMap<String, Float>? = mutableMapOf(
+        Pair("MONDAY", 0.0f),
+        Pair("TUESDAY", 0.0f),
+        Pair("WEDNESDAY", 0.0f),
+        Pair("THURSDAY", 0.0f),
+        Pair("FRIDAY", 0.0f),
+        Pair("SATURDAY", 0.0f),
+        Pair("SUNDAY", 0.0f),
+    )
     val rupee = painterResource(id = R.drawable.rupee)
     val edit = painterResource(R.drawable.outline_mode_edit_24)
     val shape = RoundedCornerShape(
@@ -141,6 +150,29 @@ fun InfoSection(
     var totalBalance = 0.0;
     var totalBalanceStr = "0.0";
     val cameraPermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
+    val isUpiSupported = false;
+
+    val totalAmount = transactions.sumOf { it.amount!! }
+    val spendingTransactions =
+        transactionsViewModel.state.value.transactionsOnCurrentMonthForAccounts.filter { it.type != "credited" }
+    var actualCapacity = 0.0;
+    spendingTransactions.forEach {
+        if (it.amount != null) {
+            // Or, you can directly access the key and update its value
+            data?.get(it.day)?.let { currentValue ->
+                it.day?.let { it1 ->
+                    data.put(
+                        it1, currentValue + (it.amount.toFloat())
+                    )
+                }
+            }
+        }
+    }
+    var mData: Map<String, Float>? = data
+    val maxValue = data?.values?.maxOrNull()
+    val updatedData = mData?.mapValues { (_, value) ->
+        value / maxValue!!
+    }
     for (account in accountsViewModel.state.value) {
         val transaction = transactionsViewModel.state.value.transactionsForAccounts.filter {
             it.account?.contains(
@@ -392,36 +424,69 @@ fun InfoSection(
                         .fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                    val data = listOf(90f, 60f, 40f, 70f, 90f, 30f, 10f)
+                    val labels = listOf(
+                        "mo",
+                        "Label 2",
+                        "Label 3",
+                        "Label 4",
+                        "Label 5",
+                        "Label 6",
+                        "Label 7"
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(100.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        val pngImage: Painter = painterResource(id = R.drawable.sc2)
-                        IconButton(
-                            onClick = {
-                                cameraPermissionState.launchPermissionRequest()
-                                navHostController.navigate("qr_scanner")
-                            }
-                        ) {
-                            Image(
-                                painter = pngImage,
-                                contentDescription = "Scan & Pay",
-                                modifier = Modifier.size(90.dp),
-                                colorFilter = ColorFilter.tint(
-                                    MaterialTheme.colors.onSurface.copy(
-                                        alpha = 0.8f
-                                    )
-                                )
+                        if (updatedData != null) {
+                            RadarChart(
+                                data = updatedData.map { it.value * 100f },
+                                labels = updatedData.map { it.key },
+                                modifier = Modifier
+                                    .size(100.dp)
+                                    .background(Color.Transparent),
+                                maxRange = 100f,
+                                chartColors = listOf(MaterialTheme.colors.onBackground),
+                                chartBorderColor = MaterialTheme.colors.surface,
+                                chartPrimaryAxisColor = MaterialTheme.colors.surface,
+                                chartSecondaryAxisColor = MaterialTheme.colors.surface,
+                                strokeWidth = 3f
                             )
                         }
-                        Text(
-                            text = "Scan & Pay",
-                            color = MaterialTheme.colors.onPrimary,
-                            textAlign = TextAlign.Center,
-                            style = TextStyle(fontWeight = FontWeight.Bold),
-                            fontSize = 10.sp
-                        )
-                    }
 
+                    }
+                    if (isUpiSupported) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            val pngImage: Painter = painterResource(id = R.drawable.sc2)
+                            IconButton(
+                                onClick = {
+                                    cameraPermissionState.launchPermissionRequest()
+                                    navHostController.navigate("qr_scanner")
+                                }
+                            ) {
+                                Image(
+                                    painter = pngImage,
+                                    contentDescription = "Scan & Pay",
+                                    modifier = Modifier.size(90.dp),
+                                    colorFilter = ColorFilter.tint(
+                                        MaterialTheme.colors.onSurface.copy(
+                                            alpha = 0.8f
+                                        )
+                                    )
+                                )
+                            }
+                            Text(
+                                text = "Scan & Pay",
+                                color = MaterialTheme.colors.onPrimary,
+                                textAlign = TextAlign.Center,
+                                style = TextStyle(fontWeight = FontWeight.Bold),
+                                fontSize = 10.sp
+                            )
+                        }
+                    }
                 }
             }
         }
