@@ -79,6 +79,7 @@ class SmsReceiver : BroadcastReceiver() {
                         }
                     }
                     Log.d(tag, "onReceive: $address -- $body")
+                    // Do something with the message and sender
                 }
             }
         }
